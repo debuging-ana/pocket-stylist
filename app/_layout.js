@@ -23,7 +23,7 @@ export default function Layout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
+          title: 'Welcome Page',
           tabBarIcon: ({ color }) => <Feather name="home" size={28} color={color} />,
         }}
       />
@@ -58,12 +58,14 @@ export default function Layout() {
       <Tabs.Screen
         name="login"
         options={{
+          title: 'Log-in',
           href: null,
         }}
       />
       <Tabs.Screen
         name="signup"
         options={{
+          title: 'Sign-up',
           href: null,
         }}
       />
