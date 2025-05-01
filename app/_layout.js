@@ -23,7 +23,7 @@ export default function Layout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Welcome Page',
+          title: 'Home',
           tabBarIcon: ({ color }) => <Feather name="home" size={28} color={color} />,
         }}
       />
