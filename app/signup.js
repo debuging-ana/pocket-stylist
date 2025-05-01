@@ -4,31 +4,231 @@ email, password and basic info.
 Validates passwords match.
 */
 
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { 
+  View, 
+  Text, 
+  TextInput, 
+  TouchableOpacity, 
+  ScrollView, 
+  StyleSheet, 
+  Alert
+} from 'react-native';
 
-export default function SignupScreen() {
+export default function SignupScreen({ navigation }) {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSignup = async () => {
+    // Reset error state
+    setError('');
+    
+    // Validate inputs
+    if (!firstName.trim()) {
+      setError('First name is required');
+      return;
+    }
+    
+    if (!lastName.trim()) {
+      setError('Last name is required');
+      return;
+    }
+    
+    if (!email.trim()) {
+      setError('Email is required');
+      return;
+    }
+    
+    if (!password) {
+      setError('Password is required');
+      return;
+    }
+    
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+    
+    // Show loading state
+    setIsLoading(true);
+    
+    try {
+      // Implement account creation logic
+      
+      // Simulate a delay (for now)
+      setTimeout(() => {
+        setIsLoading(false);
+        // Uncomment to simulate success:
+        // navigation.navigate('Home');
+        
+        // Uncomment to simulate an error:
+        setError('Account creation failed. Please try again.');
+      }, 1500);
+    } catch (err) {
+      setError('Sign up failed. Please try again.');
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <ScrollView 
-      contentContainerStyle={styles.container}
-      keyboardShouldPersistTaps="handled"
-    >
-      <Text style={styles.title}>Create Account  :D</Text>
-      {/* Form components will go heree */}
-    </ScrollView>
+    <View style={styles.mainContainer}>
+      <ScrollView 
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+      >
+        <Text style={styles.title}>Create your Account</Text>
+        
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+        
+        {/* First Name and Last Name fields side by side */}
+        <View style={styles.nameFieldsContainer}>
+          <View style={styles.nameFieldWrapper}>
+            <TextInput
+              style={styles.nameInput}
+              placeholder="First Name"
+              placeholderTextColor="#A0A0A0"
+              autoCapitalize="words"
+              value={firstName}
+              onChangeText={setFirstName}
+            />
+          </View>
+          
+          <View style={styles.nameFieldWrapper}>
+            <TextInput
+              style={styles.nameInput}
+              placeholder="Last Name"
+              placeholderTextColor="#A0A0A0"
+              autoCapitalize="words"
+              value={lastName}
+              onChangeText={setLastName}
+            />
+          </View>
+        </View>
+        
+        {/* Email field */}
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            placeholderTextColor="#A0A0A0"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            value={email}
+            onChangeText={setEmail}
+          />
+        </View>
+        
+        {/* Password field */}
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            placeholderTextColor="#A0A0A0"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
+        </View>
+        
+        {/* Confirm Password field */}
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Confirm Password"
+            placeholderTextColor="#A0A0A0"
+            secureTextEntry
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+          />
+        </View>
+        
+        {/* Sign Up button */}
+        <TouchableOpacity 
+          style={styles.signupButton} 
+          onPress={handleSignup}
+          disabled={isLoading}
+        >
+          <Text style={styles.signupButtonText}>
+            {isLoading ? 'Creating Account...' : 'Sign Up'}
+          </Text>
+        </TouchableOpacity>
+      </ScrollView>
+      </View>
+
   );
 }
 
 const styles = StyleSheet.create({
+  mainContainer: {
+    flex: 1,
+    backgroundColor: 'white',
+  },
   container: {
     flexGrow: 1,
     padding: 20,
     backgroundColor: 'white',
+    justifyContent: 'center',
   },
   title: {
-    fontSize: 22,
-    color: '#828282', 
-    fontWeight: '600',
+    fontSize: 24,
+    color: '#828282',
+    fontWeight: '700',
     marginBottom: 30,
     textAlign: 'center',
+  },
+  errorText: {
+    color: '#D32F2F',
+    textAlign: 'center',
+    marginBottom: 15,
+    fontSize: 14,
+  },
+  nameFieldsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  nameFieldWrapper: {
+    flex: 0.48, // Slightly less than half to create space between
+  },
+  nameInput: {
+    backgroundColor: 'white',
+    borderRadius: 15,
+    padding: 15,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+  },
+  inputContainer: {
+    marginBottom: 20,
+  },
+  input: {
+    backgroundColor: 'white',
+    borderRadius: 15,
+    padding: 15,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+  },
+  signupButton: {
+    backgroundColor: '#828282',
+    borderRadius: 15,
+    padding: 15,
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 20,
+    elevation: 3, // For Android shadows
+    shadowColor: '#828282', 
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+  },
+  signupButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
