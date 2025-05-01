@@ -56,12 +56,6 @@ export default function LoginScreen({ navigation }) {
     }
   };
 
-  const handleForgotPassword = () => {
-    // Navigate to forgot password screen
-    // navigation.navigate('ForgotPassword');
-    Alert.alert('Forgot Password', 'Reset password functionality will be implemented here');
-  };
-
   const handleSignUp = () => {
     // Navigate to sign up screen
     // navigation.navigate('SignUp');
@@ -108,10 +102,6 @@ export default function LoginScreen({ navigation }) {
         <Text style={styles.loginButtonText}>
           {isLoading ? 'Logging in...' : 'Log In'}
         </Text>
-      </TouchableOpacity>
-      
-      <TouchableOpacity onPress={handleForgotPassword}>
-        <Text style={styles.forgotPasswordText}>Forgot password?</Text>
       </TouchableOpacity>
       
       <View style={styles.signUpContainer}>
