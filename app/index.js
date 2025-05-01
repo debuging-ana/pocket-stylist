@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
     width: '75%',
     alignItems: 'center',
     marginVertical: 10,
-    elevation: 3, //for android shadows, test?
+    elevation: 3, //for android shadows
     shadowColor: '#828282', 
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
