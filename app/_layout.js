@@ -1,5 +1,25 @@
-import { Slot } from 'expo-router';
-//slots act like a placeholder for whatever screen is currently active
+import { Stack } from 'expo-router';
+import BackButton from '../components/BackButton';
+
 export default function Layout() {
-  return <Slot />; //this renders the screen for the current router inside this layout
+  return (
+    <Stack
+      screenOptions={{
+        headerLeft: () => <BackButton />, //our custom back button
+        headerBackTitleVisible: false, //for iOS specific which hides the back text (shows arrow)
+        headerStyle: {
+          backgroundColor: '#AFC6A3',
+        },
+        headerTitleStyle: {
+          color: 'white',
+          fontWeight: '600',
+        },
+        headerTintColor: 'white', 
+      }}
+    >
+      <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="login" options={{ title: 'Log In' }} />
+      <Stack.Screen name="signup" options={{ title: 'Create Account' }} />
+    </Stack>
+  );
 }
