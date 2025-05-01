@@ -1,6 +1,5 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Link } from 'expo-router';
-import { Feather } from '@expo/vector-icons';
 
 export default function HomeScreen() {
   return (
@@ -8,7 +7,6 @@ export default function HomeScreen() {
       <View style={styles.contentContainer}>
         {/* Logo and App Name */}
         <View style={styles.headerContainer}>
-          <Feather name="shopping-bag" size={40} color="#AFC6A3" />
           <Text style={styles.appName}>Pocket Stylist</Text>
         </View>
         
@@ -84,7 +82,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     width: '75%',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 20,
     elevation: 3,
     shadowColor: '#828282', 
     shadowOffset: { width: 0, height: 2 },
