@@ -4,31 +4,204 @@ email and password to access their account.
 Shows error messages if login fails.
 */
 
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { 
+  View, 
+  Text, 
+  TextInput, 
+  TouchableOpacity, 
+  ScrollView, 
+  StyleSheet, 
+  Alert 
+} from 'react-native';
 
-export default function LoginScreen() {
+export default function LoginScreen({ navigation }) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleLogin = async () => {
+    // Reset error state
+    setError('');
+    
+    // Validate inputs
+    if (!email.trim()) {
+      setError('Email is required');
+      return;
+    }
+    if (!password) {
+      setError('Password is required');
+      return;
+    }
+    
+    // Show loading state
+    setIsLoading(true);
+    
+    try {
+      // Implement authentication logic
+      
+      // Simulate a delay (for now)
+      setTimeout(() => {
+        setIsLoading(false);
+        // Uncomment to simulate success:
+        // navigation.navigate('Home');
+        
+        // Uncomment to simulate an error:
+        setError('Invalid email or password. Please try again.');
+      }, 1500);
+    } catch (err) {
+      setError('Login failed. Please try again.');
+      setIsLoading(false);
+    }
+  };
+
+  const handleForgotPassword = () => {
+    // Navigate to forgot password screen
+    // navigation.navigate('ForgotPassword');
+    Alert.alert('Forgot Password', 'Reset password functionality will be implemented here');
+  };
+
+  const handleSignUp = () => {
+    // Navigate to sign up screen
+    // navigation.navigate('SignUp');
+    Alert.alert('Sign Up', 'Sign up functionality will be implemented here');
+  };
+
   return (
     <ScrollView 
       contentContainerStyle={styles.container}
       keyboardShouldPersistTaps="handled"
     >
-      <Text style={styles.title}>where the users will log in</Text>
-      {/* Form components go here like email,password, submit, forgot password etc. */}
+      <Text style={styles.title}>Log In to your Account</Text>
+      
+      {error ? <Text style={styles.errorText}>{error}</Text> : null}
+      
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          placeholderTextColor="#A0A0A0"
+          keyboardType="email-address"
+          autoCapitalize="none"
+          value={email}
+          onChangeText={setEmail}
+        />
+      </View>
+      
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          placeholderTextColor="#A0A0A0"
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword}
+        />
+      </View>
+      
+      <TouchableOpacity 
+        style={styles.loginButton} 
+        onPress={handleLogin}
+        disabled={isLoading}
+      >
+        <Text style={styles.loginButtonText}>
+          {isLoading ? 'Logging in...' : 'Log In'}
+        </Text>
+      </TouchableOpacity>
+      
+      <TouchableOpacity onPress={handleForgotPassword}>
+        <Text style={styles.forgotPasswordText}>Forgot password?</Text>
+      </TouchableOpacity>
+      
+      <View style={styles.signUpContainer}>
+        <Text style={styles.signUpText}>Don't have an account? </Text>
+        <TouchableOpacity onPress={handleSignUp}>
+          <Text style={styles.signUpLink}>Sign up</Text>
+        </TouchableOpacity>
+      </View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
+    flex: 1,
     padding: 20,
     backgroundColor: 'white',
+    justifyContent: 'center',
   },
   title: {
-    fontSize: 22,
-    color: '#828282', 
-    fontWeight: '600',
+    fontSize: 24,
+    color: '#828282',
+    fontWeight: '700',
     marginBottom: 30,
     textAlign: 'center',
+  },
+  inputContainer: {
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 16,
+    color: '#333',
+    marginBottom: 8,
+    fontWeight: '500',
+  },
+  input: {
+    backgroundColor: 'white',
+    borderRadius: 15,
+    padding: 15,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+  },
+  loginButton: {
+    backgroundColor: '#828282',
+    borderRadius: 15,
+    padding: 15,
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 20,
+    elevation: 3, //for android shadows
+    shadowColor: '#828282', 
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+  },
+  loginButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  forgotPasswordText: {
+    color: '#4285F4',
+    textAlign: 'center',
+    marginBottom: 50,
+    textDecorationLine: 'underline',
+    fontSize: 16
+  },
+  signUpContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    position: 'absolute',
+    bottom: 50,
+    left: 0,
+    right: 0,
+  },
+  signUpText: {
+    color: '#828282',
+    fontSize: 16,
+  },
+  
+  signUpLink: {
+    color: '#4285F4',
+    fontSize: 16,
+    fontWeight: '500',
+    textDecorationLine: 'underline',
+  },
+  errorText: {
+    color: '#D32F2F',
+    textAlign: 'center',
+    marginBottom: 15,
+    fontSize: 14,
   },
 });
