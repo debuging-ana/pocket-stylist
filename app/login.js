@@ -1,53 +1,45 @@
-/* AUTHENTICATION FILES 
-LoginScreen.js - The screen where existing users enter their 
-email and password to access their account. 
-Shows error messages if login fails.
-*/
+// AUTHENTICATION FILES
+// LoginScreen.js - The screen where existing users enter their 
+// email and password to access their account. 
+// Shows error messages if login fails.
 
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  TextInput, 
-  TouchableOpacity, 
-  ScrollView, 
-  StyleSheet, 
-  Alert 
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet
 } from 'react-native';
+import { Link } from 'expo-router';
 
-export default function LoginScreen({ navigation }) {
+export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
   const handleLogin = async () => {
-    // Reset error state
     setError('');
-    
-    // Validate inputs
+
     if (!email.trim()) {
       setError('Email is required');
       return;
     }
+
     if (!password) {
       setError('Password is required');
       return;
     }
-    
-    // Show loading state
+
     setIsLoading(true);
-    
+
     try {
-      // Implement authentication logic
-      
-      // Simulate a delay (for now)
+      // Simulate authentication
       setTimeout(() => {
         setIsLoading(false);
-        // Uncomment to simulate success:
-        // navigation.navigate('Home');
-        
-        // Uncomment to simulate an error:
+        // Simulate error for now
         setError('Invalid email or password. Please try again.');
       }, 1500);
     } catch (err) {
@@ -56,21 +48,15 @@ export default function LoginScreen({ navigation }) {
     }
   };
 
-  const handleSignUp = () => {
-    // Navigate to sign up screen
-    // navigation.navigate('SignUp');
-    Alert.alert('Sign Up', 'Sign up functionality will be implemented here');
-  };
-
   return (
-    <ScrollView 
+    <ScrollView
       contentContainerStyle={styles.container}
       keyboardShouldPersistTaps="handled"
     >
       <Text style={styles.title}>Log In to your Account</Text>
-      
+
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
-      
+
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
@@ -82,7 +68,7 @@ export default function LoginScreen({ navigation }) {
           onChangeText={setEmail}
         />
       </View>
-      
+
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
@@ -93,9 +79,9 @@ export default function LoginScreen({ navigation }) {
           onChangeText={setPassword}
         />
       </View>
-      
-      <TouchableOpacity 
-        style={styles.loginButton} 
+
+      <TouchableOpacity
+        style={styles.loginButton}
         onPress={handleLogin}
         disabled={isLoading}
       >
@@ -103,12 +89,14 @@ export default function LoginScreen({ navigation }) {
           {isLoading ? 'Logging in...' : 'Log In'}
         </Text>
       </TouchableOpacity>
-      
+
       <View style={styles.signUpContainer}>
         <Text style={styles.signUpText}>Don't have an account? </Text>
-        <TouchableOpacity onPress={handleSignUp}>
-          <Text style={styles.signUpLink}>Sign up</Text>
-        </TouchableOpacity>
+        <Link href="/signup" asChild>
+          <TouchableOpacity>
+            <Text style={styles.signUpLink}>Sign up</Text>
+          </TouchableOpacity>
+        </Link>
       </View>
     </ScrollView>
   );
