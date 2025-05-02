@@ -75,6 +75,13 @@ export default function Layout() {
           href: null,
         }}
       />
+      <Tabs.Screen
+        name="change-password"
+        options={{
+          title: 'Change Password',
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }

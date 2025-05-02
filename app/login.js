@@ -97,7 +97,14 @@ export default function LoginScreen() {
             <Text style={styles.signUpLink}>Sign up</Text>
           </TouchableOpacity>
         </Link>
-      </View>
+        <Text style={styles.signUpText}> or </Text>
+        <Link href="/change-password" asChild>
+          <TouchableOpacity>
+            <Text style={styles.signUpLink}>Forgot password</Text>
+          </TouchableOpacity>
+        </Link>
+       
+        </View>
     </ScrollView>
   );
 }
@@ -158,7 +165,9 @@ const styles = StyleSheet.create({
     fontSize: 16
   },
   signUpContainer: {
-    flexDirection: 'row',
+    flexDirection: 'coloumn',
+    alignItems: 'center',
+    gap: 5,
     justifyContent: 'center',
     position: 'absolute',
     bottom: 50,
