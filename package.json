@@ -32,9 +32,9 @@
   },
   "devDependencies": {
     "@types/react": "~19.0.10",
-    "metro": "^0.82.0",
-    "metro-config": "0.81.0",
-    "metro-resolver": "0.81.0"
+    "metro": "^0.82.2",
+    "metro-config": "^0.82.2",
+    "metro-resolver": "^0.82.2"
   },
   "expo": {
     "doctor": {
