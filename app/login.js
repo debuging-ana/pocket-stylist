@@ -90,6 +90,12 @@ export default function LoginScreen() {
         </Text>
       </TouchableOpacity>
 
+      <Link href="/change-password" asChild>
+        <TouchableOpacity style={styles.forgotPasswordContainer}>
+          <Text style={styles.forgotPasswordText}>Forgot password?</Text> 
+        </TouchableOpacity>
+      </Link>
+
       <View style={styles.signUpContainer}>
         <Text style={styles.signUpText}>Don't have an account? </Text>
         <Link href="/signup" asChild>
@@ -97,14 +103,7 @@ export default function LoginScreen() {
             <Text style={styles.signUpLink}>Sign up</Text>
           </TouchableOpacity>
         </Link>
-        <Text style={styles.signUpText}> or </Text>
-        <Link href="/change-password" asChild>
-          <TouchableOpacity>
-            <Text style={styles.signUpLink}>Forgot password</Text> 
-          </TouchableOpacity>
-        </Link>
-       
-        </View>
+      </View>
     </ScrollView>
   );
 }
@@ -146,7 +145,7 @@ const styles = StyleSheet.create({
     padding: 15,
     alignItems: 'center',
     marginTop: 10,
-    marginBottom: 20,
+    marginBottom: 15,
     elevation: 3, //for android shadows
     shadowColor: '#828282', 
     shadowOffset: { width: 0, height: 2 },
@@ -157,17 +156,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  forgotPasswordContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
   forgotPasswordText: {
     color: '#4285F4',
     textAlign: 'center',
-    marginBottom: 50,
     textDecorationLine: 'underline',
     fontSize: 16
   },
   signUpContainer: {
-    flexDirection: 'coloumn',
+    flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
     justifyContent: 'center',
     position: 'absolute',
     bottom: 50,
@@ -178,7 +179,6 @@ const styles = StyleSheet.create({
     color: '#828282',
     fontSize: 16,
   },
-  
   signUpLink: {
     color: '#4285F4',
     fontSize: 16,
