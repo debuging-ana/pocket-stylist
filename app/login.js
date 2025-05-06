@@ -39,7 +39,7 @@ export default function LoginScreen() {
       // Simulate authentication
       setTimeout(() => {
         setIsLoading(false);
-        // Simulate error for now
+        // Simulate error for now 
         setError('Invalid email or password. Please try again.');
       }, 1500);
     } catch (err) {
@@ -100,7 +100,7 @@ export default function LoginScreen() {
         <Text style={styles.signUpText}> or </Text>
         <Link href="/change-password" asChild>
           <TouchableOpacity>
-            <Text style={styles.signUpLink}>Forgot password</Text>
+            <Text style={styles.signUpLink}>Forgot password</Text> 
           </TouchableOpacity>
         </Link>
        
