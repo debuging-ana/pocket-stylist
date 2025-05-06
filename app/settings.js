@@ -1,39 +1,66 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Link } from 'expo-router';
+import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
 
 export default function SettingsScreen() {
   return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <View style={styles.container}>
-        <Text style={styles.title}>Settings</Text>
+    <ScrollView style={styles.scrollContainer}>
+      <View style={styles.header}>
+        <Ionicons name="settings" size={70} color="#7D7D7D" />
+      </View>
+      
+      <View style={styles.gridContainer}>
+        <View style={styles.row}>
+          <Link href="/profile-settings" asChild>
+            <TouchableOpacity style={styles.gridItem}>
+              <View style={styles.iconContainer}>
+                <Ionicons name="person-circle-outline" size={40} color="#7D7D7D" />
+              </View>
+              <Text style={styles.buttonText}>Profile Settings</Text>
+            </TouchableOpacity>
+          </Link>
+          
+          <Link href="/notifications" asChild>
+            <TouchableOpacity style={styles.gridItem}>
+              <View style={styles.iconContainer}>
+                <Ionicons name="notifications-outline" size={40} color="#7D7D7D" />
+              </View>
+              <Text style={styles.buttonText}>Notifications</Text>
+            </TouchableOpacity>
+          </Link>
+        </View>
         
-        <Link href="/profile-settings" asChild>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>Profile Settings</Text>
+        <View style={styles.row}>
+          <Link href="/change-password" asChild>
+            <TouchableOpacity style={styles.gridItem}>
+              <View style={styles.iconContainer}>
+                <FontAwesome name="lock" size={36} color="#7D7D7D" />
+              </View>
+              <Text style={styles.buttonText}>Change Password</Text>
+            </TouchableOpacity>
+          </Link>
+          
+          <Link href="/change-email" asChild>
+            <TouchableOpacity style={styles.gridItem}>
+              <View style={styles.iconContainer}>
+                <MaterialIcons name="email" size={40} color="#7D7D7D" />
+              </View>
+              <Text style={styles.buttonText}>Change Email</Text>
+            </TouchableOpacity>
+          </Link>
+        </View>
+        
+        <View style={styles.row}>
+          <TouchableOpacity style={styles.gridItem}>
+            <View style={styles.iconContainer}>
+              <Ionicons name="trash-outline" size={40} color="#7D7D7D" />
+            </View>
+            <Text style={styles.buttonText}>Delete Account</Text>
           </TouchableOpacity>
-        </Link>
-        
-        <Link href="/notifications" asChild>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>Notifications</Text>
-          </TouchableOpacity>
-        </Link>
-        
-        <Link href="/change-password" asChild>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>Change Password</Text>
-          </TouchableOpacity>
-        </Link>
-        
-        <Link href="/change-email" asChild>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>Change Email</Text>
-          </TouchableOpacity>
-        </Link>
-        
-        <TouchableOpacity style={[styles.button, styles.dangerButton]}>
-          <Text style={styles.buttonText}>Delete Account</Text>
-        </TouchableOpacity>
+          
+          {/* Empty view to maintain the grid layout */}
+          <View style={styles.emptyGridItem}></View>
+        </View>
       </View>
     </ScrollView>
   );
@@ -41,43 +68,46 @@ export default function SettingsScreen() {
 
 const styles = StyleSheet.create({
   scrollContainer: {
-    flexGrow: 1,
-  },
-  container: {
     flex: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    backgroundColor: 'white', 
-    padding: 20,
-    paddingTop: 60,
+    backgroundColor: '#F7F7F7',
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#828282', 
-    marginBottom: 40,
-    alignSelf: 'flex-start',
-    marginLeft: 10,
-  },
-  button: {
-    backgroundColor: '#AFC6A3', 
-    padding: 15,
-    borderRadius: 25,
-    width: '90%',
+  header: {
     alignItems: 'center',
-    marginVertical: 10,
-    elevation: 3,
-    shadowColor: '#828282', 
+    justifyContent: 'center',
+    paddingTop: 40,
+    paddingBottom: 20,
+    backgroundColor: '#F7F7F7',
+  },
+  gridContainer: {
+    padding: 10,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 15,
+  },
+  gridItem: {
+    backgroundColor: 'white',
+    borderRadius: 30,
+    width: '48%', 
+    height: 120,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
-  dangerButton: {
-    backgroundColor: '#E57373',
-    marginTop: 30,
+  emptyGridItem: {
+    width: '48%',
+  },
+  iconContainer: {
+    marginBottom: 10,
   },
   buttonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
+    color: '#7D7D7D',
+    fontSize: 14,
+    fontWeight: '400',
   },
 });
