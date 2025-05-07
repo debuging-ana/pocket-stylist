@@ -1,6 +1,19 @@
-import { View, Text, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { getAuth, sendPasswordResetEmail } from "firebase/auth";
+import { app } from "../firebaseConfig.js";
+import { useState } from 'react';
 
 export default function ChangePasswordScreen() {
+  const [email, setEmail] = useState ('')
+  const handleResetPassword = () => {
+    const auth = getAuth(app);
+
+    sendPasswordResetEmail(auth, email)
+      .then((res) => console.log(res))
+      .catch((err) => console.log(err));
+
+    // Alert.alert ("A reset password link has just been sent to your e-mail.");
+  }
   return (
     <View style={{
       flex: 1,
@@ -27,6 +40,7 @@ export default function ChangePasswordScreen() {
         E-mail:
       </Text>
       <TextInput placeholder='Your e-mail address'
+      onChangeText={setEmail}
         style={{
           backgroundColor: 'white',
           borderRadius: 15,
@@ -36,7 +50,11 @@ export default function ChangePasswordScreen() {
           borderColor: '#E0E0E0',
         }} />
 
-      <TouchableOpacity style={{
+      <TouchableOpacity onPress={
+        handleResetPassword
+      }
+      
+        style={{
         backgroundColor: 'grey',
         padding: 18,
         marginTop: 18,
