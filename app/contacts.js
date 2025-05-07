@@ -7,6 +7,7 @@ const friends = [
   { id: '3', name: 'Charlie Lee' },
 ];
 
+
 export default function ContactsScreen({ navigation }) {
   const renderItem = ({ item }) => (
     <TouchableOpacity 
@@ -16,6 +17,7 @@ export default function ContactsScreen({ navigation }) {
       <Text style={styles.contactName}>{item.name}</Text>
     </TouchableOpacity>
   );
+
 
   return (
     <View style={styles.container}>
