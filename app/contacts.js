@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import { Link } from 'expo-router';
 
 const friends = [
   { id: '1', name: 'Alice Johnson' },
@@ -7,17 +8,14 @@ const friends = [
   { id: '3', name: 'Charlie Lee' },
 ];
 
-
-export default function ContactsScreen({ navigation }) {
+export default function Contacts() {
   const renderItem = ({ item }) => (
-    <TouchableOpacity 
-      style={styles.contactItem} 
-      onPress={() => navigation.navigate('Chat', { friendName: item.name })}
-    >
-      <Text style={styles.contactName}>{item.name}</Text>
-    </TouchableOpacity>
+    <Link href={{ pathname: '/chat/[friendName]', params: { friendName: item.name } }} asChild>
+      <TouchableOpacity style={styles.contactItem}>
+        <Text style={styles.contactName}>{item.name}</Text>
+      </TouchableOpacity>
+    </Link>
   );
-
 
   return (
     <View style={styles.container}>

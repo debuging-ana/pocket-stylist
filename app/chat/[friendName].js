@@ -1,17 +1,21 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
-import { useRoute } from '@react-navigation/native'; 
+import { useLocalSearchParams } from 'expo-router';
 
-export default function ChatScreen() {
-  const route = useRoute();
-  const { friendName = 'Friend' } = route.params || {};
+export default function Chat() {
+  const { friendName } = useLocalSearchParams();
   const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState([]);
+  const [allMessages, setAllMessages] = useState({});
+  const messages = allMessages[friendName] || [];
 
   const handleSendMessage = () => {
     if (message.trim()) {
-      setMessages([...messages, { id: String(messages.length + 1), text: message }]);
-      setMessage('');  // Reset message input
+      const newMessage = { id: String(messages.length + 1), text: message };
+      setAllMessages({
+        ...allMessages,
+        [friendName]: [...messages, newMessage],
+      });
+      setMessage('');
     }
   };
 
@@ -23,7 +27,7 @@ export default function ChatScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>{`Chat with ${friendName}`}</Text>
+      <Text style={styles.header}>Chat with {friendName}</Text>
       <FlatList
         data={messages}
         renderItem={renderMessage}
