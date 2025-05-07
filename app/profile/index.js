@@ -442,10 +442,12 @@ const styles = StyleSheet.create({
   dropdownText: {
     fontSize: 16,
     color: '#666666',
-    fontWeight: 'bold',
+    fontWeight: 'normal',
   },
   dropdownItemText: {
     color: '#666666',
+    fontWeight: 'normal', 
+    fontSize: 16,
   },
   dropdownContainer: {
     borderColor: '#AFC6A3',
