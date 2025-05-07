@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
+import { useRoute } from '@react-navigation/native'; 
 
-export default function ChatScreen({ route }) {
-  const { friendName } = route.params;
+export default function ChatScreen() {
+  const route = useRoute();
+  const { friendName = 'Friend' } = route.params || {};
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
 

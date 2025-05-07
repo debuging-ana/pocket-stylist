@@ -4,6 +4,7 @@ import Entypo from '@expo/vector-icons/Entypo';
 import Feather from '@expo/vector-icons/Feather';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons'; 
 
 export default function Layout() {
   return (
@@ -18,12 +19,24 @@ export default function Layout() {
         fontWeight: '600',
       },
       headerTintColor: 'white',
+      tabBarStyle: {
+        paddingBottom: 10,
+        paddingTop: 5,
+        height: 70,
+        paddingLeft: 5,
+        paddingRight: -30,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
     }}>
       <Tabs.Screen
         name="index"
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => <Feather name="home" size={28} color={color} />,
+          tabBarItemStyle: {
+          marginHorizontal: 30, 
+          },
         }}
       />
       <Tabs.Screen
@@ -31,6 +44,9 @@ export default function Layout() {
         options={{
           title: 'Location',
           tabBarIcon: ({ color }) => <Entypo name="location" size={28} color={color} />,
+          tabBarItemStyle: {
+            marginHorizontal: 30, 
+            },
         }}
       />
       <Tabs.Screen
@@ -38,6 +54,9 @@ export default function Layout() {
         options={{
           title: 'Camera',
           tabBarIcon: ({ color }) => <Feather name="camera" size={28} color={color} />,
+          tabBarItemStyle: {
+            marginHorizontal: 30, 
+            },
         }}
       />
       <Tabs.Screen
@@ -45,6 +64,19 @@ export default function Layout() {
         options={{
           title: 'Wardrobe',
           tabBarIcon: ({ color }) => <MaterialCommunityIcons name="hanger" size={28} color={color} />,
+          tabBarItemStyle: {
+            marginHorizontal: 30, 
+            },
+        }}
+      />
+      <Tabs.Screen
+        name="connect"
+        options={{
+        title: 'Connect',
+        tabBarIcon: ({ color }) => <MaterialIcons name="connect-without-contact" size={28} color={color} />,
+        tabBarItemStyle: {
+          marginHorizontal: 30, 
+          },
         }}
       />
       <Tabs.Screen
@@ -52,21 +84,31 @@ export default function Layout() {
         options={{
           title: 'Settings',
           tabBarIcon: ({ color }) => <Ionicons name="settings-outline" size={28} color={color} />,
+          tabBarItemStyle: {
+            marginHorizontal: 30, 
+            },
         }}
       />
       <Tabs.Screen
+        name="chat"
+        options={{ tabBarButton: () => null }}
+      />
+      <Tabs.Screen
+        name="contacts"
+        options={{ tabBarButton: () => null }}
+      />
+      <Tabs.Screen
         name="profile/index"
-        options={{
+        options={{ 
           title: 'Profile',
-          tabBarIcon: ({ color }) => <Feather name="user" size={28} color={color} />,
+          tabBarButton: () => null 
         }}
-      />,
+      />
+
       {/* Hidden Screens */}
       <Tabs.Screen name="login" options={{ href: null }} />
       <Tabs.Screen name="signup" options={{ href: null }} />
       <Tabs.Screen name="change-password" options={{ href: null }} />
-      <Tabs.Screen name="chat" options={{ href: null }} />
-      <Tabs.Screen name="contacts" options={{ href: null }} />
       <Tabs.Screen name="delete-account" options={{ href: null }} />
     </Tabs>
   );

@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     height: 250,
-    backgroundColor: '#AFC6A3',
+    backgroundColor: '#E8F0E2',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
     borderColor: 'white',
   },
   placeholderText: {
-    color: '#828282',
+    color: '#666666',
     fontSize: 14,
     textAlign: 'center',
     padding: 10,
@@ -406,7 +406,7 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     fontSize: 16,
-    color: '#4A775A',
+    color: '#666666',
     fontWeight: 'bold',
     marginBottom: 5,
   },  
@@ -417,7 +417,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#4A775A',
+    color: '#666666',
     marginTop: 30,
     marginVertical: 20,
   },
@@ -427,7 +427,7 @@ const styles = StyleSheet.create({
   },
   dropdownLabel: {
     fontSize: 16,
-    color: '#4A775A',
+    color: '#666666',
     marginBottom: 5,
     fontWeight: 'bold',
   },
@@ -437,7 +437,7 @@ const styles = StyleSheet.create({
     minHeight: 45,
   },
   dropdownDisabled: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#f9f9f9',
   },
   dropdownText: {
     fontSize: 16,
@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
   },
   saveButton: {
-    backgroundColor: '#4A775A',
+    backgroundColor: '#AFC6A3',
     borderRadius: 10,
     padding: 15,
     alignItems: 'center',
