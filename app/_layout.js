@@ -100,7 +100,8 @@ function TabsLayout() {
 
 export default function Layout() {
   return (
-    <AuthProvider>
+    // structure responsible to identify if user is logged in or not and also share the user details across the app pages
+    <AuthProvider>   
       <TabsLayout />
     </AuthProvider>
   );
