@@ -13,7 +13,7 @@ export default function ForgotPasswordScreen() {
 
     sendPasswordResetEmail(auth, email)
       .then(() => {
-        Alert.alert ("A reset password link has just been sent to your e-mail.");
+        Alert.alert ("A reset password link has just been sent to your e-mail if you have an account with us.");
         navigation.navigate('index');
       })
       .catch((err) => {
