@@ -84,7 +84,7 @@ export default function Layout() {
       <Tabs.Screen name="login" options={{ title: 'Log-in', href: null }} />
       <Tabs.Screen name="signup" options={{ title: 'Sign-up', href: null }} />
       <Tabs.Screen name="profile/index" options={{ href: null }} />
-      <Tabs.Screen name="change-password" options={{ title: 'Change Password', href: null }} />
+      <Tabs.Screen name="forgot-password" options={{ title: 'Forgot Password', href: null }} />
       <Tabs.Screen name="delete-account" options={{ href: null }} />
       <Tabs.Screen name="chat" options={{ tabBarButton: () => null }} />
       <Tabs.Screen name="contacts" options={{ tabBarButton: () => null }} />
