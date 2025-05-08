@@ -1,3 +1,4 @@
+
 import BackButton from '../components/BackButton';
 import { Tabs } from 'expo-router';
 import Entypo from '@expo/vector-icons/Entypo';
@@ -8,7 +9,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 export default function Layout() {
   return (
     <Tabs screenOptions={{
-      headerLeft: BackButton,
+      headerLeft: () => <BackButton />,
       headerBackTitleVisible: false,
       headerStyle: {
         backgroundColor: '#AFC6A3',
@@ -55,19 +56,32 @@ export default function Layout() {
         }}
       />
       <Tabs.Screen
+        name="login"
+        options={{
+          title: 'Log-in',
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="signup"
+        options={{
+          title: 'Sign-up',
+          href: null,
+        }}
+      />
+      <Tabs.Screen
         name="profile/index"
         options={{
-          title: 'Profile',
-          tabBarIcon: ({ color }) => <Feather name="user" size={28} color={color} />,
+          href: null,
         }}
-      />,
-      {/* Hidden Screens */}
-      <Tabs.Screen name="login" options={{ href: null }} />
-      <Tabs.Screen name="signup" options={{ href: null }} />
-      <Tabs.Screen name="change-password" options={{ href: null }} />
-      <Tabs.Screen name="chat" options={{ href: null }} />
-      <Tabs.Screen name="contacts" options={{ href: null }} />
-      <Tabs.Screen name="delete-account" options={{ href: null }} />
+      />
+      <Tabs.Screen
+        name="change-password"
+        options={{
+          title: 'Change Password',
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }
