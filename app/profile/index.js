@@ -2,13 +2,6 @@
 Profile Screen - Displays & allows editing of user info
 */
 
-/*
-wat i need to work on:
-- No Firebase integration yet (both for fetching and saving user profile)
-- No async error or loading state handling (in case data operations fail or take time)
-- Profile data not persisted — currently it only updates local state and shows an alert
-*/
-
 import React, { useState, useEffect } from 'react';
 import { 
   View, 
@@ -24,6 +17,10 @@ import {
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import DropDownPicker from 'react-native-dropdown-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// key for storing our profile data
+const PROFILE_STORAGE_KEY = 'userProfile';
 
 // this screen lets our users view & update their profile info, including personal details and photo.
 const ProfileScreen = () => {  
@@ -69,13 +66,15 @@ const ProfileScreen = () => {
   
   const [profilePhotoUri, setProfilePhotoUri] = useState(null);
   const [isEditing, setIsEditing] = useState(false); 
+  const [isLoggedIn] = useState(true);
 
   useEffect(() => {
-    (async () => {
-      // asks our users for permission to access their photo library
-      // this is required for ios and android to open the gallery/photos
+      loadProfileData();
+      requestPhotoPermission();
+      }, []);
+
+      const requestPhotoPermission = async () => {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      
       if (status !== 'granted') {
         Alert.alert(
           'Photo Access Required', 
@@ -86,13 +85,42 @@ const ProfileScreen = () => {
           ]
         );
       }
-    })();
-  }, []);
+    };
 
+   // load saved profile data from storage
+   const loadProfileData = async () => {
+    try {
+      const savedProfile = await AsyncStorage.getItem(PROFILE_STORAGE_KEY);
+      if (savedProfile) {
+        const parsedProfile = JSON.parse(savedProfile);
+        setProfile(parsedProfile);
+        if (parsedProfile.profilePhotoUri) {
+          setProfilePhotoUri(parsedProfile.profilePhotoUri);
+        }
+      }
+    } catch (error) {
+      console.log('Error loading profile:', error);
+    }
+  };
+
+  // save profile data to storage
+  const saveProfileData = async () => {
+    try {
+      const profileToSave = {
+        ...profile,
+        profilePhotoUri: profilePhotoUri || null
+      };
+      await AsyncStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profileToSave));
+      return true;
+    } catch (error) {
+      console.log('Error saving profile:', error);
+      return false;
+    }
+  };
+  
+  //handle selecting a photo
   const handleSelectPhoto = async () => {
     try {
-      // launch the device's gallery so our users can choose a profile pic
-      // do nothing if the user cancels
       const pickerResult = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
@@ -103,23 +131,59 @@ const ProfileScreen = () => {
       if (pickerResult.canceled) return;
 
       if (pickerResult.assets?.length > 0) {
-        setProfilePhotoUri(pickerResult.assets[0].uri);
+        const selectedImage = pickerResult.assets[0];
+        
+        // file type validation that checks the URI extension
+        const validExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
+        const fileExtension = selectedImage.uri.split('.').pop().toLowerCase();
+        
+        if (!validExtensions.includes(`.${fileExtension}`)) {
+          Alert.alert('Invalid File', 'Please select a JPG, PNG, or GIF image.');
+          return;
+        }
+        setProfilePhotoUri(selectedImage.uri);
       }
     } catch (error) {
-      Alert.alert('Photo Error', 'Couldn’t grab your photo — maybe check your photos/gallery settings?');
+      Alert.alert('Error', 'Could not grab your photo. Please try again');
       console.error('Image picker error:', error);
     }
   };
+  //email validation
+  const isValidEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
 
-  const handleSaveProfile = () => {
+  // handle saving the profile with validation
+  const handleSaveProfile = async () => {
     if (!profile.firstName.trim()) {
-      Alert.alert('Missing Information', 'Please enter your first name so we know what to call you!');
+      Alert.alert('Missing Information', 'Please enter your first name');
       return;
     }
 
-    setIsEditing(false);
-    Alert.alert('Profile Saved', 'Your changes have been saved!');
+    // validate email format if user provided it
+    if (profile.email && !isValidEmail(profile.email)) {
+      Alert.alert('Invalid Email', 'Please enter a valid email address!');
+      return;
+    }
+
+    const saveSuccess = await saveProfileData();
+    
+    if (saveSuccess) {
+      setIsEditing(false);
+      Alert.alert('Success', 'Your profile has been saved!');
+    } else {
+      Alert.alert('Error', 'Could not save profile. Please try again.');
+    }
   };
+
+  // show login message if not logged in
+  if (!isLoggedIn) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.loginMessage}>Please log in to view your profile!</Text>
+      </View>
+    );
+  }
 
   return (
     // helps move the screen content up when the keyboard appears, 
@@ -195,9 +259,24 @@ const ProfileScreen = () => {
               </View>
             </View>
 
-            {/* Bio Field */}
-            <View style={styles.bioFieldWrapper}>
-            <Text style={styles.inputLabel}>Bio</Text>
+              {/* Email Field */}
+              <View style={styles.emailFieldWrapper}>
+                <Text style={styles.inputLabel}>Email</Text>
+                <TextInput
+                  style={styles.inputField}
+                  placeholder="your.email@example.com"
+                  placeholderTextColor="#828282" 
+                  value={profile.email}
+                  onChangeText={(text) => setProfile({...profile, email: text})}
+                  editable={isEditing}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+              </View>
+
+              {/* Bio Field */}
+              <View style={styles.bioFieldWrapper}>
+              <Text style={styles.inputLabel}>Bio</Text>
               <TextInput
                 style={[
                   styles.inputField,

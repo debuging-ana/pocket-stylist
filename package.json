@@ -9,6 +9,7 @@
   "dependencies": {
     "@expo/config-plugins": "~10.0.0",
     "@expo/prebuild-config": "~9.0.0",
+    "@react-native-async-storage/async-storage": "2.1.2",
     "@react-native-firebase/app": "20.0.0",
     "@react-native-firebase/auth": "20.0.0",
     "@react-native-firebase/firestore": "20.0.0",
@@ -29,6 +30,7 @@
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-native": "0.79.2",
+    "react-native-dotenv": "^3.4.11",
     "react-native-dropdown-picker": "^5.4.6",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-reanimated": "~3.17.4",
