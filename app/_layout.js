@@ -1,4 +1,3 @@
-
 import BackButton from '../components/BackButton';
 import { Tabs } from 'expo-router';
 import Entypo from '@expo/vector-icons/Entypo';
@@ -9,35 +8,35 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 export default function Layout() {
   return (
-    <Tabs screenOptions={{
-      headerLeft: () => <BackButton />,
-      headerBackTitleVisible: false,
-      headerStyle: {
-        backgroundColor: '#AFC6A3',
-      },
-      headerTitleStyle: {
-        color: 'white',
-        fontWeight: '600',
-      },
-      headerTintColor: 'white',
-      tabBarStyle: {
-        paddingBottom: 10,
-        paddingTop: 5,
-        height: 70,
-        paddingLeft: 5,
-        paddingRight: -30,
-        justifyContent: 'center',
-        alignItems: 'center',
-      },
-    }}>
+    <Tabs
+      screenOptions={{
+        headerLeft: () => <BackButton />,
+        headerBackTitleVisible: false,
+        headerStyle: {
+          backgroundColor: '#AFC6A3',
+        },
+        headerTitleStyle: {
+          color: 'white',
+          fontWeight: '600',
+        },
+        headerTintColor: 'white',
+        tabBarStyle: {
+          paddingBottom: 10,
+          paddingTop: 5,
+          height: 70,
+          paddingLeft: 5,
+          paddingRight: -30,
+          justifyContent: 'center',
+          alignItems: 'center',
+        },
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => <Feather name="home" size={28} color={color} />,
-          tabBarItemStyle: {
-          marginHorizontal: 30, 
-          },
+          tabBarItemStyle: { marginHorizontal: 30 },
         }}
       />
       <Tabs.Screen
@@ -45,9 +44,7 @@ export default function Layout() {
         options={{
           title: 'Location',
           tabBarIcon: ({ color }) => <Entypo name="location" size={28} color={color} />,
-          tabBarItemStyle: {
-            marginHorizontal: 30, 
-            },
+          tabBarItemStyle: { marginHorizontal: 30 },
         }}
       />
       <Tabs.Screen
@@ -55,9 +52,7 @@ export default function Layout() {
         options={{
           title: 'Camera',
           tabBarIcon: ({ color }) => <Feather name="camera" size={28} color={color} />,
-          tabBarItemStyle: {
-            marginHorizontal: 30, 
-            },
+          tabBarItemStyle: { marginHorizontal: 30 },
         }}
       />
       <Tabs.Screen
@@ -65,19 +60,15 @@ export default function Layout() {
         options={{
           title: 'Wardrobe',
           tabBarIcon: ({ color }) => <MaterialCommunityIcons name="hanger" size={28} color={color} />,
-          tabBarItemStyle: {
-            marginHorizontal: 30, 
-            },
+          tabBarItemStyle: { marginHorizontal: 30 },
         }}
       />
       <Tabs.Screen
         name="connect"
         options={{
-        title: 'Connect',
-        tabBarIcon: ({ color }) => <MaterialIcons name="connect-without-contact" size={28} color={color} />,
-        tabBarItemStyle: {
-          marginHorizontal: 30, 
-          },
+          title: 'Connect',
+          tabBarIcon: ({ color }) => <MaterialIcons name="connect-without-contact" size={28} color={color} />,
+          tabBarItemStyle: { marginHorizontal: 30 },
         }}
       />
       <Tabs.Screen
@@ -85,58 +76,18 @@ export default function Layout() {
         options={{
           title: 'Settings',
           tabBarIcon: ({ color }) => <Ionicons name="settings-outline" size={28} color={color} />,
-          tabBarItemStyle: {
-            marginHorizontal: 30, 
-            },
-        }}
-      />
-      <Tabs.Screen
-        name="login"
-        options={{
-          title: 'Log-in',
-          href: null,
-        }}
-      />
-      <Tabs.Screen
-        name="signup"
-        options={{
-          title: 'Sign-up',
-          href: null,
-        }}
-      />
-      <Tabs.Screen
-        name="profile/index"
-        options={{
-          href: null,
-        }}
-      />
-      <Tabs.Screen
-        name="change-password"
-        options={{
-          title: 'Change Password',
-          href: null,
-        }}
-      />
-        name="chat"
-        options={{ tabBarButton: () => null }}
-      />
-      <Tabs.Screen
-        name="contacts"
-        options={{ tabBarButton: () => null }}
-      />
-      <Tabs.Screen
-        name="profile/index"
-        options={{ 
-          title: 'Profile',
-          tabBarButton: () => null 
+          tabBarItemStyle: { marginHorizontal: 30 },
         }}
       />
 
       {/* Hidden Screens */}
-      <Tabs.Screen name="login" options={{ href: null }} />
-      <Tabs.Screen name="signup" options={{ href: null }} />
-      <Tabs.Screen name="change-password" options={{ href: null }} />
+      <Tabs.Screen name="login" options={{ title: 'Log-in', href: null }} />
+      <Tabs.Screen name="signup" options={{ title: 'Sign-up', href: null }} />
+      <Tabs.Screen name="profile/index" options={{ href: null }} />
+      <Tabs.Screen name="change-password" options={{ title: 'Change Password', href: null }} />
       <Tabs.Screen name="delete-account" options={{ href: null }} />
+      <Tabs.Screen name="chat" options={{ tabBarButton: () => null }} />
+      <Tabs.Screen name="contacts" options={{ tabBarButton: () => null }} />
     </Tabs>
   );
 }
