@@ -91,7 +91,6 @@ export default function Layout() {
         }}
       />
       <Tabs.Screen
-<<<<<<< HEAD
         name="login"
         options={{
           title: 'Log-in',
@@ -118,7 +117,6 @@ export default function Layout() {
           href: null,
         }}
       />
-=======
         name="chat"
         options={{ tabBarButton: () => null }}
       />
@@ -139,7 +137,6 @@ export default function Layout() {
       <Tabs.Screen name="signup" options={{ href: null }} />
       <Tabs.Screen name="change-password" options={{ href: null }} />
       <Tabs.Screen name="delete-account" options={{ href: null }} />
->>>>>>> 6a66035278f844f1cd7f6f1ec5584eacec611a23
     </Tabs>
   );
 }
