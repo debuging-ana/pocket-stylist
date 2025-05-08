@@ -7,6 +7,11 @@ export default {
     scheme: "pocketstylist",
     version: "1.0.0",
     newArchEnabled: true,
+    ios: {
+      infoPlist: {
+        NSPhotoLibraryUsageDescription: "Allow photo access to choose profile pictures"
+      }
+    },
     extra: {
       firebaseApiKey: process.env.FIREBASE_API_KEY,
       firebaseAuthDomain: process.env.FIREBASE_AUTH_DOMAIN,
