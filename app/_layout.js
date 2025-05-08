@@ -1,16 +1,22 @@
 import BackButton from '../components/BackButton';
-import { Tabs } from 'expo-router';
+import { Tabs, usePathname } from 'expo-router';
 import Entypo from '@expo/vector-icons/Entypo';
 import Feather from '@expo/vector-icons/Feather';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'; 
+import { AuthProvider,  useAuth } from '../context/AuthContext';
 
-export default function Layout() {
+function TabsLayout() {
+  const { user } = useAuth();
+  const pathname = usePathname();
+
   return (
     <Tabs
       screenOptions={{
-        headerLeft: () => <BackButton />,
+        headerLeft: () => {
+          return pathname === '/' ? null : <BackButton />;
+        },
         headerBackTitleVisible: false,
         headerStyle: {
           backgroundColor: '#AFC6A3',
@@ -20,7 +26,7 @@ export default function Layout() {
           fontWeight: '600',
         },
         headerTintColor: 'white',
-        tabBarStyle: {
+        tabBarStyle: user ? {
           paddingBottom: 10,
           paddingTop: 5,
           height: 70,
@@ -28,7 +34,7 @@ export default function Layout() {
           paddingRight: -30,
           justifyContent: 'center',
           alignItems: 'center',
-        },
+        } : { display: 'none' },
       }}
     >
       <Tabs.Screen
@@ -89,5 +95,13 @@ export default function Layout() {
       <Tabs.Screen name="chat" options={{ tabBarButton: () => null }} />
       <Tabs.Screen name="contacts" options={{ tabBarButton: () => null }} />
     </Tabs>
+  );
+}
+
+export default function Layout() {
+  return (
+    <AuthProvider>
+      <TabsLayout />
+    </AuthProvider>
   );
 }
