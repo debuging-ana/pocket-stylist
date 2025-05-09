@@ -2,12 +2,15 @@ import { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ScrollView } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { getAuth, reauthenticateWithCredential, EmailAuthProvider, deleteUser } from 'firebase/auth';
 
 export default function DeleteAccount() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const auth = getAuth();
 
   const handleDeleteAccount = () => {
     setError('');
@@ -38,25 +41,29 @@ export default function DeleteAccount() {
         {
           text: 'Yes, Delete',
           style: 'destructive',
-          onPress: () => {
+          onPress: async () => {
             setIsLoading(true);
 
-            // Simulate API call
-            setTimeout(() => {
+            try {
+              const user = auth.currentUser;
+
+              if (!user || !user.email) {
+                throw new Error('No user is currently logged in.');
+              }
+
+              const credential = EmailAuthProvider.credential(user.email, password);
+              await reauthenticateWithCredential(user, credential);
+
+              await deleteUser(user);
+
+              Alert.alert('Account Deleted', 'Your account has been successfully deleted.', [
+                { text: 'OK', onPress: () => router.replace('/') },
+              ]);
+            } catch (err) {
+              setError(err.message || 'Failed to delete account.');
+            } finally {
               setIsLoading(false);
-              Alert.alert(
-                'Account Deleted',
-                'Your account has been successfully deleted',
-                [
-                  {
-                    text: 'OK',
-                    onPress: () => {
-                      router.replace('/');
-                    },
-                  },
-                ]
-              );
-            }, 1000);
+            }
           },
         },
       ]
@@ -113,7 +120,7 @@ export default function DeleteAccount() {
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
+    flex: 1,
     padding: 20,
     backgroundColor: 'white',
     justifyContent: 'center',
@@ -148,7 +155,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 15,
     elevation: 3,
-    shadowColor: '#D32F2F',
+    shadowColor: '#D32F2F', 
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
   },
