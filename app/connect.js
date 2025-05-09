@@ -4,12 +4,12 @@ import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 
 export default function ConnectScreen() {
   return (
-    <ScrollView style={styles.scrollContainer}>
-    {/* wrapper for the main icon at the top of the screen in case want to change it */}
-    <View style={styles.iconWrapper}>
+    <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.scrollContent}>
+      {/* Wrapper for the main icon at the top of the screen */}
+      <View style={styles.iconWrapper}>
         <MaterialIcons name="connect-without-contact" size={80} color="#7D7D7D" />
-    </View>
-      
+      </View>
+
       <View style={styles.contentContainer}>
         <View style={styles.gridContainer}>
           <View style={styles.row}>
@@ -21,7 +21,7 @@ export default function ConnectScreen() {
                 <Text style={styles.buttonText}>My Profile</Text>
               </TouchableOpacity>
             </Link>
-            
+
             <Link href="/contacts" asChild>
               <TouchableOpacity style={styles.gridItem}>
                 <View style={styles.iconContainer}>
@@ -31,7 +31,7 @@ export default function ConnectScreen() {
               </TouchableOpacity>
             </Link>
           </View>
-          
+
           <View style={styles.row}>
             <Link href="/chat" asChild>
               <TouchableOpacity style={styles.gridItem}>
@@ -41,7 +41,7 @@ export default function ConnectScreen() {
                 <Text style={styles.buttonText}>Messages</Text>
               </TouchableOpacity>
             </Link>
-            
+
             {/* Empty grid item to maintain layout */}
             <View style={styles.emptyGridItem}></View>
           </View>
@@ -56,6 +56,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#E8F0E2',
   },
+  scrollContent: {
+    flexGrow: 1,
+  },
   iconWrapper: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -66,12 +69,12 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-    backgroundColor: 'white', 
+    minHeight: '100%',
+    backgroundColor: 'white',
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     paddingTop: 40,
     paddingBottom: 40,
-    marginTop: 0,
     zIndex: 2,
   },
   gridContainer: {
@@ -85,8 +88,8 @@ const styles = StyleSheet.create({
   gridItem: {
     backgroundColor: 'white',
     borderRadius: 30,
-    width: '48%', 
-    height: 150,
+    width: '48%',
+    height: 170,
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
