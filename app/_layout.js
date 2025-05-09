@@ -77,7 +77,7 @@ function TabsLayout() {
         options={{
           title: 'Settings',
           tabBarIcon: ({ color }) => <Ionicons name="settings-outline" size={28} color={color} />,
-          tabBarItemStyle: { marginHorizontal: 42 },
+          tabBarItemStyle: { marginHorizontal: 40 },
         }}
       />
 
