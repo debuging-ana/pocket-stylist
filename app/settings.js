@@ -12,7 +12,7 @@ export default function SettingsScreen() {
       <View style={styles.contentContainer}>
         <View style={styles.gridContainer}>
           <View style={styles.row}>
-            <Link href="/profile-settings" asChild>
+            <Link href="/profile/index.js" asChild>
               <TouchableOpacity style={styles.gridItem}>
                 <View style={styles.iconContainer}>
                   <Ionicons name="person-circle-outline" size={40} color="#7D7D7D" />
