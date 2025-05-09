@@ -48,14 +48,7 @@ function TabsLayout() {
           tabBarItemStyle: { marginHorizontal: 30 },
         }}
       />
-      <Tabs.Screen
-        name="location"
-        options={{
-          title: 'Location',
-          tabBarIcon: ({ color }) => <Entypo name="location" size={28} color={color} />,
-          tabBarItemStyle: { marginHorizontal: 30 },
-        }}
-      />
+
       <Tabs.Screen
         name="camera"
         options={{
