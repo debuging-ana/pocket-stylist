@@ -1,16 +1,25 @@
 import BackButton from '../components/BackButton';
-import { Tabs } from 'expo-router';
+import { Tabs, usePathname } from 'expo-router';
 import Entypo from '@expo/vector-icons/Entypo';
 import Feather from '@expo/vector-icons/Feather';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons'; 
+import { WardrobeProvider } from '../context/wardrobeContext';
+import { AuthProvider,  useAuth } from '../context/AuthContext';
 
-export default function Layout() {
+function TabsLayout() {
+  const { user } = useAuth();
+  const pathname = usePathname();
+
   return (
+    //wrapped entire app with wardrobe provider to share clothing state across all our screens
+    <WardrobeProvider>
     <Tabs
       screenOptions={{
-        headerLeft: () => <BackButton />,
+        headerLeft: () => {
+          return pathname === '/' ? null : <BackButton />;
+        },
         headerBackTitleVisible: false,
         headerStyle: {
           backgroundColor: '#AFC6A3',
@@ -20,7 +29,7 @@ export default function Layout() {
           fontWeight: '600',
         },
         headerTintColor: 'white',
-        tabBarStyle: {
+        tabBarStyle: user ? {
           paddingBottom: 10,
           paddingTop: 5,
           height: 70,
@@ -28,7 +37,7 @@ export default function Layout() {
           paddingRight: -30,
           justifyContent: 'center',
           alignItems: 'center',
-        },
+        } : { display: 'none' },
       }}
     >
       <Tabs.Screen
@@ -80,14 +89,31 @@ export default function Layout() {
         }}
       />
 
+
       {/* Hidden Screens */}
-      <Tabs.Screen name="login" options={{ title: 'Log-in', href: null }} />
-      <Tabs.Screen name="signup" options={{ title: 'Sign-up', href: null }} />
-      <Tabs.Screen name="profile/index" options={{ href: null }} />
-      <Tabs.Screen name="change-password" options={{ title: 'Change Password', href: null }} />
-      <Tabs.Screen name="delete-account" options={{ href: null }} />
-      <Tabs.Screen name="chat" options={{ tabBarButton: () => null }} />
-      <Tabs.Screen name="contacts" options={{ tabBarButton: () => null }} />
+      <Tabs.Screen name="login" options={{ title: 'Log-in', tabBarButton: () => null }} />
+      <Tabs.Screen name="signup" options={{ title: 'Sign-up', tabBarButton: () => null }} />
+      <Tabs.Screen name="profile/index" options={{ title: 'Profile', tabBarButton: () => null }} />
+      <Tabs.Screen name="change-password" options={{ title: 'Change Password', tabBarButton: () => null }} /> //does this exist?
+      <Tabs.Screen name="delete-account" options={{ tabBarButton: () => null }} />
+      <Tabs.Screen name="chat/[friendName]" options={{ tabBarButton: () => null }} />
+      <Tabs.Screen name="contacts" options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' }, title: 'Chat' }} />
+      <Tabs.Screen name="wardrobe/add-item" options={{ title: 'Add Item', tabBarButton: () => null, headerShown: true }} />
+      <Tabs.Screen name="wardrobe/tops" options={{ title: 'My Tops', tabBarButton: () => null , headerShown: true }} />
+      <Tabs.Screen name="wardrobe/bottoms" options={{ title: 'My Bottoms', tabBarButton: () => null, headerShown: true }} />
+      <Tabs.Screen name="wardrobe/jackets" options={{ title: 'My Jackets', tabBarButton: () => null, headerShown: true }}  />
+      <Tabs.Screen name="wardrobe/accessories" options={{ title: 'My Accessories', tabBarButton: () => null, headerShown: true }} />
+      <Tabs.Screen name="wardrobe/shoes" options={{ title: 'My Shoes', tabBarButton: () => null, headerShown: true }} />
+      <Tabs.Screen name="wardrobe/edit-item" options={{ title: 'Edit Item', tabBarButton: () => null, headerShown: true }} />
     </Tabs>
+    </WardrobeProvider>
+  );
+}
+export default function Layout() {
+  return (
+    // structure responsible to identify if user is logged in or not and also share the user details across the app pages
+    <AuthProvider>   
+      <TabsLayout />
+    </AuthProvider>
   );
 }

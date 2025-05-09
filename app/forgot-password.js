@@ -2,17 +2,23 @@ import { View, Text, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 import { app } from "../firebaseConfig.js";
 import { useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
 
-export default function ChangePasswordScreen() {
-  const [email, setEmail] = useState ('')
+export default function ForgotPasswordScreen() {
+  const [email, setEmail] = useState ('');
+  const navigation = useNavigation();
+
   const handleResetPassword = () => {
     const auth = getAuth(app);
 
     sendPasswordResetEmail(auth, email)
-      .then((res) => console.log(res))
-      .catch((err) => console.log(err));
-
-    // Alert.alert ("A reset password link has just been sent to your e-mail.");
+      .then(() => {
+        Alert.alert ("A reset password link has just been sent to your e-mail if you have an account with us.");
+        navigation.navigate('index');
+      })
+      .catch((err) => {
+        Alert.alert("Error", err.message);
+      });
   }
   return (
     <View style={{
