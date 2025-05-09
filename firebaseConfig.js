@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import Constants from "expo-constants";
 
+
 const {
     firebaseApiKey,
     firebaseAuthDomain,
