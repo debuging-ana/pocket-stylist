@@ -27,24 +27,40 @@ export default function DeleteAccount() {
       return;
     }
 
-    setIsLoading(true);
+    Alert.alert(
+      'Confirm Deletion',
+      'Are you sure you want to permanently delete your account?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Yes, Delete',
+          style: 'destructive',
+          onPress: () => {
+            setIsLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      Alert.alert(
-        'Account Deleted',
-        'Your account has been successfully deleted',
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              router.replace('/');
-            },
+            // Simulate API call
+            setTimeout(() => {
+              setIsLoading(false);
+              Alert.alert(
+                'Account Deleted',
+                'Your account has been successfully deleted',
+                [
+                  {
+                    text: 'OK',
+                    onPress: () => {
+                      router.replace('/');
+                    },
+                  },
+                ]
+              );
+            }, 1000);
           },
-        ]
-      );
-    }, 1000);
+        },
+      ]
+    );
   };
 
   return (
@@ -55,9 +71,9 @@ export default function DeleteAccount() {
       <View style={styles.iconContainer}>
         <Ionicons name="trash-outline" size={80} color="#828282" />
       </View>
-      
+
       <Text style={styles.title}>Delete Account</Text>
-      
+
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
       <View style={styles.inputContainer}>
@@ -70,7 +86,7 @@ export default function DeleteAccount() {
           onChangeText={setPassword}
         />
       </View>
-      
+
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
@@ -81,7 +97,7 @@ export default function DeleteAccount() {
           onChangeText={setConfirmPassword}
         />
       </View>
-      
+
       <TouchableOpacity 
         style={styles.deleteButton}
         onPress={handleDeleteAccount}
@@ -97,7 +113,7 @@ export default function DeleteAccount() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     padding: 20,
     backgroundColor: 'white',
     justifyContent: 'center',
@@ -132,7 +148,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 15,
     elevation: 3,
-    shadowColor: '#D32F2F', 
+    shadowColor: '#D32F2F',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
   },
@@ -141,7 +157,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-
   errorText: {
     color: '#D32F2F',
     textAlign: 'center',
