@@ -5,6 +5,7 @@ Validates passwords match.
 */
 
 import React, { useState } from 'react';
+import { useRouter } from 'expo-router';
 import { 
   View, 
   Text, 
@@ -14,8 +15,9 @@ import {
   StyleSheet, 
   Alert
 } from 'react-native';
+import { signupUser } from '../screens/services/auth'; 
 
-export default function SignupScreen({ navigation }) {
+export default function SignupScreen() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -24,6 +26,7 @@ export default function SignupScreen({ navigation }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const router = useRouter();
   const handleSignup = async () => {
     // Reset error state
     setError('');
@@ -57,20 +60,45 @@ export default function SignupScreen({ navigation }) {
     // Show loading state
     setIsLoading(true);
     
+    //actual firebase integration
     try {
-      // Implement account creation logic
-      
-      // Simulate a delay (for now)
-      setTimeout(() => {
-        setIsLoading(false);
-        // Uncomment to simulate success:
-        // navigation.navigate('Home');
-        
-        // Uncomment to simulate an error:
-        setError('Account creation failed. Please try again.');
-      }, 1500);
+      await signupUser(email, password);
+      // Show success alert
+    Alert.alert(
+        'Account Created',
+        'Your account has been successfully created!',
+        [
+          { 
+            text: 'OK',
+            onPress: () => {
+              router.push('/login');
+            } 
+          }
+        ]
+      );
+
+      //clears form fields
+      setFirstName('');
+      setLastName('');
+      setEmail('');
+      setPassword('');
+      setConfirmPassword('');
+
     } catch (err) {
-      setError('Sign up failed. Please try again.');
+      let errorMessage = 'Sign up failed. Please try again.';
+      switch (err.code) {
+        case 'auth/email-already-in-use':
+          errorMessage = 'Email already in use';
+          break;
+        case 'auth/invalid-email':
+          errorMessage = 'Invalid email address';
+          break;
+        case 'auth/weak-password':
+          errorMessage = 'Password should be at least 6 characters';
+          break;
+      }
+      setError(errorMessage);
+      } finally {
       setIsLoading(false);
     }
   };
