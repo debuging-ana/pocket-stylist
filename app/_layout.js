@@ -53,7 +53,7 @@ function TabsLayout() {
         options={{
           title: 'Wardrobe',
           tabBarIcon: ({ color }) => <MaterialCommunityIcons name="hanger" size={28} color={color} />,
-          tabBarItemStyle: { marginHorizontal: 42 },
+          tabBarItemStyle: { marginHorizontal: 40 },
         }}
       />
       <Tabs.Screen
@@ -72,7 +72,6 @@ function TabsLayout() {
           tabBarItemStyle: { marginHorizontal: 42 },
         }}
       />
-
       <Tabs.Screen
         name="settings"
         options={{
