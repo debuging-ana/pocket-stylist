@@ -52,12 +52,14 @@ export default function SettingsScreen() {
           </View>
           
           <View style={styles.row}>
-            <TouchableOpacity style={styles.gridItem}>
-              <View style={styles.iconContainer}>
-                <Ionicons name="trash-outline" size={40} color="#7D7D7D" />
-              </View>
-              <Text style={styles.buttonText}>Delete Account</Text>
-            </TouchableOpacity>
+            <Link href="/delete-account" asChild>
+              <TouchableOpacity style={styles.gridItem}>
+                <View style={styles.iconContainer}>
+                  <Ionicons name="trash-outline" size={40} color="#7D7D7D" />
+                </View>
+                <Text style={styles.buttonText}>Delete Account</Text>
+              </TouchableOpacity>
+            </Link>
             
             {/* Empty view to maintain the grid layout */}
             <View style={styles.emptyGridItem}></View>
