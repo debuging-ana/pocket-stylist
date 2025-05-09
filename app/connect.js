@@ -33,7 +33,7 @@ export default function ConnectScreen() {
           </View>
 
           <View style={styles.row}>
-            <Link href="/chat" asChild>
+            <Link href="/contacts" asChild>
               <TouchableOpacity style={styles.gridItem}>
                 <View style={styles.iconContainer}>
                   <Ionicons name="chatbubbles-outline" size={40} color="#7D7D7D" />

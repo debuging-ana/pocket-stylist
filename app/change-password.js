@@ -9,7 +9,7 @@ import {
   Alert
 } from 'react-native';
 import { router } from 'expo-router';
-import { updatePassword } from '../screens/services/auth'; // Assuming this function exists
+import { updatePassword } from '../screens/services/auth'; 
 import { FontAwesome } from '@expo/vector-icons';
 
 export default function ChangePassword() {
