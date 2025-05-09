@@ -36,17 +36,18 @@ export default function WardrobeScreen() {
         <View style={styles.resultsContainer}>
           {filteredItems.length > 0 ? (
             filteredItems.map(item => (
-              <View key={item.id} style={styles.searchItem}>
-                <View style={styles.searchImagePlaceholder}>
-                  <Ionicons 
-                    name={
-                      item.category.toLowerCase().includes('top') ? "shirt-outline" :
-                      item.category.toLowerCase().includes('bottom') ? "restaurant-outline" :
-                      item.category.toLowerCase().includes('jacket') ? "jacket-outline" :
-                      item.category.toLowerCase().includes('accessory') ? "watch-outline" :
-                      item.category.toLowerCase().includes('shoe') ? "footsteps-outline" :
-                      "folder-outline"
-                    } 
+              <Link href={`/wardrobe/${item.id}`} asChild key={item.id}>
+                <TouchableOpacity style={styles.searchItem}>
+                  <View style={styles.searchImagePlaceholder}>
+                    <Ionicons 
+                      name={
+                        item.category.toLowerCase().includes('top') ? "shirt-outline" :
+                        item.category.toLowerCase().includes('bottom') ? "restaurant-outline" :
+                        item.category.toLowerCase().includes('jacket') ? "jacket-outline" :
+                        item.category.toLowerCase().includes('accessory') ? "watch-outline" :
+                        item.category.toLowerCase().includes('shoe') ? "footsteps-outline" :
+                        "folder-outline"
+                      } 
                     size={24} 
                     color="#7D7D7D" 
                   />
@@ -55,7 +56,8 @@ export default function WardrobeScreen() {
                   <Text style={styles.searchText}>{item.name}</Text>
                   <Text style={styles.searchCategory}>{item.category}</Text>
                 </View>
-              </View>
+              </TouchableOpacity>
+            </Link>
             ))
           ) : (
             <Text style={styles.noResults}>No items found</Text>
