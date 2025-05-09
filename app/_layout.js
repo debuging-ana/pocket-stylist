@@ -45,23 +45,7 @@ function TabsLayout() {
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => <Feather name="home" size={28} color={color} />,
-          tabBarItemStyle: { marginHorizontal: 30 },
-        }}
-      />
-      <Tabs.Screen
-        name="location"
-        options={{
-          title: 'Location',
-          tabBarIcon: ({ color }) => <Entypo name="location" size={28} color={color} />,
-          tabBarItemStyle: { marginHorizontal: 30 },
-        }}
-      />
-      <Tabs.Screen
-        name="camera"
-        options={{
-          title: 'Camera',
-          tabBarIcon: ({ color }) => <Feather name="camera" size={28} color={color} />,
-          tabBarItemStyle: { marginHorizontal: 30 },
+          tabBarItemStyle: { marginHorizontal: 42 },
         }}
       />
       <Tabs.Screen
@@ -69,15 +53,23 @@ function TabsLayout() {
         options={{
           title: 'Wardrobe',
           tabBarIcon: ({ color }) => <MaterialCommunityIcons name="hanger" size={28} color={color} />,
-          tabBarItemStyle: { marginHorizontal: 30 },
+          tabBarItemStyle: { marginHorizontal: 40 },
+        }}
+      />
+      <Tabs.Screen
+        name="camera"
+        options={{
+          title: 'Camera',
+          tabBarIcon: ({ color }) => <Feather name="camera" size={28} color={color} />,
+          tabBarItemStyle: { marginHorizontal: 42 },
         }}
       />
       <Tabs.Screen
         name="connect"
         options={{
           title: 'Connect',
-          tabBarIcon: ({ color }) => <MaterialIcons name="connect-without-contact" size={28} color={color} />,
-          tabBarItemStyle: { marginHorizontal: 30 },
+          tabBarIcon: ({ color }) => <MaterialCommunityIcons name="account" size={28} color={color} />,
+          tabBarItemStyle: { marginHorizontal: 42 },
         }}
       />
       <Tabs.Screen
@@ -85,7 +77,7 @@ function TabsLayout() {
         options={{
           title: 'Settings',
           tabBarIcon: ({ color }) => <Ionicons name="settings-outline" size={28} color={color} />,
-          tabBarItemStyle: { marginHorizontal: 30 },
+          tabBarItemStyle: { marginHorizontal: 40 },
         }}
       />
 

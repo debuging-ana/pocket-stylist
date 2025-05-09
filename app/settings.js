@@ -12,7 +12,7 @@ export default function SettingsScreen() {
       <View style={styles.contentContainer}>
         <View style={styles.gridContainer}>
           <View style={styles.row}>
-            <Link href="/profile-settings" asChild>
+            <Link href="profile" asChild>
               <TouchableOpacity style={styles.gridItem}>
                 <View style={styles.iconContainer}>
                   <Ionicons name="person-circle-outline" size={40} color="#7D7D7D" />
@@ -52,12 +52,14 @@ export default function SettingsScreen() {
           </View>
           
           <View style={styles.row}>
-            <TouchableOpacity style={styles.gridItem}>
-              <View style={styles.iconContainer}>
-                <Ionicons name="trash-outline" size={40} color="#7D7D7D" />
-              </View>
-              <Text style={styles.buttonText}>Delete Account</Text>
-            </TouchableOpacity>
+            <Link href="/delete-account" asChild>
+              <TouchableOpacity style={styles.gridItem}>
+                <View style={styles.iconContainer}>
+                  <Ionicons name="trash-outline" size={40} color="#7D7D7D" />
+                </View>
+                <Text style={styles.buttonText}>Delete Account</Text>
+              </TouchableOpacity>
+            </Link>
             
             {/* Empty view to maintain the grid layout */}
             <View style={styles.emptyGridItem}></View>
@@ -71,25 +73,28 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   scrollContainer: {
     flex: 1,
-    backgroundColor: '#E8F0E2', // HERE - background for the main container
+    backgroundColor: '#E8F0E2',
+  },
+  scrollContent: {
+    flexGrow: 1,
   },
   iconWrapper: {
     alignItems: 'center',
     justifyContent: 'center',
     height: 120,
     paddingTop: 20,
-    zIndex: 1, // Lower z-index so it gets overlapped
+    zIndex: 1,
     backgroundColor: 'transparent',
   },
   contentContainer: {
     flex: 1,
-    backgroundColor: 'white', 
+    minHeight: '100%',
+    backgroundColor: 'white',
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    paddingTop: 40, // Extra padding for the partially hidden icon
+    paddingTop: 40,
     paddingBottom: 40,
-    marginTop: -0, // bring the container down a bit
-    zIndex: 2, // Higher z-index to make it appear above the icon
+    zIndex: 2,
   },
   gridContainer: {
     padding: 15,
@@ -102,8 +107,8 @@ const styles = StyleSheet.create({
   gridItem: {
     backgroundColor: 'white',
     borderRadius: 30,
-    width: '48%', 
-    height: 150,
+    width: '48%',
+    height: 170,
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',

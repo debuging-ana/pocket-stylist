@@ -10,9 +10,11 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  StyleSheet
+  StyleSheet,
+  Alert
 } from 'react-native';
 import { Link } from 'expo-router';
+import { loginUser } from '../screens/services/auth';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -35,15 +37,34 @@ export default function LoginScreen() {
 
     setIsLoading(true);
 
+    //actual firebase
     try {
-      // Simulate authentication
-      setTimeout(() => {
-        setIsLoading(false);
-        // Simulate error for now 
-        setError('Invalid email or password. Please try again.');
-      }, 1500);
+      await loginUser(email, password);
+      // t show success alert
+      Alert.alert(
+        'Login Successful',
+        'Welcome back!',
+        [
+          { text: 'OK' } // AuthContext will handle navigation
+        ]
+      );
+      // AuthContext will handle navigation on success
     } catch (err) {
-      setError('Login failed. Please try again.');
+      // better error handling
+      let errorMessage = 'Login failed. Please try again.';
+      switch (err.code) {
+        case 'auth/invalid-email':
+          errorMessage = 'Invalid email format';
+          break;
+        case 'auth/user-not-found':
+        case 'auth/wrong-password':
+          errorMessage = 'Invalid email or password';
+          break;
+        case 'auth/too-many-requests':
+          errorMessage = 'Account temporarily locked. Try again later';
+          break;
+      }
+      setError(errorMessage);
       setIsLoading(false);
     }
   };
