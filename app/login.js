@@ -13,7 +13,7 @@ import {
   StyleSheet,
   Alert
 } from 'react-native';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { loginUser } from '../screens/services/auth';
 
 export default function LoginScreen() {
@@ -21,6 +21,7 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const router = useRouter();
 
   const handleLogin = async () => {
     setError('');
@@ -37,20 +38,12 @@ export default function LoginScreen() {
 
     setIsLoading(true);
 
-    //actual firebase
     try {
       await loginUser(email, password);
-      // t show success alert
-      Alert.alert(
-        'Login Successful',
-        'Welcome back!',
-        [
-          { text: 'OK' } // AuthContext will handle navigation
-        ]
-      );
-      // AuthContext will handle navigation on success
+      // Navigate directly to home tab after successful login
+      router.replace('/homepage');
     } catch (err) {
-      // better error handling
+      // Better error handling
       let errorMessage = 'Login failed. Please try again.';
       switch (err.code) {
         case 'auth/invalid-email':
@@ -65,6 +58,7 @@ export default function LoginScreen() {
           break;
       }
       setError(errorMessage);
+    } finally {
       setIsLoading(false);
     }
   };

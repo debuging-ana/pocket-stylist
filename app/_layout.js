@@ -41,7 +41,7 @@ function TabsLayout() {
       }}
     >
       <Tabs.Screen
-        name="index"
+        name="homepage"
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => <Feather name="home" size={28} color={color} />,
