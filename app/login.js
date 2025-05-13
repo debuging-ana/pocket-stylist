@@ -41,7 +41,7 @@ export default function LoginScreen() {
     try {
       await loginUser(email, password);
       // Navigate directly to home tab after successful login
-      router.replace('/homepage');
+      router.replace('/homepagegit ');
     } catch (err) {
       // Better error handling
       let errorMessage = 'Login failed. Please try again.';
