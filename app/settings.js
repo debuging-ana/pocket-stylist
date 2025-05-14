@@ -8,7 +8,16 @@ import { useAuth } from '../context/AuthContext';
 
 export default function SettingsScreen() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await logout();  // Call the logout function from context
+      router.push('/'); // Navigate to the root (index.js) after logout
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
+  };
 
   return (
     <>
@@ -115,7 +124,7 @@ export default function SettingsScreen() {
 
         <TouchableOpacity 
           style={styles.logoutButton}
-          onPress={() => {/* Handle logout */}}
+          onPress={handleLogout}
         >
           <Feather name="log-out" size={18} color="#FFFFFF" />
           <Text style={styles.logoutText}>Log Out</Text>

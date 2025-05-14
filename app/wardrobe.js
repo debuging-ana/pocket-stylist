@@ -167,6 +167,8 @@ export default function WardrobeScreen() {
                   <Text style={styles.categoryName}>Shoes</Text>
                 </TouchableOpacity>
               </Link>
+
+              
               
               {/* Empty grid item to maintain layout */}
               <View style={styles.emptyGridItem}></View>

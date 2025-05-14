@@ -65,7 +65,7 @@ export default function HomePage() {
               <View style={[styles.actionIconContainer, { backgroundColor: '#F0E5E9' }]}>
                 <Feather name="camera" size={22} color="#AF7E88" />
               </View>
-              <Text style={styles.actionText}>Add Item</Text>
+              <Text style={styles.actionText}>Camera</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.actionButton} onPress={() => router.push('/connect')}>
               <View style={[styles.actionIconContainer, { backgroundColor: '#E5EDF7' }]}>

@@ -1,17 +1,15 @@
 import { createContext, useState, useContext, useEffect } from 'react';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { app } from "../firebaseConfig"
+import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
+import { app } from "../firebaseConfig";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    //returns a value AND return a function . 
-    // Ex: user = Ana, setUser will update the value of user automatically when calling the fuction.
     const [user, setUser] = useState(null);
     const auth = getAuth(app);
 
     useEffect(() => {
-        //check if the user is allowed in or not. will check if you managed to login or not.
+        // Check if the user is allowed in or not. Will check if you managed to login or not.
         const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
             setUser(firebaseUser);
         });
@@ -19,11 +17,21 @@ export const AuthProvider = ({ children }) => {
         return unsubscribe;
     }, []);
 
+    // Logout function
+    const logout = async () => {
+        try {
+            await signOut(auth);  // Firebase logout method
+            setUser(null);         // Update the user state to null after logging out
+        } catch (error) {
+            console.error("Error logging out: ", error);
+        }
+    };
+
     return (
-        <AuthContext.Provider value={{ user }}>
+        <AuthContext.Provider value={{ user, logout }}>
             {children}
         </AuthContext.Provider>
-    )
-}
+    );
+};
 
 export const useAuth = () => useContext(AuthContext);
