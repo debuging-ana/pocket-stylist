@@ -1,11 +1,16 @@
-//Firebase authentication logic (login/signup/reset)
+// Firebase authentication logic (login/signup/update email)
 
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  updateEmail as firebaseUpdateEmail
+} from 'firebase/auth';
 import { app } from '../../firebaseConfig';
 
 const auth = getAuth(app);
 
-// Centralized auth functions
+// Login
 export const loginUser = async (email, password) => {
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -15,6 +20,7 @@ export const loginUser = async (email, password) => {
   }
 };
 
+// Sign up
 export const signupUser = async (email, password) => {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -24,4 +30,15 @@ export const signupUser = async (email, password) => {
   }
 };
 
-export { auth }; // Export auth instance for context
+// Update email
+export const updateEmail = async (newEmail) => {
+  const user = auth.currentUser;
+
+  if (!user) {
+    throw new Error('No user is currently signed in');
+  }
+
+  return firebaseUpdateEmail(user, newEmail);
+};
+
+export { auth }; // Export auth instance for use elsewhere
