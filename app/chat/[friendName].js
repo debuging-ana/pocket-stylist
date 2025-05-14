@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 
 export default function Chat() {
   const { friendName } = useLocalSearchParams();
+  const router = useRouter();
   const [message, setMessage] = useState('');
   const [allMessages, setAllMessages] = useState({});
   const messages = allMessages[friendName] || [];
@@ -27,13 +28,19 @@ export default function Chat() {
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <Text style={styles.backButtonText}>← Back</Text>
+      </TouchableOpacity>
+
       <Text style={styles.header}>Chat with {friendName}</Text>
+
       <FlatList
         data={messages}
         renderItem={renderMessage}
         keyExtractor={(item) => item.id}
         style={styles.messagesList}
       />
+
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.textInput}
@@ -54,6 +61,14 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: 'white',
+  },
+  backButton: {
+    marginBottom: 10,
+  },
+  backButtonText: {
+    fontSize: 16,
+    color: '#4F46E5',
+    fontWeight: '500',
   },
   header: {
     fontSize: 28,
@@ -95,3 +110,4 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+
