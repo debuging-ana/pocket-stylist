@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar } from 'react-native';
 import { useRouter } from 'expo-router';
 import Feather from '@expo/vector-icons/Feather';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
@@ -9,10 +9,8 @@ import { useAuth } from '../context/AuthContext';
 export default function HomePage() {
   const router = useRouter();
   const { user } = useAuth();
-  const [weather, setWeather] = useState({ temp: 72, condition: 'sunny' });
   const [loading, setLoading] = useState(true);
-  
-  // Function to get greeting based on time of day
+
   const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return 'Good Morning';
@@ -20,32 +18,16 @@ export default function HomePage() {
     return 'Good Evening';
   };
 
-  // Simulate loading data
   useEffect(() => {
     setTimeout(() => {
       setLoading(false);
     }, 1000);
   }, []);
 
-  // Placeholder data for recent items
   const recentItems = [
     { id: 1, name: 'Blue Denim Jacket', category: 'Outerwear', lastWorn: '3 days ago' },
     { id: 2, name: 'White Sneakers', category: 'Footwear', lastWorn: '1 day ago' },
   ];
-
-  // Weather icon based on condition
-  const getWeatherIcon = () => {
-    switch(weather.condition) {
-      case 'sunny':
-        return 'sunny-outline';
-      case 'rainy':
-        return 'rainy-outline';
-      case 'cloudy':
-        return 'cloudy-outline';
-      default:
-        return 'thermometer-outline';
-    }
-  };
 
   return (
     <>
@@ -66,54 +48,32 @@ export default function HomePage() {
               </View>
             </TouchableOpacity>
           </View>
-
-          <View style={styles.weatherWidget}>
-            <View style={styles.weatherInfo}>
-              <Ionicons name={getWeatherIcon()} size={22} color="#4A6D51" />
-              <Text style={styles.weatherText}>{weather.temp}°F • {weather.condition.charAt(0).toUpperCase() + weather.condition.slice(1)}</Text>
-            </View>
-          </View>
         </View>
-        
+
         <View style={styles.quickActions}>
           <View style={styles.sectionTitleContainer}>
             <Text style={styles.sectionTitle}>Quick Actions</Text>
           </View>
           <View style={styles.actionsContainer}>
-            <TouchableOpacity 
-              style={styles.actionButton}
-              onPress={() => router.push('/wardrobe')}
-            >
+            <TouchableOpacity style={styles.actionButton} onPress={() => router.push('/wardrobe')}>
               <View style={[styles.actionIconContainer, { backgroundColor: '#E8F0E2' }]}>
                 <MaterialCommunityIcons name="hanger" size={22} color="#4A6D51" />
               </View>
               <Text style={styles.actionText}>My Wardrobe</Text>
             </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={styles.actionButton}
-              onPress={() => router.push('/camera')}
-            >
+            <TouchableOpacity style={styles.actionButton} onPress={() => router.push('/camera')}>
               <View style={[styles.actionIconContainer, { backgroundColor: '#F0E5E9' }]}>
                 <Feather name="camera" size={22} color="#AF7E88" />
               </View>
               <Text style={styles.actionText}>Add Item</Text>
             </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={styles.actionButton}
-              onPress={() => router.push('/connect')}
-            >
+            <TouchableOpacity style={styles.actionButton} onPress={() => router.push('/connect')}>
               <View style={[styles.actionIconContainer, { backgroundColor: '#E5EDF7' }]}>
                 <MaterialCommunityIcons name="account-group" size={22} color="#5A7DA3" />
               </View>
               <Text style={styles.actionText}>Connect</Text>
             </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={styles.actionButton}
-              onPress={() => router.push('/settings')}
-            >
+            <TouchableOpacity style={styles.actionButton} onPress={() => router.push('/settings')}>
               <View style={[styles.actionIconContainer, { backgroundColor: '#EFEAE5' }]}>
                 <Ionicons name="settings-outline" size={22} color="#A3885A" />
               </View>
@@ -129,45 +89,29 @@ export default function HomePage() {
               <Text style={styles.seeAllText}>See All</Text>
             </TouchableOpacity>
           </View>
-
-          <ScrollView 
-            horizontal 
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.suggestionsScrollContent}
-          >
-            <TouchableOpacity 
-              style={[styles.suggestionCard, { backgroundColor: '#D2E5C4' }]}
-              onPress={() => router.push('/daily-outfit')}
-            >
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestionsScrollContent}>
+            <TouchableOpacity style={[styles.suggestionCard, { backgroundColor: '#D2E5C4' }]} onPress={() => router.push('/daily-outfit')}>
               <View style={styles.cardContent}>
                 <View style={styles.cardHeader}>
                   <Ionicons name="sunny-outline" size={18} color="#FFFFFF" />
                   <Text style={styles.cardTag}>Weather-Based</Text>
                 </View>
                 <Text style={styles.cardTitle}>Today's Look</Text>
-                <Text style={styles.cardDescription}>
-                  Perfect outfit suggestions based on today's weather and your style preferences
-                </Text>
+                <Text style={styles.cardDescription}>Perfect outfit suggestions based on today's weather and your style preferences</Text>
                 <View style={styles.cardButton}>
                   <Text style={styles.cardButtonText}>View Outfit</Text>
                   <Feather name="arrow-right" size={14} color="#4A6D51" />
                 </View>
               </View>
             </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={[styles.suggestionCard, { backgroundColor: '#E5DAE0' }]}
-              onPress={() => router.push('/occasion-outfits')}
-            >
+            <TouchableOpacity style={[styles.suggestionCard, { backgroundColor: '#E5DAE0' }]} onPress={() => router.push('/occasion-outfits')}>
               <View style={styles.cardContent}>
                 <View style={styles.cardHeader}>
                   <Ionicons name="calendar-outline" size={18} color="#FFFFFF" />
                   <Text style={styles.cardTag}>Special Event</Text>
                 </View>
                 <Text style={styles.cardTitle}>Event Ready</Text>
-                <Text style={styles.cardDescription}>
-                  Outfit ideas perfect for your upcoming events and occasions
-                </Text>
+                <Text style={styles.cardDescription}>Outfit ideas perfect for your upcoming events and occasions</Text>
                 <View style={styles.cardButton}>
                   <Text style={styles.cardButtonText}>Explore</Text>
                   <Feather name="arrow-right" size={14} color="#AF7E88" />
@@ -176,7 +120,7 @@ export default function HomePage() {
             </TouchableOpacity>
           </ScrollView>
         </View>
-        
+
         <View style={styles.recentSection}>
           <View style={styles.sectionTitleContainer}>
             <Text style={styles.sectionTitle}>Recent Items</Text>
@@ -192,11 +136,7 @@ export default function HomePage() {
             </View>
           ) : recentItems.length > 0 ? (
             recentItems.map(item => (
-              <TouchableOpacity 
-                key={item.id}
-                style={styles.recentItemCard}
-                onPress={() => router.push(`/wardrobe/item/${item.id}`)}
-              >
+              <TouchableOpacity key={item.id} style={styles.recentItemCard} onPress={() => router.push(`/wardrobe/item/${item.id}`)}>
                 <View style={styles.recentItemImagePlaceholder}>
                   <MaterialCommunityIcons 
                     name={item.category === 'Footwear' ? 'shoe-formal' : 'tshirt-crew'} 
@@ -217,13 +157,8 @@ export default function HomePage() {
           ) : (
             <View style={styles.emptyState}>
               <MaterialCommunityIcons name="tshirt-crew" size={40} color="#AFC6A3" />
-              <Text style={styles.emptyStateText}>
-                Add items to your wardrobe to see them here
-              </Text>
-              <TouchableOpacity 
-                style={styles.addItemButton}
-                onPress={() => router.push('/camera')}
-              >
+              <Text style={styles.emptyStateText}>Add items to your wardrobe to see them here</Text>
+              <TouchableOpacity style={styles.addItemButton} onPress={() => router.push('/camera')}>
                 <Text style={styles.addItemButtonText}>Add First Item</Text>
                 <Feather name="plus" size={16} color="#FFFFFF" style={{ marginLeft: 5 }} />
               </TouchableOpacity>
@@ -231,25 +166,16 @@ export default function HomePage() {
           )}
         </View>
 
-        <TouchableOpacity 
-          style={styles.tipCard}
-          onPress={() => router.push('/tips')}
-        >
+        <TouchableOpacity style={styles.tipCard} onPress={() => router.push('/tips')}>
           <View style={styles.tipIconContainer}>
             <Ionicons name="bulb-outline" size={24} color="#FFFFFF" />
           </View>
           <View style={styles.tipContent}>
             <Text style={styles.tipTitle}>Style Tip</Text>
-            <Text style={styles.tipText}>
-              Try mixing textures within the same color family for a sophisticated monochromatic look
-            </Text>
+            <Text style={styles.tipText}>Try mixing textures within the same color family for a sophisticated monochromatic look</Text>
           </View>
           <Feather name="chevron-right" size={20} color="#CCCCCC" />
         </TouchableOpacity>
-
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>StyleCloset v1.2.0</Text>
-        </View>
       </ScrollView>
     </>
   );
@@ -261,10 +187,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   headerContainer: {
-    paddingTop: 50,
-    paddingBottom: 20,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
+    paddingTop: 25,
+    paddingBottom: 25,
     backgroundColor: '#E8F0E2',
   },
   header: {
