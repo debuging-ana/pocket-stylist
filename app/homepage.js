@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: 11,
     marginTop: 2,
   },
   quickActions: {
@@ -318,9 +318,9 @@ const styles = StyleSheet.create({
 
   },
   actionIconContainer: {
-    height: 50,
-    width: 50,
-    borderRadius: 15,
+    height: 60,
+    width: 60,
+    borderRadius: 50,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 8,
@@ -422,7 +422,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 10,
-    backgroundColor: '#F8F8F8',
+    backgroundColor: 'white',
     justifyContent: 'center',
     alignItems: 'center',
   },
