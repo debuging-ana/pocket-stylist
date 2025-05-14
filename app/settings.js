@@ -50,7 +50,7 @@ export default function SettingsScreen() {
             onPress={() => router.push('/profile')}
           >
             <View style={[styles.settingIconContainer, { backgroundColor: '#E8F0E2' }]}>
-              <Ionicons name="person-outline" size={22} color="#4A6D51" />
+              <Ionicons name="person-circle-outline" size={22} color="#4A6D51" />
             </View>
             <View style={styles.settingInfo}>
               <Text style={styles.settingName}>Profile Settings</Text>

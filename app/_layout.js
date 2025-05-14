@@ -61,7 +61,7 @@ function TabsLayout() {
         <Tabs.Screen
           name="connect"
           options={{
-            tabBarIcon: ({ color }) => <MaterialCommunityIcons name="account" size={28} color={color} />,
+            tabBarIcon: ({ color }) => <MaterialCommunityIcons name="account-group" size={28} color={color} />,
             tabBarItemStyle: { marginHorizontal: 42 },
           }}
         />
