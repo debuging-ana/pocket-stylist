@@ -42,7 +42,7 @@ export default function SettingsScreen() {
 
         <View style={styles.settingsSection}>
           <View style={styles.sectionTitleContainer}>
-            <Text style={styles.sectionTitle}>Account Settings</Text>
+            <Text style={styles.sectionTitle}>General Settings</Text>
           </View>
 
           <TouchableOpacity 
