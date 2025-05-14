@@ -59,7 +59,7 @@ function TabsLayout() {
           }}
         />
         <Tabs.Screen
-          name="connect"
+          name="contacts"
           options={{
             tabBarIcon: ({ color }) => <MaterialCommunityIcons name="account-group" size={28} color={color} />,
             tabBarItemStyle: { marginHorizontal: 42 },
@@ -80,7 +80,6 @@ function TabsLayout() {
         <Tabs.Screen name="change-password" options={{ title: 'Change Password', tabBarButton: () => null }} />
         <Tabs.Screen name="delete-account" options={{ tabBarButton: () => null }} />
         <Tabs.Screen name="chat/[friendName]" options={{ tabBarButton: () => null }} />
-        <Tabs.Screen name="contacts" options={{ tabBarButton: () => null, tabBarStyle: { display: 'none' }, title: 'Chat' }} />
         <Tabs.Screen name="wardrobe/add-item" options={{ title: 'Add Item', tabBarButton: () => null, headerShown: true }} />
         <Tabs.Screen name="wardrobe/tops" options={{ title: 'My Tops', tabBarButton: () => null, headerShown: true }} />
         <Tabs.Screen name="wardrobe/bottoms" options={{ title: 'My Bottoms', tabBarButton: () => null, headerShown: true }} />

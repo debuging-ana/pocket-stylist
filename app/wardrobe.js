@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
   addButtonText: {
     color: '#FFFFFF',
     fontWeight: '600',
-    fontSize: 16,
+    fontSize: 14,
     marginLeft: 8,
   },
   categoriesContainer: {

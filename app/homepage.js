@@ -67,11 +67,11 @@ export default function HomePage() {
               </View>
               <Text style={styles.actionText}>Camera</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.actionButton} onPress={() => router.push('/connect')}>
+            <TouchableOpacity style={styles.actionButton} onPress={() => router.push('/contacts')}>
               <View style={[styles.actionIconContainer, { backgroundColor: '#E5EDF7' }]}>
                 <MaterialCommunityIcons name="account-group" size={22} color="#5A7DA3" />
               </View>
-              <Text style={styles.actionText}>Connect</Text>
+              <Text style={styles.actionText}>Messages</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.actionButton} onPress={() => router.push('/settings')}>
               <View style={[styles.actionIconContainer, { backgroundColor: '#EFEAE5' }]}>
