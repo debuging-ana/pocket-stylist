@@ -292,6 +292,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 15,
+    marginTop: 2,
   },
   quickActions: {
     padding: 20,
@@ -314,7 +315,7 @@ const styles = StyleSheet.create({
   actionButton: {
     alignItems: 'center',
     width: '22%',
-    marginBottom: 10,
+
   },
   actionIconContainer: {
     height: 50,
