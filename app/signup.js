@@ -15,6 +15,7 @@ import {
   StyleSheet, 
   Alert
 } from 'react-native';
+import { Link } from 'expo-router';
 import { signupUser } from '../screens/services/auth'; 
 
 export default function SignupScreen() {
@@ -185,6 +186,16 @@ export default function SignupScreen() {
             {isLoading ? 'Creating Account...' : 'Sign Up'}
           </Text>
         </TouchableOpacity>
+        
+        {/* Already have an account link */}
+        <View style={styles.loginLinkContainer}>
+          <Text style={styles.loginText}>Already have an account? </Text>
+          <Link href="/login" asChild>
+            <TouchableOpacity>
+              <Text style={styles.loginLink}>Login</Text>
+            </TouchableOpacity>
+          </Link>
+        </View>
       </ScrollView>
       </View>
 
@@ -258,5 +269,24 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: '600',
+  },
+  loginLinkContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'absolute',
+    bottom: 50,
+    left: 0,
+    right: 0,
+  },
+  loginText: {
+    color: '#828282',
+    fontSize: 16,
+  },
+  loginLink: {
+    color: '#4285F4',
+    fontSize: 16,
+    fontWeight: '500',
+    textDecorationLine: 'underline',
   },
 });
