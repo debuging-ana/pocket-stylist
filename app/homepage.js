@@ -118,6 +118,34 @@ export default function HomePage() {
                 </View>
               </View>
             </TouchableOpacity>
+            <TouchableOpacity style={[styles.suggestionCard, { backgroundColor: '#BDD4E7' }]} onPress={() => router.push('/occasion-styles')}>
+              <View style={styles.cardContent}>
+                <View style={styles.cardHeader}>
+                  <Ionicons name="briefcase-outline" size={18} color="#FFFFFF" />
+                  <Text style={styles.cardTag}>Occasion-Based</Text>
+                </View>
+                <Text style={styles.cardTitle}>Styling by Occasion</Text>
+                <Text style={styles.cardDescription}>Find the perfect look for any occasion, from office meetings to weekend brunches</Text>
+                <View style={styles.cardButton}>
+                  <Text style={styles.cardButtonText}>Browse Occasions</Text>
+                  <Feather name="arrow-right" size={14} color="#5A7DA3" />
+                </View>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.suggestionCard, { backgroundColor: '#FFC0CB' }]} onPress={() => router.push('/personalized-styles')}>
+              <View style={styles.cardContent}>
+                <View style={styles.cardHeader}>
+                  <Ionicons name="person-outline" size={18} color="#FFFFFF" />
+                  <Text style={styles.cardTag}>Personalized</Text>
+                </View>
+                <Text style={styles.cardTitle}>Made for You</Text>
+                <Text style={styles.cardDescription}>Custom style recommendations based on your preferences, style, and wardrobe items</Text>
+                <View style={styles.cardButton}>
+                  <Text style={styles.cardButtonText}>See Recommendations</Text>
+                  <Feather name="arrow-right" size={14} color="#AF7E88" />
+                </View>
+              </View>
+            </TouchableOpacity>
           </ScrollView>
         </View>
 
