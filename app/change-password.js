@@ -33,8 +33,8 @@ export default function ChangePassword() {
       return;
     }
 
-    if (newPassword.length < 6) {
-      setError('New password must be at least 6 characters');
+    if (newPassword.length < 8) {
+      setError('New password must be at least 8 characters');
       return;
     }
 
@@ -72,7 +72,16 @@ export default function ChangePassword() {
         case 'auth/requires-recent-login':
           errorMessage = 'Please log in again before changing your password';
           // Could navigate to re-authentication screen here
+          router.push('/login'); // Redirect to login
           break;
+        case 'auth/invalid-credential':
+          errorMessage = 'Invalid credentials. Please try again.';
+          break;
+        case 'auth/too-many-requests':
+          errorMessage = 'Too many unsuccessful attempts. Please try again later.';
+          break;
+        default:
+          console.error('Password update error:', err);
       }
       
       setError(errorMessage);

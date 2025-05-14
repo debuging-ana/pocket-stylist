@@ -9,13 +9,18 @@ import {
   Alert,
 } from 'react-native';
 import { router } from 'expo-router';
-import { updateEmail } from '../screens/services/auth'; 
+import { updateEmail, getCurrentUser } from '../screens/services/auth'; 
 import { FontAwesome } from '@expo/vector-icons';
 
 export default function ChangeEmail() {
   const [newEmail, setNewEmail] = useState('');
+  const [password, setPassword] = useState(''); // For potential reauthentication
+  const [showPasswordField, setShowPasswordField] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  
+  const user = getCurrentUser();
+  const currentEmail = user ? user.email : '';
 
   const handleChangeEmail = async () => {
     setError('');
@@ -25,9 +30,16 @@ export default function ChangeEmail() {
       return;
     }
 
+    // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(newEmail)) {
       setError('Please enter a valid email address');
+      return;
+    }
+
+    // Prevent updating to the same email
+    if (newEmail === currentEmail) {
+      setError('New email must be different from your current email');
       return;
     }
 
@@ -53,7 +65,11 @@ export default function ChangeEmail() {
           break;
         case 'auth/requires-recent-login':
           errorMessage = 'Please log in again before changing your email';
+          // For security-sensitive operations, Firebase may require recent authentication
+          router.push('/login');
           break;
+        default:
+          console.error('Email update error:', err);
       }
 
       setError(errorMessage);
@@ -72,6 +88,10 @@ export default function ChangeEmail() {
       </View>
 
       <Text style={styles.title}>Change Email</Text>
+      
+      {currentEmail ? (
+        <Text style={styles.currentEmail}>Current: {currentEmail}</Text>
+      ) : null}
 
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
@@ -86,6 +106,19 @@ export default function ChangeEmail() {
           onChangeText={setNewEmail}
         />
       </View>
+
+      {showPasswordField && (
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your password"
+            placeholderTextColor="#A0A0A0"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
+        </View>
+      )}
 
       <TouchableOpacity
         style={styles.changeButton}
@@ -123,8 +156,14 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: '#7D7D7D',
     fontWeight: '700',
-    marginBottom: 30,
+    marginBottom: 10,
     textAlign: 'center',
+  },
+  currentEmail: {
+    fontSize: 14,
+    color: '#A0A0A0',
+    textAlign: 'center',
+    marginBottom: 20,
   },
   inputContainer: {
     marginBottom: 20,
