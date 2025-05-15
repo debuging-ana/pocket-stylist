@@ -33,20 +33,23 @@ export default function HomePage() {
     <>
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        {/* Header Section */}
         <View style={styles.headerContainer}>
-          <View style={styles.header}>
-            <View style={styles.headerTextContainer}>
-              <Text style={styles.greeting}>{getGreeting()},</Text>
-              <Text style={styles.username}>{user?.email?.split('@')[0] || 'Stylist'}</Text>
-            </View>
-            <TouchableOpacity 
-              style={styles.profileButton}
-              onPress={() => router.push('/profile')}
-            >
-              <View style={styles.profileImageContainer}>
-                <Text style={styles.profileInitial}>{(user?.email?.charAt(0) || 'S').toUpperCase()}</Text>
+          <View style={styles.headerCard}>
+            <View style={styles.header}>
+              <View style={styles.headerTextContainer}>
+                <Text style={styles.greeting}>{getGreeting()},</Text>
+                <Text style={styles.username}>{user?.email?.split('@')[0] || 'Stylist'}</Text>
               </View>
-            </TouchableOpacity>
+              <TouchableOpacity 
+                style={styles.profileButton}
+                onPress={() => router.push('/profile')}
+              >
+                <View style={styles.profileImageContainer}>
+                  <Text style={styles.profileInitial}>{(user?.email?.charAt(0) || 'S').toUpperCase()}</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
 
@@ -56,7 +59,7 @@ export default function HomePage() {
           </View>
           <View style={styles.actionsContainer}>
             <TouchableOpacity style={styles.actionButton} onPress={() => router.push('/wardrobe')}>
-              <View style={[styles.actionIconContainer, { backgroundColor: '#E8F0E2' }]}>
+              <View style={[styles.actionIconContainer, { backgroundColor: '#DBE9D1' }]}>
                 <MaterialCommunityIcons name="hanger" size={22} color="#4A6D51" />
               </View>
               <Text style={styles.actionText}>My Wardrobe</Text>
@@ -212,18 +215,28 @@ export default function HomePage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '#F9F9F4',
   },
   headerContainer: {
-    paddingTop: 25,
-    paddingBottom: 25,
-    backgroundColor: '#E8F0E2',
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 0,
+    backgroundColor: '#F9F9F4',
+  },
+  headerCard: {
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
   },
   headerTextContainer: {
     flex: 1,
@@ -265,33 +278,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
-  weatherWidget: {
-    marginTop: 15,
-    marginHorizontal: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    borderRadius: 15,
-    padding: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  weatherInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  weatherText: {
-    marginLeft: 8,
-    color: '#4A6D51',
-    fontWeight: '500',
-    fontSize: 14,
-  },
   sectionTitleContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 11,
+    marginBottom: 10,
     marginTop: 2,
   },
   quickActions: {

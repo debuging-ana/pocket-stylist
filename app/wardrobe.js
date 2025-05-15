@@ -24,19 +24,21 @@ export default function WardrobeScreen() {
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         {/* Header Section */}
         <View style={styles.headerContainer}>
-          <View style={styles.header}>
-            <View style={styles.headerTextContainer}>
-              <Text style={styles.greeting}>My Wardrobe</Text>
-              <Text style={styles.username}>{user?.email?.split('@')[0] || 'Stylist'}</Text>
-            </View>
-            <TouchableOpacity 
-              style={styles.profileButton}
-              onPress={() => router.push('/profile')}
-            >
-              <View style={styles.profileImageContainer}>
-                <Text style={styles.profileInitial}>{(user?.email?.charAt(0) || 'S').toUpperCase()}</Text>
+          <View style={styles.headerCard}>
+            <View style={styles.header}>
+              <View style={styles.headerTextContainer}>
+                <Text style={styles.greeting}>My Wardrobe</Text>
+                <Text style={styles.username}>{user?.email?.split('@')[0] || 'Stylist'}</Text>
               </View>
-            </TouchableOpacity>
+              <TouchableOpacity 
+                style={styles.profileButton}
+                onPress={() => router.push('/profile')}
+              >
+                <View style={styles.profileImageContainer}>
+                  <Text style={styles.profileInitial}>{(user?.email?.charAt(0) || 'S').toUpperCase()}</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
           </View>
           
           {/* Search Bar in Header */}
@@ -167,8 +169,6 @@ export default function WardrobeScreen() {
                   <Text style={styles.categoryName}>Shoes</Text>
                 </TouchableOpacity>
               </Link>
-
-              
               
               {/* Empty grid item to maintain layout */}
               <View style={styles.emptyGridItem}></View>
@@ -183,19 +183,29 @@ export default function WardrobeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '#F9F9F4',
   },
   headerContainer: {
-    paddingTop: 25,
-    paddingBottom: 25,
-    backgroundColor: '#E8F0E2',
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 0,
+    backgroundColor: '#F9F9F4',
+  },
+  headerCard: {
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    marginBottom: 15,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    marginBottom: 15,
   },
   headerTextContainer: {
     flex: 1,
@@ -243,7 +253,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 15,
     padding: 12,
-    marginHorizontal: 20,
     marginTop: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
@@ -262,7 +271,6 @@ const styles = StyleSheet.create({
   },
   resultsContainer: {
     marginTop: 15,
-    paddingHorizontal: 20,
   },
   settingCard: {
     flexDirection: 'row',
@@ -321,7 +329,6 @@ const styles = StyleSheet.create({
   addButton: {
     flexDirection: 'row',
     backgroundColor: '#AFC6A3',
-    marginHorizontal: 20,
     marginTop: 20,
     marginBottom: 0,
     padding: 15,

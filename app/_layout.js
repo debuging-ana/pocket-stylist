@@ -27,6 +27,7 @@ function TabsLayout() {
           },
           headerTintColor: 'white',
           tabBarStyle: user ? {
+            backgroundColor: '#AFC6A3',
             paddingBottom: 10,
             paddingTop: 5,
             height: 70,
@@ -35,40 +36,42 @@ function TabsLayout() {
             justifyContent: 'center',
             alignItems: 'center',
           } : { display: 'none' },
+          tabBarActiveTintColor: '#FFFFFF',
+          tabBarInactiveTintColor: '#FFFFFF',
         }}
       >
         <Tabs.Screen
           name="homepage"
           options={{
-            tabBarIcon: ({ color }) => <Feather name="home" size={28} color={color} />,
+            tabBarIcon: ({ focused }) => <Ionicons name="home" size={28} color="#FFFFFF" />,
             tabBarItemStyle: { marginHorizontal: 42 },
           }}
         />
         <Tabs.Screen
           name="wardrobe"
           options={{
-            tabBarIcon: ({ color }) => <MaterialCommunityIcons name="hanger" size={28} color={color} />,
+            tabBarIcon: ({ focused }) => <MaterialCommunityIcons name="hanger" size={28} color="#FFFFFF" />,
             tabBarItemStyle: { marginHorizontal: 40 },
           }}
         />
         <Tabs.Screen
           name="camera"
           options={{
-            tabBarIcon: ({ color }) => <Feather name="camera" size={28} color={color} />,
+            tabBarIcon: ({ focused }) => <Ionicons name="camera" size={28} color="#FFFFFF" />,
             tabBarItemStyle: { marginHorizontal: 42 },
           }}
         />
         <Tabs.Screen
           name="contacts"
           options={{
-            tabBarIcon: ({ color }) => <MaterialCommunityIcons name="account-group" size={28} color={color} />,
+            tabBarIcon: ({ focused }) => <Ionicons name="people" size={28} color="#FFFFFF" />,
             tabBarItemStyle: { marginHorizontal: 42 },
           }}
         />
         <Tabs.Screen
           name="settings"
           options={{
-            tabBarIcon: ({ color }) => <Ionicons name="settings-outline" size={28} color={color} />,
+            tabBarIcon: ({ focused }) => <Ionicons name="settings" size={28} color="#FFFFFF" />,
             tabBarItemStyle: { marginHorizontal: 40 },
           }}
         />
