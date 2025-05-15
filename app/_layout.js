@@ -48,9 +48,9 @@ function TabsLayout() {
           }}
         />
         <Tabs.Screen
-          name="wardrobe"
+          name="explorePage"
           options={{
-            tabBarIcon: ({ focused }) => <MaterialCommunityIcons name="hanger" size={28} color="#FFFFFF" />,
+            tabBarIcon: ({ focused }) => <MaterialCommunityIcons name="magnify" size={28} color="#FFFFFF" />,
             tabBarItemStyle: { marginHorizontal: 40 },
           }}
         />
@@ -62,9 +62,9 @@ function TabsLayout() {
           }}
         />
         <Tabs.Screen
-          name="explorePage"
+          name="wardrobe"
           options={{
-            tabBarIcon: ({ focused }) => <MaterialCommunityIcons name="magnify" size={28} color="#FFFFFF" />,
+            tabBarIcon: ({ focused }) => <MaterialCommunityIcons name="hanger" size={28} color="#FFFFFF" />,
             tabBarItemStyle: { marginHorizontal: 42 },
           }}
         />
