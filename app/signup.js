@@ -1,22 +1,16 @@
-/* AUTHENTICATION FILES 
-SignupScreen.js - Where new users create an account by entering their 
-email, password and basic info. 
-Validates passwords match.
-*/
-
 import React, { useState } from 'react';
-import { useRouter } from 'expo-router';
 import { 
   View, 
   Text, 
   TextInput, 
   TouchableOpacity, 
   ScrollView, 
-  StyleSheet, 
-  Alert
+  StyleSheet,
+  StatusBar
 } from 'react-native';
-import { Link } from 'expo-router';
-import { signupUser } from '../screens/services/auth'; 
+import { Link, useRouter } from 'expo-router';
+import { signupUser } from '../screens/services/auth';
+import Feather from '@expo/vector-icons/Feather';
 
 export default function SignupScreen() {
   const [firstName, setFirstName] = useState('');
@@ -28,6 +22,7 @@ export default function SignupScreen() {
   const [error, setError] = useState('');
 
   const router = useRouter();
+  
   const handleSignup = async () => {
     // Reset error state
     setError('');
@@ -65,19 +60,9 @@ export default function SignupScreen() {
     try {
       await signupUser(email, password);
       // Show success alert
-    Alert.alert(
-        'Account Created',
-        'Your account has been successfully created!',
-        [
-          { 
-            text: 'OK',
-            onPress: () => {
-              router.push('/login');
-            } 
-          }
-        ]
-      );
-
+      alert('Account created successfully! Please log in.');
+      router.push('/login');
+      
       //clears form fields
       setFirstName('');
       setLastName('');
@@ -99,95 +84,105 @@ export default function SignupScreen() {
           break;
       }
       setError(errorMessage);
-      } finally {
+    } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <View style={styles.mainContainer}>
+    <>
+      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
       <ScrollView 
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
-        <Text style={styles.title}>Create your Account</Text>
-        
-        {error ? <Text style={styles.errorText}>{error}</Text> : null}
-        
-        {/* First Name and Last Name fields side by side */}
-        <View style={styles.nameFieldsContainer}>
-          <View style={styles.nameFieldWrapper}>
-            <TextInput
-              style={styles.nameInput}
-              placeholder="First Name"
-              placeholderTextColor="#A0A0A0"
-              autoCapitalize="words"
-              value={firstName}
-              onChangeText={setFirstName}
-            />
+        <View style={styles.headerContainer}>
+          <View style={styles.headerCard}>
+            <Text style={styles.title}>Create Account</Text>
+            <Text style={styles.subtitle}>Join us to manage your wardrobe</Text>
+            
+            {error ? (
+              <View style={styles.errorContainer}>
+                <Feather name="alert-circle" size={16} color="#D32F2F" />
+                <Text style={styles.errorText}>{error}</Text>
+              </View>
+            ) : null}
+            
+            <View style={styles.nameFieldsContainer}>
+              <View style={styles.nameFieldWrapper}>
+                <Text style={styles.inputLabel}>First Name</Text>
+                <TextInput
+                  style={styles.nameInput}
+                  placeholder="First Name"
+                  placeholderTextColor="#A0A0A0"
+                  autoCapitalize="words"
+                  value={firstName}
+                  onChangeText={setFirstName}
+                />
+              </View>
+              
+              <View style={styles.nameFieldWrapper}>
+                <Text style={styles.inputLabel}>Last Name</Text>
+                <TextInput
+                  style={styles.nameInput}
+                  placeholder="Last Name"
+                  placeholderTextColor="#A0A0A0"
+                  autoCapitalize="words"
+                  value={lastName}
+                  onChangeText={setLastName}
+                />
+              </View>
+            </View>
+            
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>Email</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Email"
+                placeholderTextColor="#A0A0A0"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                value={email}
+                onChangeText={setEmail}
+              />
+            </View>
+            
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>Password</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Password"
+                placeholderTextColor="#A0A0A0"
+                secureTextEntry
+                value={password}
+                onChangeText={setPassword}
+              />
+            </View>
+            
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>Confirm Password</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Confirm Password"
+                placeholderTextColor="#A0A0A0"
+                secureTextEntry
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+              />
+            </View>
+            
+            <TouchableOpacity 
+              style={styles.signupButton} 
+              onPress={handleSignup}
+              disabled={isLoading}
+            >
+              <Text style={styles.signupButtonText}>
+                {isLoading ? 'Creating Account...' : 'Sign Up'}
+              </Text>
+            </TouchableOpacity>
           </View>
-          
-          <View style={styles.nameFieldWrapper}>
-            <TextInput
-              style={styles.nameInput}
-              placeholder="Last Name"
-              placeholderTextColor="#A0A0A0"
-              autoCapitalize="words"
-              value={lastName}
-              onChangeText={setLastName}
-            />
-          </View>
         </View>
         
-        {/* Email field */}
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Email"
-            placeholderTextColor="#A0A0A0"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            value={email}
-            onChangeText={setEmail}
-          />
-        </View>
-        
-        {/* Password field */}
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            placeholderTextColor="#A0A0A0"
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-          />
-        </View>
-        
-        {/* Confirm Password field */}
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Confirm Password"
-            placeholderTextColor="#A0A0A0"
-            secureTextEntry
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-          />
-        </View>
-        
-        {/* Sign Up button */}
-        <TouchableOpacity 
-          style={styles.signupButton} 
-          onPress={handleSignup}
-          disabled={isLoading}
-        >
-          <Text style={styles.signupButtonText}>
-            {isLoading ? 'Creating Account...' : 'Sign Up'}
-          </Text>
-        </TouchableOpacity>
-        
-        {/* Already have an account link */}
         <View style={styles.loginLinkContainer}>
           <Text style={styles.loginText}>Already have an account? </Text>
           <Link href="/login" asChild>
@@ -197,45 +192,68 @@ export default function SignupScreen() {
           </Link>
         </View>
       </ScrollView>
-      </View>
-
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  mainContainer: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
   container: {
     flexGrow: 1,
-    padding: 20,
-    backgroundColor: 'white',
+    backgroundColor: '#F9F9F4',
     justifyContent: 'center',
+    paddingVertical: 40,
+    paddingBottom: 80,
+  },
+  headerContainer: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+  },
+  headerCard: {
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   title: {
-    fontSize: 24,
-    color: '#828282',
-    fontWeight: '700',
-    marginBottom: 30,
+    fontSize: 26,
+    fontWeight: 'bold',
+    color: '#4A6D51',
     textAlign: 'center',
+    marginBottom: 10,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#828282',
+    textAlign: 'center',
+    marginBottom: 40,
+  },
+  errorContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFEBEE',
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 20,
   },
   errorText: {
     color: '#D32F2F',
-    textAlign: 'center',
-    marginBottom: 15,
+    marginLeft: 10,
     fontSize: 14,
   },
   nameFieldsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 20,
+    marginBottom: 15,
   },
   nameFieldWrapper: {
     flex: 0.48, // Slightly less than half to create space between
   },
   nameInput: {
-    backgroundColor: 'white',
+    backgroundColor: '#F9F9F4',
     borderRadius: 15,
     padding: 15,
     fontSize: 16,
@@ -243,10 +261,16 @@ const styles = StyleSheet.create({
     borderColor: '#E0E0E0',
   },
   inputContainer: {
-    marginBottom: 20,
+    marginBottom: 15,
+  },
+  inputLabel: {
+    fontSize: 14,
+    color: '#4A6D51',
+    marginBottom: 8,
+    fontWeight: '500',
   },
   input: {
-    backgroundColor: 'white',
+    backgroundColor: '#F9F9F4',
     borderRadius: 15,
     padding: 15,
     fontSize: 16,
@@ -254,14 +278,14 @@ const styles = StyleSheet.create({
     borderColor: '#E0E0E0',
   },
   signupButton: {
-    backgroundColor: '#828282',
+    backgroundColor: '#4A6D51',
     borderRadius: 15,
     padding: 15,
     alignItems: 'center',
     marginTop: 10,
-    marginBottom: 20,
-    elevation: 3, // For Android shadows
-    shadowColor: '#828282', 
+    marginBottom: 5,
+    elevation: 3,
+    shadowColor: '#4A6D51',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
   },
@@ -274,19 +298,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    position: 'absolute',
-    bottom: 50,
-    left: 0,
-    right: 0,
+    marginTop: 30,
   },
   loginText: {
     color: '#828282',
     fontSize: 16,
   },
   loginLink: {
-    color: '#4285F4',
+    color: '#4A6D51',
     fontSize: 16,
     fontWeight: '500',
-    textDecorationLine: 'underline',
   },
 });
