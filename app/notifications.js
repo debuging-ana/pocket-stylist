@@ -34,6 +34,10 @@ export default function NotificationsScreen() {
     router.back(); // Go back after saving
   };
 
+  const handleCancel = () => {
+    router.back(); // Go back without saving
+  };
+
   return (
     <>
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
@@ -42,12 +46,6 @@ export default function NotificationsScreen() {
         <View style={styles.headerContainer}>
           <View style={styles.headerCard}>
             <View style={styles.header}>
-              <TouchableOpacity 
-                onPress={() => router.back()}
-                style={styles.backButton}
-              >
-                <Feather name="chevron-left" size={24} color="#4A6D51" />
-              </TouchableOpacity>
               <View style={styles.headerTextContainer}>
                 <Text style={styles.username}>Notifications</Text>
                 <Text style={styles.greeting}>Manage your notification preferences</Text>
@@ -156,6 +154,13 @@ export default function NotificationsScreen() {
         >
           <Text style={styles.saveButtonText}>Save Settings</Text>
         </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={styles.cancelButton}
+          onPress={() => router.push('/settings')}
+        >
+          <Text style={styles.cancelButtonText}>Cancel</Text>
+        </TouchableOpacity>
       </ScrollView>
     </>
   );
@@ -168,7 +173,7 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingTop: 20, // Increased top padding to account for status bar
     paddingBottom: 0,
     backgroundColor: '#F9F9F4',
   },
@@ -185,9 +190,6 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  backButton: {
-    marginRight: 10,
   },
   headerTextContainer: {
     flex: 1,
@@ -255,7 +257,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#4A6D51',
     marginHorizontal: 20,
     marginTop: 5,
-    marginBottom: 20,
+    marginBottom: 15.9,
     padding: 15,
     borderRadius: 15,
     justifyContent: 'center',
@@ -272,13 +274,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   cancelButton: {
-    marginVertical: 15,
+    marginHorizontal: 20,
+    marginBottom: 30,
+    padding: 15,
+    borderRadius: 15,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#4A6D51',
   },
   cancelButtonText: {
     color: '#4A6D51',
-    fontWeight: '500',
+    fontWeight: '600',
     fontSize: 16,
   },
 });
