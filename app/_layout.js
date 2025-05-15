@@ -43,7 +43,7 @@ function TabsLayout() {
         <Tabs.Screen
           name="homepage"
           options={{
-            tabBarIcon: ({ focused }) => <Ionicons name="home" size={28} color="#FFFFFF" />,
+            tabBarIcon: ({ focused }) => <MaterialCommunityIcons name="home-variant" size={28} color="#FFFFFF" />,
             tabBarItemStyle: { marginHorizontal: 42 },
           }}
         />
@@ -62,16 +62,16 @@ function TabsLayout() {
           }}
         />
         <Tabs.Screen
-          name="contacts"
+          name="explorePage"
           options={{
-            tabBarIcon: ({ focused }) => <Ionicons name="people" size={28} color="#FFFFFF" />,
+            tabBarIcon: ({ focused }) => <MaterialCommunityIcons name="magnify" size={28} color="#FFFFFF" />,
             tabBarItemStyle: { marginHorizontal: 42 },
           }}
         />
         <Tabs.Screen
-          name="settings"
+          name="userProfile"
           options={{
-            tabBarIcon: ({ focused }) => <Ionicons name="settings" size={28} color="#FFFFFF" />,
+            tabBarIcon: ({ focused }) => <MaterialCommunityIcons name="account" size={28} color="#FFFFFF" />,
             tabBarItemStyle: { marginHorizontal: 40 },
           }}
         />
