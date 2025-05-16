@@ -122,7 +122,7 @@ const ProfileScreen = () => {
   const handleSelectPhoto = async () => {
     try {
       const pickerResult = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: 'Images',// changed from Media TypeOptions.Images
         allowsEditing: true,
         aspect: [1, 1],
         quality: 0.7

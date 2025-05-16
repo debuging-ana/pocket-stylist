@@ -1,52 +1,105 @@
-/*
- this context manages our wardrobe items state and provides
- includes simple functions to add, update & delete items
-*/
-import { createContext, useState, useContext } from 'react';
+import { createContext, useState, useContext, useEffect } from 'react';
+import { db } from '../firebaseConfig';
+import { collection, doc, setDoc, getDocs, deleteDoc } from "firebase/firestore"; 
+import { useAuth } from './AuthContext';
 
 const WardrobeContext = createContext();
 
 export const WardrobeProvider = ({ children }) => {
-  // state to store our wardrobe items - starts empty
   const [wardrobeItems, setWardrobeItems] = useState([]);
+  const { user } = useAuth();
 
-  // function to add a new item to the wardrobe
-  const addItem = (newItem) => {
-    // basic validation that checks if required fields exist
-    if (!newItem.name || !newItem.category || !newItem.imageUri) {
-      console.log('Almost there! Please fill in the missing details');
-      return; 
+  // load items from Firestore when user logs in
+  useEffect(() => {
+    if (user) {
+      loadItems();
+    } else {
+      setWardrobeItems([]); // clear items from state if user logs out
     }
+  }, [user]);
 
-    // more reliable ID than using just Date.now()
-    const newId = Date.now() + '-' + Math.floor(Math.random() * 1000);
-
-    // create the complete item with our generated ID
-    const completeItem = {
-      ...newItem, 
-      id: newId   
-    };
-
-    // adds the new item to our wardrobe state
-    setWardrobeItems([...wardrobeItems, completeItem]);
+  //function to load wardrobe items from Firestore
+  const loadItems = async () => {
+    if (!user) return;
+    
+    try {
+      // get all documents from wardrobe subcollection under current user's document
+      const querySnapshot = await getDocs(collection(db, "users", user.uid, "wardrobe"));
+      const items = [];
+      //iterate thru the returned documents & format them
+      querySnapshot.forEach((doc) => {
+        items.push({ id: doc.id, ...doc.data() });
+      });
+      setWardrobeItems(items);
+    } catch (error) {
+      console.error("Error loading items: ", error);
+    }
   };
 
-  // function to update an existing item
-  const updateItem = (updatedItem) => {
+  const addItem = async (newItem) => {
+    if (!newItem.name || !newItem.category || !newItem.imageUri) {
+      console.log('Almost there! Please fill in the missing details');
+      return;
+    }
+
+    if (!user) {
+      console.log("User not logged in");
+      return;
+    }
+
+    try {
+      const newId = Date.now() + '-' + Math.floor(Math.random() * 1000);
+      const completeItem = { ...newItem, id: newId };
+      
+      // save the new item in Firestore under the user's wardrobe subcollection
+      await setDoc(doc(db, "users", user.uid, "wardrobe", newId), completeItem);
+      
+      // adds the new item to local state
+      setWardrobeItems([...wardrobeItems, completeItem]);
+    } catch (error) {
+      console.error("Error adding item: ", error);
+    }
+  };
+
+  const updateItem = async (updatedItem) => {
     if (!wardrobeItems.some(item => item.id === updatedItem.id)) {
       console.log("Item not found - cannot update");
       return;
     }
 
-    // update the item by mapping through the array
-    setWardrobeItems(wardrobeItems.map(item => 
-      item.id === updatedItem.id ? updatedItem : item
-    ));
+    if (!user) {
+      console.log("User not logged in");
+      return;
+    }
+
+    try {
+      // overwrite the item in Firestore w the updated data
+      await setDoc(doc(db, "users", user.uid, "wardrobe", updatedItem.id), updatedItem);
+      
+      // update local state
+      setWardrobeItems(wardrobeItems.map(item => 
+        item.id === updatedItem.id ? updatedItem : item
+      ));
+    } catch (error) {
+      console.error("Error updating item: ", error);
+    }
   };
 
-  // to delete an item by its ID
-  const deleteItem = (itemId) => {
-    setWardrobeItems(wardrobeItems.filter(item => item.id !== itemId));
+  const deleteItem = async (itemId) => {
+    if (!user) {
+      console.log("User not logged in");
+      return;
+    }
+
+    try {
+      // remove item from Firestore
+      await deleteDoc(doc(db, "users", user.uid, "wardrobe", itemId));
+      
+      // remove item from local state
+      setWardrobeItems(wardrobeItems.filter(item => item.id !== itemId));
+    } catch (error) {
+      console.error("Error deleting item: ", error);
+    }
   };
 
   return (

@@ -1,12 +1,23 @@
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { useWardrobe } from '../../context/wardrobeContext';
+import { useNavigation } from 'expo-router';
+import { useLayoutEffect } from 'react';
+import WardrobeBackButton from './components/WardrobeBackButton';
 
 export default function ItemDetailScreen() {
   const { id } = useLocalSearchParams();
   const { wardrobeItems } = useWardrobe();
+  const navigation = useNavigation();
 
   const item = wardrobeItems.find((item) => item.id === id);
+
+  //added back button
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => <WardrobeBackButton />,
+    });
+  }, [navigation]);
 
   if (!item) {
     return (

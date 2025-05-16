@@ -1,18 +1,22 @@
 /*
- this is the edit screen - similar to add-item but with data pre-filled
- & uses the updateItem function instead of addItem
+this is the edit screen - (similar to add-item) allows users to modify existing wardrobe items
+pre-fills with existing data & updates via firebase
 */
+import { useNavigation } from 'expo-router';
+import { useLayoutEffect } from 'react';
+import WardrobeBackButton from './components/WardrobeBackButton'; 
 import { useState } from 'react';
 import { 
-    View, 
-    Text, 
-    StyleSheet, 
-    TouchableOpacity, 
-    TextInput, 
-    Image, 
-    Alert,
-    ScrollView,
-    StatusBar 
+  View, 
+  Text, 
+  StyleSheet, 
+  TouchableOpacity, 
+  TextInput, 
+  Image, 
+  Alert,
+  ScrollView,
+  StatusBar,
+  ActivityIndicator // for loading indicator
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -58,11 +62,19 @@ export default function EditItemScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { updateItem } = useWardrobe();
-  
+  const navigation = useNavigation();
   // initialize state with the item's current values
-  const [imageUri, setImageUri] = useState(params.imageUri || null);
-  const [name, setName] = useState(params.name || '');
+  const [imageUri, setImageUri] = useState(null);
+  const [name, setName] = useState('');
   const [category, setCategory] = useState(params.category || 'tops');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null); // added for error handling
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => <WardrobeBackButton />,
+    });
+  }, [navigation]);
 
   // category options now using the centralized icon function
   const categories = [
@@ -73,40 +85,64 @@ export default function EditItemScreen() {
     { id: 'shoes', name: 'Shoes' },
   ];
 
+  // updated image picker function with new Media Type format & better error handling
   const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
+    try {
+      // check camera roll permission
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission required', 'Please allow photo access to select images');
+        return;
+      }
 
-    if (!result.canceled) {
-      setImageUri(result.assets[0].uri);
+      // launch image picker 
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: 'Images', // updated from deprecated format (warnings)
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+
+      if (!result.canceled && result.assets?.[0]?.uri) {
+        setImageUri(result.assets[0].uri);
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to select image');
     }
   };
 
-  // handle saving the updated item
-  const saveChanges = () => {
+  // handle saving the updated item to firebase through wardrobe context
+  const saveChanges = async () => {
     if (!imageUri) {
-      Alert.alert('Image missing. Upload to proceed');
+      Alert.alert('Image required', 'Please upload an image to proceed');
       return;
     }
     if (!name.trim()) {
-      Alert.alert('Please enter a name');
+      Alert.alert('New Name required', 'Please enter a new name for your item');
       return;
     }
     
-    const updatedItem = {
-      id: params.id, // keep the same ID
-      name,
-      category,
-      imageUri,
-    };
+    setIsLoading(true);
+    setError(null);
     
-    updateItem(updatedItem);
-    Alert.alert('Changes Saved!', 'Your item has been updated');
-    router.back(); 
+    try {
+      const updatedItem = {
+        id: params.id, // keep the same ID
+        name,
+        category,
+        imageUri,
+      };
+      
+      await updateItem(updatedItem);
+      Alert.alert('Success!', 'Your changes have been saved');
+      router.push('/wardrobe');
+    } catch (error) {
+      setError('Failed to save changes');
+      console.error('Update error:', error);
+      Alert.alert('Error', 'Could not save your changes. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -114,12 +150,22 @@ export default function EditItemScreen() {
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         <View style={styles.content}>
+          {/* error message display */}
+          {error && (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
+          )}
+
           <View style={styles.card}>
             <Text style={styles.sectionTitle}>Item Photo</Text>
             {/* image preview section */}
             <View style={styles.imageContainer}>
               {imageUri ? (
-                <Image source={{ uri: imageUri }} style={styles.image} />
+                <Image 
+                  source={{ uri: imageUri }} 
+                  style={styles.image}
+                />
               ) : (
                 <View style={styles.imagePlaceholder}>
                   <MaterialCommunityIcons name="image" size={50} color="#AFC6A3" />
@@ -128,8 +174,11 @@ export default function EditItemScreen() {
               )}
             </View>
 
-            {/* image selection button */}
-            <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
+            {/* image selection button with loading state */}
+            <TouchableOpacity 
+              style={styles.imageButton} 
+              onPress={pickImage}
+            >
               <Feather name="image" size={18} color="white" style={styles.buttonIcon} />
               <Text style={styles.buttonText}>Change Image</Text>
             </TouchableOpacity>
@@ -142,10 +191,11 @@ export default function EditItemScreen() {
               <Text style={styles.inputLabel}>Name</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Item name"
+                placeholder="Rename it to match your style.."
                 placeholderTextColor="#8a8b8a"
                 value={name}
                 onChangeText={setName}
+                editable={!isLoading}
               />
             </View>
 
@@ -159,8 +209,10 @@ export default function EditItemScreen() {
                     style={[
                       styles.categoryButton,
                       category === cat.id && styles.selectedCategory,
+                      isLoading && styles.disabledButton
                     ]}
-                    onPress={() => setCategory(cat.id)}
+                    onPress={() => !isLoading && setCategory(cat.id)}
+                    disabled={isLoading}
                   >
                     <View style={styles.categoryIcon}>
                       {getCategoryIcon(cat.id, 30)}
@@ -177,10 +229,20 @@ export default function EditItemScreen() {
             </View>
           </View>
 
-          {/* save button */}
-          <TouchableOpacity style={styles.saveButton} onPress={saveChanges}>
-            <Text style={styles.saveButtonText}>Save Changes</Text>
-            <Feather name="check" size={18} color="white" style={{ marginLeft: 5 }} />
+          {/* save button with loading state */}
+          <TouchableOpacity 
+            style={[styles.saveButton, isLoading && styles.disabledButton]} 
+            onPress={saveChanges}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <ActivityIndicator color="white" />
+            ) : (
+              <>
+                <Text style={styles.saveButtonText}>Save Changes</Text>
+                <Feather name="check" size={18} color="white" style={{ marginLeft: 5 }} />
+              </>
+            )}
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -224,6 +286,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 15,
+    position: 'relative', // Needed for absolute positioning of loading overlay
   },
   image: {
     width: '100%',
@@ -310,5 +373,26 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: '600',
     fontSize: 16,
+  },
+  disabledButton: {
+    opacity: 0.6,
+  },
+  errorContainer: {
+    backgroundColor: '#FFEBEE',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 15,
+  },
+  errorText: {
+    color: '#C62828',
+    textAlign: 'center',
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(255,255,255,0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

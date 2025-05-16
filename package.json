@@ -23,7 +23,7 @@
     "expo": "53.0.9",
     "expo-blur": "~14.1.4",
     "expo-constants": "~17.1.6",
-    "expo-image-picker": "~16.1.4",
+    "expo-image-picker": "^16.1.4",
     "expo-router": "~5.0.5",
     "expo-symbols": "~0.4.4",
     "firebase": "^11.6.1",

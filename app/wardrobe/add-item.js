@@ -1,15 +1,19 @@
 // the add item screen - where users can add new clothing items to their digital wardrobe
+import { useNavigation } from 'expo-router';
+import { useLayoutEffect } from 'react';
+import WardrobeBackButton from './components/WardrobeBackButton';
 import { useState } from 'react';
 import { 
-    View, 
-    Text, 
-    StyleSheet, 
-    TouchableOpacity, 
-    TextInput, 
-    Image, 
-    Alert,
-    ScrollView,
-    StatusBar
+  View, 
+  Text, 
+  StyleSheet, 
+  TouchableOpacity, 
+  TextInput, 
+  Image, 
+  Alert,
+  ScrollView,
+  StatusBar,
+  ActivityIndicator
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
@@ -53,11 +57,21 @@ const getCategoryIcon = (category, size = 22) => {
 
 export default function AddItemScreen() {
   const router = useRouter();
-  const { addItem } = useWardrobe();
-  const [imageUri, setImageUri] = useState(null); //stores the image URI
+  const { addItem } = useWardrobe(); 
+  const [imageUri, setImageUri] = useState(null);
   const [name, setName] = useState('');
-  const [category, setCategory] = useState('tops'); //default
+  const [category, setCategory] = useState('tops'); // default
+  const navigation = useNavigation();
+  const [isLoading, setIsLoading] = useState(false);
+  const [imageLoading, setImageLoading] = useState(false);
 
+  // configure custom back button in header
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => <WardrobeBackButton />,
+    });
+  }, [navigation]);
+  
   // category options now using the centralized icon function
   const categories = [
     { id: 'tops', name: 'Tops' },
@@ -69,40 +83,67 @@ export default function AddItemScreen() {
 
   // to handle selecting an image from user's gallery/photos
   const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images, //no videos
-      allowsEditing: true,
-      aspect: [4, 3], //standard aspect ratio
-      quality: 1, //high qual
-    });
+    setImageLoading(true);
+    try {
+      // check/request permissions
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission required', 'Please allow photo access to select images');
+        return;
+      }
 
-    // if user didnt cancel the picker and actually selects an image:
-    if (!result.canceled) {
-      setImageUri(result.assets[0].uri);
+      // launch image picker with modern configuration
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: 'Images', // updated from deprecated Media TypeOptions (warnings)
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+
+      // handle result using current Expo format
+      if (!result.canceled && result.assets?.length > 0) {
+        setImageUri(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error('Image picker error:', error);
+      Alert.alert('Error', 'Failed to select image');
+    } finally {
+      setImageLoading(false);
     }
   };
 
-  // handles saving the new item to user wardrobe
-  const saveItem = () => {
+  // saves the new item to Firebase through the wardrobe context
+  const saveItem = async () => {
     if (!imageUri) {
-      Alert.alert('Image missing – upload to proceed');
+      Alert.alert('Image Required', 'Please upload an image to proceed');
       return;
     }
     if (!name.trim()) {
-      Alert.alert('Please enter a name');
+      Alert.alert('Name Required', 'Please enter a name for your item');
       return;
     }
     
-    const newItem = {
-      id: Date.now().toString(),
-      name,
-      category,
-      imageUri,
-    };
+    setIsLoading(true);
     
-    addItem(newItem);
-    Alert.alert('Styled & Filed!', 'Your item is in the wardrobe');
-    router.push('/wardrobe');
+    try {
+      const newItem = {
+        id: Date.now().toString(), // temporary ID (Firebase will generate its own)
+        name,
+        category,
+        imageUri,
+      };
+      
+      // handles Firebase storage upload & Firestore document creation
+      await addItem(newItem);
+      
+      Alert.alert('Success!', 'Your item has been added to the wardrobe');
+      router.push('/wardrobe'); 
+    } catch (error) {
+      console.error('Save error:', error);
+      Alert.alert('Error', 'Failed to save item. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -110,29 +151,53 @@ export default function AddItemScreen() {
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         <View style={styles.content}>
+          {/* image upload card */}
           <View style={styles.card}>
             <Text style={styles.sectionTitle}>Item Photo</Text>
+            
             {/* image preview section */}
             <View style={styles.imageContainer}>
               {imageUri ? (
-                <Image source={{ uri: imageUri }} style={styles.image} />
+                <Image 
+                  source={{ uri: imageUri }} 
+                  style={styles.image}
+                  onLoadStart={() => setImageLoading(true)}
+                  onLoadEnd={() => setImageLoading(false)}
+                />
               ) : (
                 <View style={styles.imagePlaceholder}>
                   <MaterialCommunityIcons name="image" size={50} color="#AFC6A3" />
                   <Text style={styles.placeholderText}>No image selected</Text>
                 </View>
               )}
+              {imageLoading && (
+                <View style={styles.loadingOverlay}>
+                  <ActivityIndicator size="large" color="#4A6D51" />
+                </View>
+              )}
             </View>
 
             {/* image selection button */}
-            <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
-              <Feather name="image" size={18} color="white" style={styles.buttonIcon} />
-              <Text style={styles.buttonText}>Choose from Gallery</Text>
+            <TouchableOpacity 
+              style={[styles.imageButton, imageLoading && styles.disabledButton]} 
+              onPress={pickImage}
+              disabled={imageLoading}
+            >
+              {imageLoading ? (
+                <ActivityIndicator color="white" />
+              ) : (
+                <>
+                  <Feather name="image" size={18} color="white" style={styles.buttonIcon} />
+                  <Text style={styles.buttonText}>Choose from Gallery</Text>
+                </>
+              )}
             </TouchableOpacity>
           </View>
 
+          {/* item details card */}
           <View style={styles.card}>
             <Text style={styles.sectionTitle}>Item Details</Text>
+            
             {/* name input */}
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>Name</Text>
@@ -174,9 +239,15 @@ export default function AddItemScreen() {
           </View>
 
           {/* save button */}
-          <TouchableOpacity style={styles.saveButton} onPress={saveItem}>
-            <Text style={styles.saveButtonText}>Save to Wardrobe</Text>
-            <Feather name="check" size={18} color="white" style={{ marginLeft: 5 }} />
+          <TouchableOpacity 
+            style={styles.saveButton} 
+            onPress={saveItem} 
+            disabled={isLoading}
+          >
+            <Text style={styles.saveButtonText}> 
+              {isLoading ? 'Saving...' : 'Saved to Wardrobe!'}
+            </Text>
+            {!isLoading && <Feather name="check" size={18} color="white" style={{ marginLeft: 5 }} />}
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -306,5 +377,16 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: '600',
     fontSize: 16,
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(255,255,255,0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  disabledButton: {
+    opacity: 0.6,
   },
 });
