@@ -52,8 +52,8 @@ export default function SettingsScreen() {
             style={styles.settingCard}
             onPress={() => router.push('/profile')}
           >
-            <View style={[styles.settingIconContainer, { backgroundColor: '#E8F0E2' }]}>
-              <Ionicons name="person-circle-outline" size={22} color="#4A6D51" />
+            <View style={[styles.settingIconContainer, { backgroundColor: '#CDD7E4' }]}>
+              <Ionicons name="person-circle-outline" size={22} color="#536C8C" />
             </View>
             <View style={styles.settingInfo}>
               <Text style={styles.settingName}>Profile Settings</Text>
@@ -66,8 +66,8 @@ export default function SettingsScreen() {
             style={styles.settingCard}
             onPress={() => router.push('/notifications')}
           >
-            <View style={[styles.settingIconContainer, { backgroundColor: '#F0E5E9' }]}>
-              <Ionicons name="notifications-outline" size={22} color="#AF7E88" />
+            <View style={[styles.settingIconContainer, { backgroundColor: '#CADBC1' }]}>
+              <Ionicons name="notifications-outline" size={22} color="#4A6D51" />
             </View>
             <View style={styles.settingInfo}>
               <Text style={styles.settingName}>Notifications</Text>
@@ -80,8 +80,8 @@ export default function SettingsScreen() {
             style={styles.settingCard}
             onPress={() => router.push('/change-password')}
           >
-            <View style={[styles.settingIconContainer, { backgroundColor: '#E5EDF7' }]}>
-              <Feather name="lock" size={22} color="#5A7DA3" />
+            <View style={[styles.settingIconContainer, { backgroundColor: '#E3D3C6' }]}>
+              <Feather name="lock" size={22} color="#8B6E57" />
             </View>
             <View style={styles.settingInfo}>
               <Text style={styles.settingName}>Change Password</Text>
@@ -94,8 +94,8 @@ export default function SettingsScreen() {
             style={styles.settingCard}
             onPress={() => router.push('/change-email')}
           >
-            <View style={[styles.settingIconContainer, { backgroundColor: '#E5EDF7' }]}>
-              <Feather name="mail" size={22} color="#5A7DA3" />
+            <View style={[styles.settingIconContainer, { backgroundColor: '#E3D3C6' }]}>
+              <Feather name="mail" size={22} color="#8B6E57" />
             </View>
             <View style={styles.settingInfo}>
               <Text style={styles.settingName}>Change Email</Text>
@@ -114,8 +114,8 @@ export default function SettingsScreen() {
             style={styles.settingCard}
             onPress={() => router.push('/delete-account')}
           >
-            <View style={[styles.settingIconContainer, { backgroundColor: '#FFE5E5' }]}>
-              <Feather name="trash-2" size={22} color="#D86262" />
+            <View style={[styles.settingIconContainer, { backgroundColor: '#DFBDBD' }]}>
+              <Feather name="trash-2" size={22} color="#995454" />
             </View>
             <View style={styles.settingInfo}>
               <Text style={styles.settingName}>Delete Account</Text>

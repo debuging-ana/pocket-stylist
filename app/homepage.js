@@ -59,26 +59,26 @@ export default function HomePage() {
           </View>
           <View style={styles.actionsContainer}>
             <TouchableOpacity style={styles.actionButton} onPress={() => router.push('/wardrobe')}>
-              <View style={[styles.actionIconContainer, { backgroundColor: '#DBE9D1' }]}>
-                <MaterialCommunityIcons name="hanger" size={22} color="#4A6D51" />
+              <View style={[styles.actionIconContainer, { backgroundColor: '#CDD7E4' }]}>
+                <MaterialCommunityIcons name="hanger" size={22} color="#536C8C" />
               </View>
               <Text style={styles.actionText}>My Wardrobe</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.actionButton} onPress={() => router.push('/camera')}>
-              <View style={[styles.actionIconContainer, { backgroundColor: '#F0E5E9' }]}>
-                <Feather name="camera" size={22} color="#AF7E88" />
+              <View style={[styles.actionIconContainer, { backgroundColor: '#CADBC1' }]}>
+                <Feather name="camera" size={22} color="#4A6D51" />
               </View>
               <Text style={styles.actionText}>Camera</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.actionButton} onPress={() => router.push('/contacts')}>
-              <View style={[styles.actionIconContainer, { backgroundColor: '#E5EDF7' }]}>
-                <MaterialCommunityIcons name="account-group" size={22} color="#5A7DA3" />
+              <View style={[styles.actionIconContainer, { backgroundColor: '#E3D3C6' }]}>
+                <MaterialCommunityIcons name="account-group" size={22} color="#8B6E57" />
               </View>
               <Text style={styles.actionText}>Messages</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.actionButton} onPress={() => router.push('/settings')}>
-              <View style={[styles.actionIconContainer, { backgroundColor: '#EFEAE5' }]}>
-                <Ionicons name="settings-outline" size={22} color="#A3885A" />
+              <View style={[styles.actionIconContainer, { backgroundColor: '#DFBDBD' }]}>
+                <Ionicons name="settings-outline" size={22} color="#995454" />
               </View>
               <Text style={styles.actionText}>Settings</Text>
             </TouchableOpacity>
@@ -93,7 +93,7 @@ export default function HomePage() {
             </TouchableOpacity>
           </View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestionsScrollContent}>
-            <TouchableOpacity style={[styles.suggestionCard, { backgroundColor: '#D2E5C4' }]} onPress={() => router.push('/daily-outfit')}>
+            <TouchableOpacity style={[styles.suggestionCard, { backgroundColor: '#CDD7E4' }]} onPress={() => router.push('/daily-outfit')}>
               <View style={styles.cardContent}>
                 <View style={styles.cardHeader}>
                   <Ionicons name="sunny-outline" size={18} color="#FFFFFF" />
@@ -107,7 +107,7 @@ export default function HomePage() {
                 </View>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.suggestionCard, { backgroundColor: '#E5DAE0' }]} onPress={() => router.push('/occasion-outfits')}>
+            <TouchableOpacity style={[styles.suggestionCard, { backgroundColor: '#CADBC1' }]} onPress={() => router.push('/occasion-outfits')}>
               <View style={styles.cardContent}>
                 <View style={styles.cardHeader}>
                   <Ionicons name="calendar-outline" size={18} color="#FFFFFF" />
@@ -117,11 +117,11 @@ export default function HomePage() {
                 <Text style={styles.cardDescription}>Outfit ideas perfect for your upcoming events and occasions</Text>
                 <View style={styles.cardButton}>
                   <Text style={styles.cardButtonText}>Explore</Text>
-                  <Feather name="arrow-right" size={14} color="#AF7E88" />
+                  <Feather name="arrow-right" size={14} color="#4A6D51" />
                 </View>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.suggestionCard, { backgroundColor: '#BDD4E7' }]} onPress={() => router.push('/occasion-styles')}>
+            <TouchableOpacity style={[styles.suggestionCard, { backgroundColor: '#E3D3C6' }]} onPress={() => router.push('/occasion-styles')}>
               <View style={styles.cardContent}>
                 <View style={styles.cardHeader}>
                   <Ionicons name="briefcase-outline" size={18} color="#FFFFFF" />
@@ -131,11 +131,11 @@ export default function HomePage() {
                 <Text style={styles.cardDescription}>Find the perfect look for any occasion, from office meetings to weekend brunches</Text>
                 <View style={styles.cardButton}>
                   <Text style={styles.cardButtonText}>Browse Occasions</Text>
-                  <Feather name="arrow-right" size={14} color="#5A7DA3" />
+                  <Feather name="arrow-right" size={14} color="#4A6D51" />
                 </View>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.suggestionCard, { backgroundColor: '#FFC0CB' }]} onPress={() => router.push('/personalized-styles')}>
+            <TouchableOpacity style={[styles.suggestionCard, { backgroundColor: '#DFBDBD' }]} onPress={() => router.push('/personalized-styles')}>
               <View style={styles.cardContent}>
                 <View style={styles.cardHeader}>
                   <Ionicons name="person-outline" size={18} color="#FFFFFF" />
@@ -145,7 +145,7 @@ export default function HomePage() {
                 <Text style={styles.cardDescription}>Custom style recommendations based on your preferences, style, and wardrobe items</Text>
                 <View style={styles.cardButton}>
                   <Text style={styles.cardButtonText}>See Recommendations</Text>
-                  <Feather name="arrow-right" size={14} color="#AF7E88" />
+                  <Feather name="arrow-right" size={14} color="#4A6D51" />
                 </View>
               </View>
             </TouchableOpacity>

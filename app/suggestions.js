@@ -21,7 +21,7 @@ export default function SuggestionsPage() {
           icon: "sunny-outline",
           iconColor: "#FFFFFF",
           description: "Perfect outfit suggestions based on today's weather and your style preferences",
-          backgroundColor: "#D2E5C4",
+          backgroundColor: "#CDD7E4",
           accentColor: "#4A6D51",
           route: "/daily-outfit",
           buttonText: "View Outfit"
@@ -33,8 +33,8 @@ export default function SuggestionsPage() {
           icon: "calendar-outline",
           iconColor: "#FFFFFF",
           description: "Outfit ideas perfect for your upcoming events and occasions",
-          backgroundColor: "#E5DAE0",
-          accentColor: "#AF7E88",
+          backgroundColor: "#CADBC1",
+          accentColor: "#4A6D51",
           route: "/occasion-outfits",
           buttonText: "Explore"
         },
@@ -45,8 +45,8 @@ export default function SuggestionsPage() {
           icon: "briefcase-outline",
           iconColor: "#FFFFFF",
           description: "Find the perfect look for any occasion, from office meetings to weekend brunches",
-          backgroundColor: "#BDD4E7",
-          accentColor: "#5A7DA3",
+          backgroundColor: "#E3D3C6",
+          accentColor: "#4A6D51",
           route: "/occasion-styles",
           buttonText: "Browse Occasions"
         },
@@ -57,8 +57,8 @@ export default function SuggestionsPage() {
           icon: "person-outline",
           iconColor: "#FFFFFF",
           description: "Custom style recommendations based on your preferences, style, and wardrobe items",
-          backgroundColor: "#FFC0CB",
-          accentColor: "#AF7E88",
+          backgroundColor: "#DFBDBD",
+          accentColor: "#4A6D51",
           route: "/personalized-styles",
           buttonText: "See Recommendations"
         }

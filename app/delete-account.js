@@ -116,7 +116,7 @@ export default function DeleteAccount() {
         <View style={styles.headerContainer}>
           <View style={styles.headerCard}>
             <View style={styles.iconContainer}>
-              <MaterialCommunityIcons name="account-remove" size={50} color="#EA6D6D" />
+              <MaterialCommunityIcons name="delete" size={50} color="#EA6D6D" />
             </View>
             
             <Text style={styles.title}>Delete Account</Text>
@@ -130,7 +130,7 @@ export default function DeleteAccount() {
             ) : null}
             
             <View style={styles.warningContainer}>
-              <Feather name="alert-triangle" size={20} color="#EA6D6D" />
+              <Feather name="alert-triangle" size={20} color="#FFA000" />
               <Text style={styles.warningText}>
                 This action is permanent and cannot be undone. All your data will be permanently deleted.
               </Text>
