@@ -10,11 +10,49 @@ import {
     TouchableOpacity, 
     TextInput, 
     Image, 
-    Alert 
+    Alert,
+    ScrollView,
+    StatusBar 
 } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useWardrobe } from '../../context/wardrobeContext';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, Feather } from '@expo/vector-icons';
+
+// utility function to render category icons based on item category (matches wardrobe.js)
+const getCategoryIcon = (category, size = 22) => {
+  const normalized = category.toLowerCase();
+
+  // return appropriate icon/component based on category
+  if (normalized.includes('top')) {
+    return <MaterialCommunityIcons name="tshirt-crew" size={size} color="#4A6D51" />;
+  }
+  if (normalized.includes('bottom')) {
+    return (
+      <Image 
+        source={require('../../assets/images/pants.png')}
+        style={{ width: size, height: size, resizeMode: 'contain' }}
+      />
+    );
+  }
+  if (normalized.includes('jacket')) {
+    return (
+      <Image 
+        source={require('../../assets/images/jacket.png')}
+        style={{ width: size, height: size, resizeMode: 'contain' }}
+      />
+    );
+  }
+  if (normalized.includes('accessories')) {
+    return <MaterialCommunityIcons name="necklace" size={size} color="#4A6D51" />;
+  }
+  if (normalized.includes('shoe')) {
+    return <MaterialCommunityIcons name="shoe-formal" size={size} color="#4A6D51" />;
+  }
+
+  // default icon
+  return <MaterialCommunityIcons name="folder" size={size} color="#4A6D51" />;
+};
 
 export default function EditItemScreen() {
   const router = useRouter();
@@ -26,12 +64,13 @@ export default function EditItemScreen() {
   const [name, setName] = useState(params.name || '');
   const [category, setCategory] = useState(params.category || 'tops');
 
+  // category options now using the centralized icon function
   const categories = [
-    { id: 'tops', name: 'Tops', image: require('../../assets/images/polo-shirt.png') },
-    { id: 'bottoms', name: 'Bottoms', image: require('../../assets/images/pants.png') },
-    { id: 'jackets', name: 'Jackets', image: require('../../assets/images/jacket.png') },
-    { id: 'accessories', name: 'Accessories', image: require('../../assets/images/necklace.png') },
-    { id: 'shoes', name: 'Shoes', image: require('../../assets/images/running-shoe.png') },
+    { id: 'tops', name: 'Tops' },
+    { id: 'bottoms', name: 'Bottoms' },
+    { id: 'jackets', name: 'Jackets' },
+    { id: 'accessories', name: 'Accessories' },
+    { id: 'shoes', name: 'Shoes' },
   ];
 
   const pickImage = async () => {
@@ -71,174 +110,205 @@ export default function EditItemScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      {/* image preview section */}
-      <View style={styles.imageContainer}>
-        {imageUri ? (
-          <Image source={{ uri: imageUri }} style={styles.image} />
-        ) : (
-          <View style={styles.imagePlaceholder}>
-           <MaterialCommunityIcons name="image" size={50} color="#7D7D7D" />
-            <Text style={styles.placeholderText}>No image selected</Text>
+    <>
+      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        <View style={styles.content}>
+          <View style={styles.card}>
+            <Text style={styles.sectionTitle}>Item Photo</Text>
+            {/* image preview section */}
+            <View style={styles.imageContainer}>
+              {imageUri ? (
+                <Image source={{ uri: imageUri }} style={styles.image} />
+              ) : (
+                <View style={styles.imagePlaceholder}>
+                  <MaterialCommunityIcons name="image" size={50} color="#AFC6A3" />
+                  <Text style={styles.placeholderText}>No image selected</Text>
+                </View>
+              )}
+            </View>
+
+            {/* image selection button */}
+            <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
+              <Feather name="image" size={18} color="white" style={styles.buttonIcon} />
+              <Text style={styles.buttonText}>Change Image</Text>
+            </TouchableOpacity>
           </View>
-        )}
-      </View>
 
-      {/* image selection button */}
-      <View style={styles.buttonRow}>
-        <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
-          <Text style={styles.buttonText}>Change Image</Text>
-        </TouchableOpacity>
-      </View>
+          <View style={styles.card}>
+            <Text style={styles.sectionTitle}>Item Details</Text>
+            {/* name input */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>Name</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Item name"
+                placeholderTextColor="#8a8b8a"
+                value={name}
+                onChangeText={setName}
+              />
+            </View>
 
-      {/* name input */}
-      <TextInput
-        style={styles.input}
-        placeholder="Item name"
-        placeholderTextColor="#8a8b8a"
-        value={name}
-        onChangeText={setName}
-      />
+            {/* category selection */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>Category</Text>
+              <View style={styles.categoryContainer}>
+                {categories.map((cat) => (
+                  <TouchableOpacity
+                    key={cat.id}
+                    style={[
+                      styles.categoryButton,
+                      category === cat.id && styles.selectedCategory,
+                    ]}
+                    onPress={() => setCategory(cat.id)}
+                  >
+                    <View style={styles.categoryIcon}>
+                      {getCategoryIcon(cat.id, 30)}
+                    </View>
+                    <Text style={[
+                      styles.categoryText, 
+                      category === cat.id && styles.selectedCategoryText
+                    ]}>
+                      {cat.name}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          </View>
 
-      {/* category selection */}
-      <Text style={styles.sectionTitle}>Select Category</Text>
-      <View style={styles.categoryContainer}>
-        {categories.map((cat) => (
-          <TouchableOpacity
-            key={cat.id}
-            style={[
-              styles.categoryButton,
-              category === cat.id && styles.selectedCategory,
-            ]}
-            onPress={() => setCategory(cat.id)}
-          >
-            <Image 
-              source={cat.image} 
-              style={[
-                styles.categoryImage,
-                category === cat.id && styles.selectedCategoryImage
-              ]} 
-            />
-            <Text style={[
-              styles.categoryText, 
-              category === cat.id && styles.selectedCategoryText
-            ]}>
-              {cat.name}
-            </Text>
+          {/* save button */}
+          <TouchableOpacity style={styles.saveButton} onPress={saveChanges}>
+            <Text style={styles.saveButtonText}>Save Changes</Text>
+            <Feather name="check" size={18} color="white" style={{ marginLeft: 5 }} />
           </TouchableOpacity>
-        ))}
-      </View>
-
-      {/* save button */}
-      <TouchableOpacity style={styles.saveButton} onPress={saveChanges}>
-        <Text style={styles.saveButtonText}>Save Changes</Text>
-      </TouchableOpacity>
-    </View>
+        </View>
+      </ScrollView>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#F9F9F4',
+  },
+  content: {
+    paddingHorizontal: 20,
+    paddingBottom: 30,
+    paddingTop: 20,
+  },
+  card: {
+    backgroundColor: 'white',
+    borderRadius: 20,
     padding: 20,
-    backgroundColor: '#E8F0E2',
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#4A6D51',
+    marginBottom: 15,
   },
   imageContainer: {
     width: '100%',
     height: 200,
-    marginBottom: 20,
+    borderRadius: 15,
+    overflow: 'hidden',
+    backgroundColor: '#F8F8F8',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'white',
-    borderRadius: 10,
-    overflow: 'hidden',
+    marginBottom: 15,
   },
   image: {
     width: '100%',
     height: '100%',
     resizeMode: 'contain',
-    backgroundColor: '#f9f9f9',
   },
   imagePlaceholder: {
     justifyContent: 'center',
     alignItems: 'center',
   },
   placeholderText: {
-    color: '#7D7D7D',
     marginTop: 10,
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20,
+    color: '#828282',
+    fontSize: 14,
   },
   imageButton: {
-    backgroundColor: 'white',
-    padding: 15,
-    borderRadius: 10,
-    width: '100%',
+    flexDirection: 'row',
+    backgroundColor: '#AFC6A3',
+    padding: 12,
+    borderRadius: 15,
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonIcon: {
+    marginRight: 8,
   },
   buttonText: {
-    color: '#4A775A',
-    fontWeight: 'bold',
+    color: 'white',
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  inputContainer: {
+    marginBottom: 15,
+  },
+  inputLabel: {
+    fontSize: 14,
+    color: '#4A6D51',
+    marginBottom: 8,
+    fontWeight: '500',
   },
   input: {
-    backgroundColor: 'white',
+    backgroundColor: '#F8F8F8',
     padding: 15,
-    borderRadius: 10,
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#4A775A',
-    marginBottom: 10,
+    borderRadius: 15,
+    color: '#4A6D51',
   },
   categoryContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    marginBottom: 20,
   },
   categoryButton: {
     width: '48%',
     padding: 15,
-    borderRadius: 10,
-    backgroundColor: 'white',
+    borderRadius: 15,
+    backgroundColor: '#F8F8F8',
     marginBottom: 10,
     flexDirection: 'row',
     alignItems: 'center',
   },
   selectedCategory: {
-    backgroundColor: '#4A775A',
+    backgroundColor: '#AFC6A3',
   },
-  categoryImage: {
-    width: 30,
-    height: 30,
-    resizeMode: 'contain',
+  categoryIcon: {
     marginRight: 10,
-    tintColor: '#7D7D7D',
-  },
-  selectedCategoryImage: {
-    tintColor: 'white',
   },
   categoryText: {
-    marginLeft: 5,
     color: '#7D7D7D',
+    fontWeight: '500',
   },
   selectedCategoryText: {
     color: 'white',
   },
   saveButton: {
-    backgroundColor: '#4A775A',
+    backgroundColor: '#AFC6A3',
     padding: 15,
-    borderRadius: 10,
+    borderRadius: 15,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 10,
   },
   saveButtonText: {
     color: 'white',
-    fontWeight: 'bold',
+    fontWeight: '600',
     fontSize: 16,
   },
 });

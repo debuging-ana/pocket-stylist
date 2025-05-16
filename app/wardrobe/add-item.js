@@ -14,8 +14,42 @@ import {
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import { useWardrobe } from '../../context/wardrobeContext';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import Feather from '@expo/vector-icons/Feather';
+import { MaterialCommunityIcons, Feather } from '@expo/vector-icons';
+
+// utility function to render category icons based on item category (matches wardrobe.js)
+const getCategoryIcon = (category, size = 22) => {
+  const normalized = category.toLowerCase();
+
+  // return appropriate icon/component based on category
+  if (normalized.includes('top')) {
+    return <MaterialCommunityIcons name="tshirt-crew" size={size} color="#4A6D51" />;
+  }
+  if (normalized.includes('bottom')) {
+    return (
+      <Image 
+        source={require('../../assets/images/pants.png')}
+        style={{ width: size, height: size, resizeMode: 'contain' }}
+      />
+    );
+  }
+  if (normalized.includes('jacket')) {
+    return (
+      <Image 
+        source={require('../../assets/images/jacket.png')}
+        style={{ width: size, height: size, resizeMode: 'contain' }}
+      />
+    );
+  }
+  if (normalized.includes('accessories')) {
+    return <MaterialCommunityIcons name="necklace" size={size} color="#4A6D51" />;
+  }
+  if (normalized.includes('shoe')) {
+    return <MaterialCommunityIcons name="shoe-formal" size={size} color="#4A6D51" />;
+  }
+
+  // default icon
+  return <MaterialCommunityIcons name="folder" size={size} color="#4A6D51" />;
+};
 
 export default function AddItemScreen() {
   const router = useRouter();
@@ -24,16 +58,16 @@ export default function AddItemScreen() {
   const [name, setName] = useState('');
   const [category, setCategory] = useState('tops'); //default
 
-  //category options with their corresponding icons
+  // category options now using the centralized icon function
   const categories = [
-    { id: 'tops', name: 'Tops', image: require('../../assets/images/polo-shirt.png') },
-    { id: 'bottoms', name: 'Bottoms', image: require('../../assets/images/pants.png') },
-    { id: 'jackets', name: 'Jackets', image: require('../../assets/images/jacket.png') },
-    { id: 'accessories', name: 'Accessories', image: require('../../assets/images/necklace.png') },
-    { id: 'shoes', name: 'Shoes', image: require('../../assets/images/running-shoe.png') },
+    { id: 'tops', name: 'Tops' },
+    { id: 'bottoms', name: 'Bottoms' },
+    { id: 'jackets', name: 'Jackets' },
+    { id: 'accessories', name: 'Accessories' },
+    { id: 'shoes', name: 'Shoes' },
   ];
 
-  //to handle selecting an image from user's gallery/photos
+  // to handle selecting an image from user's gallery/photos
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images, //no videos
@@ -42,13 +76,13 @@ export default function AddItemScreen() {
       quality: 1, //high qual
     });
 
-    //if user didnt cancel the picker and actually selects an image:
+    // if user didnt cancel the picker and actually selects an image:
     if (!result.canceled) {
       setImageUri(result.assets[0].uri);
     }
   };
 
-  //handles saving the new item to user wardrobe
+  // handles saving the new item to user wardrobe
   const saveItem = () => {
     if (!imageUri) {
       Alert.alert('Image missing – upload to proceed');
@@ -124,13 +158,9 @@ export default function AddItemScreen() {
                     ]}
                     onPress={() => setCategory(cat.id)}
                   >
-                    <Image 
-                      source={cat.image} 
-                      style={[
-                        styles.categoryImage,
-                        category === cat.id && styles.selectedCategoryImage
-                      ]} 
-                    />
+                    <View style={styles.categoryIcon}>
+                      {getCategoryIcon(cat.id, 30)}
+                    </View>
                     <Text style={[
                       styles.categoryText, 
                       category === cat.id && styles.selectedCategoryText
@@ -207,7 +237,7 @@ const styles = StyleSheet.create({
   },
   imageButton: {
     flexDirection: 'row',
-    backgroundColor: '#DBE9D1',
+    backgroundColor: '#AFC6A3',
     padding: 12,
     borderRadius: 15,
     alignItems: 'center',
@@ -253,15 +283,8 @@ const styles = StyleSheet.create({
   selectedCategory: {
     backgroundColor: '#AFC6A3',
   },
-  categoryImage: {
-    width: 30,
-    height: 30,
-    resizeMode: 'contain',
+  categoryIcon: {
     marginRight: 10,
-    tintColor: '#7D7D7D',
-  },
-  selectedCategoryImage: {
-    tintColor: 'white',
   },
   categoryText: {
     color: '#7D7D7D',
