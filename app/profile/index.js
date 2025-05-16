@@ -523,7 +523,7 @@ const styles = StyleSheet.create({
   },
   photoContainer: {
     marginTop: -20,
-    marginBottom: -20, // Reduced space under profile picture
+    marginBottom: -30, // Reduced space under profile picture
   },
   profileImage: {
     width: 180,
