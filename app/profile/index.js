@@ -1,7 +1,9 @@
 /*
 Profile Screen - Displays & allows editing of user info
 */
-
+import { auth, db } from '../../firebaseConfig';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
 import React, { useState, useEffect } from 'react';
 import { 
   View, 
@@ -17,10 +19,6 @@ import {
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import DropDownPicker from 'react-native-dropdown-picker';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-// key for storing our profile data
-const PROFILE_STORAGE_KEY = 'userProfile';
 
 // this screen lets our users view & update their profile info, including personal details and photo.
 const ProfileScreen = () => {  
@@ -47,7 +45,7 @@ const ProfileScreen = () => {
     {label: 'Rectangle', value: 'Rectangle'},
     {label: 'Hour Glass', value: 'Hour Glass'},
     {label: 'Ectomorph', value: 'Ectomorph'},
-    {label: 'Mesomorph', value: 'Mesomorph'},
+    {label: 'mesomorph', value: 'mesomorph'},
     {label: 'Endomorph', value: 'Endomorph'}
   ]);
 
@@ -68,49 +66,116 @@ const ProfileScreen = () => {
   const [isEditing, setIsEditing] = useState(false); 
   const [isLoggedIn] = useState(true);
 
+  const requestPhotoPermission = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert(
+        'Permission required',
+        'Please allow access to your photo library to select a profile picture',
+        [{ text: 'OK' }]
+      );
+      return false;
+    }
+    return true;
+  };
+
   useEffect(() => {
-      loadProfileData();
-      requestPhotoPermission();
-      }, []);
+    // request photo permissions 
+    (async () => {
+      await requestPhotoPermission();
+    })();
 
-      const requestPhotoPermission = async () => {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert(
-          'Photo Access Required', 
-          'To set a profile picture, please enable photo access in your device settings',
-          [
-            { text: 'Cancel', style: 'cancel' },
-            { text: 'Open Settings', onPress: () => ImagePicker.openSettingsAsync() }
-          ]
-        );
+    // set up auth state listener
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // user is logged in → load their profile
+        loadProfileData();
+      } else {
+        // user logged out → clear all profile data
+        setProfile({
+          firstName: '',
+          lastName: '',
+          bio: '',
+          gender: '',
+          bodyType: '',
+          lifestyle: '',
+          email: ''
+        });
+        setProfilePhotoUri(null);
       }
-    };
+    });
 
-   // load saved profile data from storage
-   const loadProfileData = async () => {
+    // cleanup function (unsubscribe on unmount)
+    return () => {
+      unsubscribe();
+    };
+  }, []); // empty dependency array = runs only once on mount
+
+  // load saved profile data from Firestore
+  const loadProfileData = async () => {
     try {
-      const savedProfile = await AsyncStorage.getItem(PROFILE_STORAGE_KEY);
-      if (savedProfile) {
-        const parsedProfile = JSON.parse(savedProfile);
-        setProfile(parsedProfile);
-        if (parsedProfile.profilePhotoUri) {
-          setProfilePhotoUri(parsedProfile.profilePhotoUri);
-        }
+      const user = auth.currentUser;
+      if (!user) {
+        // clear profile if new user logged in
+        setProfile({
+          firstName: '',
+          lastName: '',
+          bio: '',
+          gender: '',
+          bodyType: '',
+          lifestyle: ''
+        });
+        setProfilePhotoUri(null);
+        return;
+      }
+
+      const docRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setProfile({
+          firstName: data.firstName || '',
+          lastName: data.lastName || '',
+          bio: data.bio || '',
+          gender: data.gender || '',
+          bodyType: data.bodyType || '',
+          lifestyle: data.lifestyle || '',
+          email: user.email || ''
+        });
+        setProfilePhotoUri(data.profilePhotoUri || null);
+      } else {
+        // new user - reset to empty profile
+        setProfile({
+          firstName: '',
+          lastName: '',
+          bio: '',
+          gender: '',
+          bodyType: '',
+          lifestyle: '',
+          email: user.email || ''
+        });
+        setProfilePhotoUri(null);
       }
     } catch (error) {
       console.log('Error loading profile:', error);
     }
   };
 
-  // save profile data to storage
+  // save profile data to Firestore
   const saveProfileData = async () => {
     try {
+      const user = auth.currentUser;
+      if (!user) return false;
+      
       const profileToSave = {
         ...profile,
-        profilePhotoUri: profilePhotoUri || null
+        profilePhotoUri: profilePhotoUri || null,
+        uid: user.uid,
+        email: user.email
       };
-      await AsyncStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profileToSave));
+
+      await setDoc(doc(db, "users", user.uid), profileToSave);
       return true;
     } catch (error) {
       console.log('Error saving profile:', error);
@@ -118,11 +183,15 @@ const ProfileScreen = () => {
     }
   };
   
-  //handle selecting a photo
+  // handle selecting a photo
   const handleSelectPhoto = async () => {
     try {
+      // Check if we have permission
+      const hasPermission = await requestPhotoPermission();
+      if (!hasPermission) return;
+
       const pickerResult = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: 'Images',// changed from Media TypeOptions.Images
+        mediaTypes: 'Images', // updated from deprecated Media TypeOptions (warnings)
         allowsEditing: true,
         aspect: [1, 1],
         quality: 0.7
@@ -133,7 +202,7 @@ const ProfileScreen = () => {
       if (pickerResult.assets?.length > 0) {
         const selectedImage = pickerResult.assets[0];
         
-        // file type validation that checks the URI extension
+        // file type validation
         const validExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
         const fileExtension = selectedImage.uri.split('.').pop().toLowerCase();
         
@@ -148,7 +217,8 @@ const ProfileScreen = () => {
       console.error('Image picker error:', error);
     }
   };
-  //email validation
+
+  // email validation
   const isValidEmail = (email) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
@@ -160,7 +230,7 @@ const ProfileScreen = () => {
       return;
     }
 
-    // validate email format if user provided it
+    // validate email format if provided
     if (profile.email && !isValidEmail(profile.email)) {
       Alert.alert('Invalid Email', 'Please enter a valid email address!');
       return;
@@ -186,13 +256,9 @@ const ProfileScreen = () => {
   }
 
   return (
-    // helps move the screen content up when the keyboard appears, 
-    // especially on iOS where it might otherwise hide input fields & scrollview was throwing errors 'VirtualizedLists'
     <KeyboardAvoidingView 
       style={{ flex: 1 }}
-      // iOS uses 'padding' to avoid the keyboard, while Android prefers 'height' — different behaviors per platform
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      // on iOS we offset more to ensure inputs are visible above the keyboard
       keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
     >
       <ScrollView 
@@ -224,40 +290,40 @@ const ProfileScreen = () => {
           
           <View style={styles.contentContainer}>
             <View style={styles.formContainer}>
-            <View style={styles.nameRow}>
-
-              {/* First Name */}
-              <View style={styles.firstNameField}>
-              <Text style={styles.inputLabel}>First Name</Text>
-                <TextInput
-                  style={[
-                    styles.inputField,
-                    profile.firstName ? { fontWeight: 'bold' } : { fontWeight: 'normal', color: '#828282' }
-                  ]}
-                  placeholder="first name.."
-                  placeholderTextColor="#828282" 
-                  value={profile.firstName}
-                  onChangeText={(text) => setProfile({ ...profile, firstName: text })}
-                  editable={isEditing}
-                />
+              <Text style={styles.sectionTitle}>User Details   ────── ★</Text>
+              <View style={styles.nameRow}>
+                {/* First Name */}
+                <View style={styles.firstNameField}>
+                  <Text style={styles.inputLabel}>First Name</Text>
+                  <TextInput
+                    style={[
+                      styles.inputField,
+                      profile.firstName ? { fontWeight: 'normal' } : { fontWeight: 'normal', color: '#828282' }
+                    ]}
+                    placeholder="first name.."
+                    placeholderTextColor="#828282" 
+                    value={profile.firstName}
+                    onChangeText={(text) => setProfile({ ...profile, firstName: text })}
+                    editable={isEditing}
+                  />
+                </View>
+                
+                {/* Last Name */}
+                <View style={styles.lastNameField}>
+                  <Text style={styles.inputLabel}>Last Name</Text>
+                  <TextInput
+                    style={[
+                      styles.inputField,
+                      profile.lastName ? { fontWeight: 'normal' } : { fontWeight: 'normal' }
+                    ]}
+                    placeholder="last name.."
+                    placeholderTextColor="#828282" 
+                    value={profile.lastName}
+                    onChangeText={(text) => setProfile({...profile, lastName: text})}
+                    editable={isEditing}
+                  />
+                </View>
               </View>
-              
-              {/* Last Name */}
-              <View style={styles.lastNameField}>
-                <Text style={styles.inputLabel}>Last Name</Text>
-                <TextInput
-                  style={[
-                    styles.inputField,
-                    profile.lastName ? { fontWeight: 'bold' } : { fontWeight: 'normal' }
-                  ]}
-                  placeholder="last name.."
-                  placeholderTextColor="#828282" 
-                  value={profile.lastName}
-                  onChangeText={(text) => setProfile({...profile, lastName: text})}
-                  editable={isEditing}
-                />
-              </View>
-            </View>
 
               {/* Email Field */}
               <View style={styles.emailFieldWrapper}>
@@ -276,59 +342,58 @@ const ProfileScreen = () => {
 
               {/* Bio Field */}
               <View style={styles.bioFieldWrapper}>
-              <Text style={styles.inputLabel}>Bio</Text>
-              <TextInput
-                style={[
-                  styles.inputField,
-                  styles.bioField,
-                  profile.bio ? { fontWeight: 'bold' } : { fontWeight: 'normal' }
-                ]}
-                placeholder="what should we know about you?"
-                placeholderTextColor="#828282" 
-                value={profile.bio}
-                onChangeText={(text) => setProfile({...profile, bio: text})}
-                editable={isEditing}
-                multiline
-                numberOfLines={4}
-              />
-            </View> 
+                <Text style={styles.inputLabel}>Bio</Text>
+                <TextInput
+                  style={[
+                    styles.inputField,
+                    styles.bioField,
+                    profile.bio ? { fontWeight: 'normal' } : { fontWeight: 'normal' }
+                  ]}
+                  placeholder="what should we know about you?"
+                  placeholderTextColor="#828282" 
+                  value={profile.bio}
+                  onChangeText={(text) => setProfile({...profile, bio: text})}
+                  editable={isEditing}
+                  multiline
+                  numberOfLines={4}
+                />
+              </View> 
 
-              <Text style={styles.sectionTitle}>Personal</Text>
+              <Text style={styles.sectionTitle}>Personal      ─────── ★</Text>
               
               {/* Gender Dropdown */}
               <View style={styles.dropdownWrapper}>
                 <Text style={styles.dropdownLabel}>Gender</Text>
-                  <DropDownPicker
-                    listMode="MODAL"
-                    open={genderOpen}
-                    value={profile.gender}
-                    items={genderItems}
-                    // only allows 1 dropdown (gender, body type, lifestyle) to open at a time — helps avoid UI overlap
-                    setOpen={(open) => {
-                      setGenderOpen(open);
-                      if (open) {
-                        setBodyTypeOpen(false);
-                        setLifestyleOpen(false);
-                      }
-                    }}
-                    setValue={(value) => setProfile({...profile, gender: value()})}
-                    setItems={setGenderItems}
-                    disabled={!isEditing}
-                    placeholder="Select Gender"
-                    style={[styles.dropdown, !isEditing && styles.dropdownDisabled]}
-                    textStyle={styles.dropdownText}
-                    dropDownContainerStyle={styles.dropdownContainer}
-                    listItemLabelStyle={styles.dropdownItemText}
-                    listItemContainerStyle={{ backgroundColor: '#E8F0E2' }}
-                    zIndex={3000}
-                  />
+                <DropDownPicker
+                  listMode="MODAL"
+                  open={genderOpen}
+                  value={profile.gender}
+                  items={genderItems}
+                  setOpen={(open) => {
+                    setGenderOpen(open);
+                    if (open) {
+                      setBodyTypeOpen(false);
+                      setLifestyleOpen(false);
+                    }
+                  }}
+                  setValue={(value) => setProfile({...profile, gender: value()})}
+                  setItems={setGenderItems}
+                  disabled={!isEditing}
+                  placeholder="Select Gender"
+                  style={[styles.dropdown, !isEditing && styles.dropdownDisabled]}
+                  textStyle={styles.dropdownText}
+                  dropDownContainerStyle={styles.dropdownContainer}
+                  listItemLabelStyle={styles.dropdownItemText}
+                  listItemContainerStyle={{ backgroundColor: '#E8F0E2' }}
+                  zIndex={3000}
+                />
               </View>
 
-              {/* Body Type Dropdown - Hidden when Gender dropdown is open */}
+              {/* Body Type Dropdown */}
               {!genderOpen && (
                 <View style={styles.dropdownWrapper}>
                   <Text style={styles.dropdownLabel}>Body Type</Text>
-                    <DropDownPicker
+                  <DropDownPicker
                     listMode="MODAL"
                     open={bodyTypeOpen}
                     value={profile.bodyType}
@@ -354,22 +419,22 @@ const ProfileScreen = () => {
                 </View>
               )}
               
-              {/* Lifestyle Dropdown - Hidden when Gender dropdown is open */}
+              {/* Lifestyle Dropdown */}
               {!genderOpen && (
                 <View style={styles.dropdownWrapper}>
                   <Text style={styles.dropdownLabel}>LifeStyle Information</Text>
-                    <DropDownPicker
-                      listMode="MODAL"
-                      open={lifestyleOpen}
-                      value={profile.lifestyle}
-                      items={lifestyleItems}
-                      setOpen={(open) => {
-                        setLifestyleOpen(open);
-                        if (open) {
-                          setGenderOpen(false);
-                          setBodyTypeOpen(false);
-                        }
-                      }}
+                  <DropDownPicker
+                    listMode="MODAL"
+                    open={lifestyleOpen}
+                    value={profile.lifestyle}
+                    items={lifestyleItems}
+                    setOpen={(open) => {
+                      setLifestyleOpen(open);
+                      if (open) {
+                        setGenderOpen(false);
+                        setBodyTypeOpen(false);
+                      }
+                    }}
                     setValue={(value) => setProfile({...profile, lifestyle: value()})}
                     setItems={setLifestyleItems}
                     disabled={!isEditing}
@@ -384,8 +449,7 @@ const ProfileScreen = () => {
                 </View>
               )}
               
-              {/* If the user is editing their profile, enable all input fields & show the 'save' button */}
-              {/* otherwise keep everything read-only and show an 'edit' button */}
+              {/* Save/Edit Button */}
               <TouchableOpacity 
                 style={isEditing ? styles.saveButton : styles.editButton}
                 onPress={isEditing ? handleSaveProfile : () => setIsEditing(true)}
@@ -405,7 +469,6 @@ const ProfileScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#E8F0E2',
   },
   headerContainer: {
     height: 250,
@@ -414,7 +477,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   photoContainer: {
-    marginTop: -30,
+    marginTop: -10,
+    marginBottom: -15,
   },
   profileImage: {
     width: 180,
@@ -442,7 +506,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '#E8F0E2',
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     paddingTop: 10,
@@ -455,17 +519,16 @@ const styles = StyleSheet.create({
   nameRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 15,
+    marginBottom: 10,
   },
   firstNameField: {
     width: '48%', 
-    marginTop: 30, 
+    marginTop: 5, 
     marginRight: 10, 
   },
-  
   lastNameField: {
     width: '48%', 
-    marginTop: 30, 
+    marginTop: 5, 
   },
   bioFieldWrapper: {
     width: '100%',  
@@ -475,6 +538,7 @@ const styles = StyleSheet.create({
   inputField: {
     height: 45,
     borderColor: '#AFC6A3',
+    backgroundColor: 'white',
     borderWidth: 1,
     borderRadius: 10,
     paddingHorizontal: 15,
@@ -494,10 +558,10 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 25,
     fontWeight: '600',
     color: '#666666',
-    marginTop: 30,
+    marginTop: 20,
     marginVertical: 20,
   },
   dropdownWrapper: {
