@@ -45,7 +45,7 @@ const ProfileScreen = () => {
     {label: 'Rectangle', value: 'Rectangle'},
     {label: 'Hour Glass', value: 'Hour Glass'},
     {label: 'Ectomorph', value: 'Ectomorph'},
-    {label: 'mesomorph', value: 'mesomorph'},
+    {label: 'Mesomorph', value: 'Mesomorph'},
     {label: 'Endomorph', value: 'Endomorph'}
   ]);
 
@@ -290,16 +290,14 @@ const ProfileScreen = () => {
           
           <View style={styles.contentContainer}>
             <View style={styles.formContainer}>
-              <Text style={styles.sectionTitle}>User Details   ────── ★</Text>
+              <View style={styles.detailsContainer}>
+              <Text style={styles.sectionTitle}>User Details     ──── ★</Text>
               <View style={styles.nameRow}>
                 {/* First Name */}
                 <View style={styles.firstNameField}>
                   <Text style={styles.inputLabel}>First Name</Text>
                   <TextInput
-                    style={[
-                      styles.inputField,
-                      profile.firstName ? { fontWeight: 'normal' } : { fontWeight: 'normal', color: '#828282' }
-                    ]}
+                    style={styles.inputField}
                     placeholder="first name.."
                     placeholderTextColor="#828282" 
                     value={profile.firstName}
@@ -314,7 +312,7 @@ const ProfileScreen = () => {
                   <TextInput
                     style={[
                       styles.inputField,
-                      profile.lastName ? { fontWeight: 'normal' } : { fontWeight: 'normal' }
+                      profile.lastName ? { fontWeight: 'normal' } : { fontWeight: 'normal', backgroundColor: '#E8F0E2' }
                     ]}
                     placeholder="last name.."
                     placeholderTextColor="#828282" 
@@ -347,7 +345,7 @@ const ProfileScreen = () => {
                   style={[
                     styles.inputField,
                     styles.bioField,
-                    profile.bio ? { fontWeight: 'normal' } : { fontWeight: 'normal' }
+                    profile.bio ? { fontWeight: 'normal' } : { fontWeight: 'normal', backgroundColor: '#E8F0E2' }
                   ]}
                   placeholder="what should we know about you?"
                   placeholderTextColor="#828282" 
@@ -358,8 +356,10 @@ const ProfileScreen = () => {
                   numberOfLines={4}
                 />
               </View> 
+            </View>
 
-              <Text style={styles.sectionTitle}>Personal      ─────── ★</Text>
+              <View style={styles.detailsContainer}>
+              <Text style={styles.sectionTitle}>Personal       ───── ★</Text>
               
               {/* Gender Dropdown */}
               <View style={styles.dropdownWrapper}>
@@ -448,6 +448,7 @@ const ProfileScreen = () => {
                   />
                 </View>
               )}
+            </View>
               
               {/* Save/Edit Button */}
               <TouchableOpacity 
@@ -477,8 +478,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   photoContainer: {
-    marginTop: -10,
-    marginBottom: -15,
+    marginTop: -20,
+    marginBottom: -4,
   },
   profileImage: {
     width: 180,
@@ -537,8 +538,8 @@ const styles = StyleSheet.create({
   },
   inputField: {
     height: 45,
+    backgroundColor: '#E8F0E2',
     borderColor: '#AFC6A3',
-    backgroundColor: 'white',
     borderWidth: 1,
     borderRadius: 10,
     paddingHorizontal: 15,
@@ -576,11 +577,11 @@ const styles = StyleSheet.create({
   },
   dropdown: {
     borderColor: '#AFC6A3',
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#E8F0E2',
     minHeight: 45,
   },
   dropdownDisabled: {
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#E8F0E2',
   },
   dropdownText: {
     fontSize: 16,
@@ -594,28 +595,42 @@ const styles = StyleSheet.create({
   },
   dropdownContainer: {
     borderColor: '#AFC6A3',
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#E8F0E2',
   },
   saveButton: {
     backgroundColor: '#AFC6A3',
     borderRadius: 10,
     padding: 15,
     alignItems: 'center',
-    marginTop: 20,
-    marginBottom: 20,
+    marginTop: 5,
+    marginBottom: 5,
   },
   editButton: {
     backgroundColor: '#828282',
     borderRadius: 10,
     padding: 15,
     alignItems: 'center',
-    marginTop: 20,
-    marginBottom: 20,
+    marginTop: 5,
+    marginBottom: 5,
   },
   buttonText: {
     color: 'white',
     fontSize: 16,
     fontWeight: '600',
+  },
+  detailsContainer: {
+    backgroundColor: 'white',
+    borderRadius: 15,
+    padding: 20,
+    marginBottom: 35,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
 });
 
