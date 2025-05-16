@@ -2,9 +2,43 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Image,
 import { Link, useRouter } from 'expo-router';
 import { useWardrobe } from '../context/wardrobeContext';
 import { useState } from 'react';
-import { Ionicons } from '@expo/vector-icons';
-import Feather from '@expo/vector-icons/Feather';
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
+
+// utility function to render category icons based on item category
+const getCategoryIcon = (category, size = 22) => {
+  const normalized = category.toLowerCase();
+
+  // return appropriate icon/component based on category
+  if (normalized.includes('top')) {
+    return <MaterialCommunityIcons name="tshirt-crew" size={size} color="#4A6D51" />;
+  }
+  if (normalized.includes('bottom')) {
+    return (
+      <Image 
+        source={require('../assets/images/pants.png')}
+        style={{ width: size, height: size, resizeMode: 'contain' }}
+      />
+    );
+  }
+  if (normalized.includes('jacket')) {
+    return (
+      <Image 
+        source={require('../assets/images/jacket.png')}
+        style={{ width: size, height: size, resizeMode: 'contain' }}
+      />
+    );
+  }
+  if (normalized.includes('accessories')) {
+    return <MaterialCommunityIcons name="necklace" size={size} color="#4A6D51" />;
+  }
+  if (normalized.includes('shoe')) {
+    return <MaterialCommunityIcons name="shoe-formal" size={size} color="#4A6D51" />;
+  }
+
+  // default icon
+  return <MaterialCommunityIcons name="folder" size={size} color="#4A6D51" />;
+};
 
 export default function WardrobeScreen() {
   const router = useRouter();
@@ -40,6 +74,7 @@ export default function WardrobeScreen() {
               </TouchableOpacity>
             </View>
           </View>
+        </View>
           
           {/* Search Bar in Header */}
           <View style={styles.searchInputContainer}>
@@ -70,33 +105,17 @@ export default function WardrobeScreen() {
                   <Link href={`/wardrobe/${item.id}`} asChild key={item.id}>
                     <TouchableOpacity style={styles.settingCard}>
                       <View style={[styles.settingIconContainer, { backgroundColor: '#E8F0E2' }]}>
-                        <Ionicons 
-                          name={
-                            item.category.toLowerCase().includes('top') ? "shirt-outline" :
-                            item.category.toLowerCase().includes('bottom') ? "restaurant-outline" :
-                            item.category.toLowerCase().includes('jacket') ? "jacket-outline" :
-                            item.category.toLowerCase().includes('accessory') ? "watch-outline" :
-                            item.category.toLowerCase().includes('shoe') ? "footsteps-outline" :
-                            "folder-outline"
-                          } 
-                          size={22} 
-                          color="#4A6D51" 
-                        />
+                        {getCategoryIcon(item.category)}
                       </View>
-                      <View style={styles.settingInfo}>
-                        <Text style={styles.settingName}>{item.name}</Text>
-                        <Text style={styles.settingDescription}>{item.category}</Text>
-                      </View>
-                      <Feather name="chevron-right" size={20} color="#CCCCCC" />
+                      <Text style={styles.categoryName}>{item.name}</Text>
                     </TouchableOpacity>
                   </Link>
                 ))
               ) : (
-                <Text style={styles.noResults}>No items found</Text>
+                <Text style={styles.noResults}>No matching items found</Text>
               )}
             </View>
           )}
-        </View>
 
         {/* Categories Section */}
         <View style={styles.settingsSection}>
@@ -108,11 +127,8 @@ export default function WardrobeScreen() {
             <View style={styles.row}>
               <Link href="/wardrobe/tops" asChild>
                 <TouchableOpacity style={styles.categoryCard}>
-                  <View style={[styles.categoryIconContainer, ]}>
-                    <Image 
-                      source={require('../assets/images/polo-shirt.png')} 
-                      style={styles.categoryImage}
-                    />
+                  <View style={[styles.categoryIconContainer]}>
+                    {getCategoryIcon('tops', 40)}
                   </View>
                   <Text style={styles.categoryName}>Tops</Text>
                 </TouchableOpacity>
@@ -121,10 +137,7 @@ export default function WardrobeScreen() {
               <Link href="/wardrobe/bottoms" asChild>
                 <TouchableOpacity style={styles.categoryCard}>
                   <View style={[styles.categoryIconContainer, ]}>
-                    <Image 
-                      source={require('../assets/images/pants.png')} 
-                      style={styles.categoryImage}
-                    />
+                    {getCategoryIcon('bottoms', 40)}
                   </View>
                   <Text style={styles.categoryName}>Bottoms</Text>
                 </TouchableOpacity>
@@ -135,10 +148,7 @@ export default function WardrobeScreen() {
               <Link href="/wardrobe/jackets" asChild>
                 <TouchableOpacity style={styles.categoryCard}>
                   <View style={[styles.categoryIconContainer, ]}>
-                    <Image 
-                      source={require('../assets/images/jacket.png')} 
-                      style={styles.categoryImage}
-                    />
+                    {getCategoryIcon('jackets', 40)}
                   </View>
                   <Text style={styles.categoryName}>Jackets</Text>
                 </TouchableOpacity>
@@ -146,11 +156,8 @@ export default function WardrobeScreen() {
               
               <Link href="/wardrobe/accessories" asChild>
                 <TouchableOpacity style={styles.categoryCard}>
-                  <View style={[styles.categoryIconContainer, ]}>
-                    <Image 
-                      source={require('../assets/images/necklace.png')} 
-                      style={styles.categoryImage}
-                    />
+                  <View style={[styles.categoryIconContainer]}>
+                    {getCategoryIcon('accessories', 40)}
                   </View>
                   <Text style={styles.categoryName}>Accessories</Text>
                 </TouchableOpacity>
@@ -161,10 +168,7 @@ export default function WardrobeScreen() {
               <Link href="/wardrobe/shoes" asChild>
                 <TouchableOpacity style={styles.categoryCard}>
                   <View style={[styles.categoryIconContainer, ]}>
-                    <Image 
-                      source={require('../assets/images/running-shoe.png')} 
-                      style={styles.categoryImage}
-                    />
+                    {getCategoryIcon('shoes', 40)}
                   </View>
                   <Text style={styles.categoryName}>Shoes</Text>
                 </TouchableOpacity>
@@ -254,6 +258,8 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 12,
     marginTop: 10,
+    marginLeft:20,
+    marginRight: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
@@ -292,21 +298,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  settingInfo: {
-    flex: 1,
-    marginLeft: 15,
-  },
-  settingName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#4A6D51',
-    marginBottom: 4,
-  },
-  settingDescription: {
-    fontSize: 13,
-    color: '#828282',
-    textTransform: 'capitalize',
-  },
   noResults: {
     textAlign: 'center',
     color: '#828282',
@@ -331,6 +322,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#AFC6A3',
     marginTop: 20,
     marginBottom: 0,
+    marginLeft: 20,
+    marginRight: 20,
     padding: 15,
     borderRadius: 15,
     justifyContent: 'center',
@@ -374,11 +367,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
-  },
-  categoryImage: {
-    width: 40,
-    height: 40,
-    resizeMode: 'contain',
   },
   categoryName: {
     fontSize: 16,
