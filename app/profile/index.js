@@ -19,6 +19,9 @@ import {
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import DropDownPicker from 'react-native-dropdown-picker';
+import { router } from 'expo-router';
+import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons'; // Import MaterialCommunityIcons
 
 // this screen lets our users view & update their profile info, including personal details and photo.
 const ProfileScreen = () => {  
@@ -246,6 +249,12 @@ const ProfileScreen = () => {
     }
   };
 
+  // handle cancel edit
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    loadProfileData(); // Reload original data from database
+  };
+
   // show login message if not logged in
   if (!isLoggedIn) {
     return (
@@ -280,8 +289,9 @@ const ProfileScreen = () => {
                 />
               ) : (
                 <View style={styles.photoPlaceholder}>
+                  <MaterialCommunityIcons name="image-edit-outline" size={80} color="#4A6D51" />
                   <Text style={styles.placeholderText}>
-                    {isEditing ? 'Tap to add photo' : 'No photo selected'}
+                    {isEditing ? 'Tap to add photo' : 'Add a photo'}
                   </Text>
                 </View>
               )}
@@ -291,7 +301,7 @@ const ProfileScreen = () => {
           <View style={styles.contentContainer}>
             <View style={styles.formContainer}>
               <View style={styles.detailsContainer}>
-              <Text style={styles.sectionTitle}>User Details     ──── ★</Text>
+              <Text style={styles.sectionTitle}>User Details</Text>
               <View style={styles.nameRow}>
                 {/* First Name */}
                 <View style={styles.firstNameField}>
@@ -299,7 +309,7 @@ const ProfileScreen = () => {
                   <TextInput
                     style={styles.inputField}
                     placeholder="first name.."
-                    placeholderTextColor="#828282" 
+                    placeholderTextColor="#A0A0A0" 
                     value={profile.firstName}
                     onChangeText={(text) => setProfile({ ...profile, firstName: text })}
                     editable={isEditing}
@@ -310,12 +320,9 @@ const ProfileScreen = () => {
                 <View style={styles.lastNameField}>
                   <Text style={styles.inputLabel}>Last Name</Text>
                   <TextInput
-                    style={[
-                      styles.inputField,
-                      profile.lastName ? { fontWeight: 'normal' } : { fontWeight: 'normal', backgroundColor: '#E8F0E2' }
-                    ]}
+                    style={styles.inputField}
                     placeholder="last name.."
-                    placeholderTextColor="#828282" 
+                    placeholderTextColor="#A0A0A0" 
                     value={profile.lastName}
                     onChangeText={(text) => setProfile({...profile, lastName: text})}
                     editable={isEditing}
@@ -329,7 +336,7 @@ const ProfileScreen = () => {
                 <TextInput
                   style={styles.inputField}
                   placeholder="your.email@example.com"
-                  placeholderTextColor="#828282" 
+                  placeholderTextColor="#A0A0A0" 
                   value={profile.email}
                   onChangeText={(text) => setProfile({...profile, email: text})}
                   editable={isEditing}
@@ -345,10 +352,9 @@ const ProfileScreen = () => {
                   style={[
                     styles.inputField,
                     styles.bioField,
-                    profile.bio ? { fontWeight: 'normal' } : { fontWeight: 'normal', backgroundColor: '#E8F0E2' }
                   ]}
                   placeholder="what should we know about you?"
-                  placeholderTextColor="#828282" 
+                  placeholderTextColor="#A0A0A0" 
                   value={profile.bio}
                   onChangeText={(text) => setProfile({...profile, bio: text})}
                   editable={isEditing}
@@ -359,7 +365,7 @@ const ProfileScreen = () => {
             </View>
 
               <View style={styles.detailsContainer}>
-              <Text style={styles.sectionTitle}>Personal       ───── ★</Text>
+              <Text style={styles.sectionTitle}>Personal</Text>
               
               {/* Gender Dropdown */}
               <View style={styles.dropdownWrapper}>
@@ -384,7 +390,13 @@ const ProfileScreen = () => {
                   textStyle={styles.dropdownText}
                   dropDownContainerStyle={styles.dropdownContainer}
                   listItemLabelStyle={styles.dropdownItemText}
-                  listItemContainerStyle={{ backgroundColor: '#E8F0E2' }}
+                  listItemContainerStyle={styles.dropdownItemContainer}
+                  ArrowDownIconComponent={() => (
+                    <MaterialIcons name="keyboard-arrow-down" size={24} color="#4A6D51" />
+                  )}
+                  ArrowUpIconComponent={() => (
+                    <MaterialIcons name="keyboard-arrow-up" size={24} color="#4A6D51" />
+                  )}
                   zIndex={3000}
                 />
               </View>
@@ -413,7 +425,13 @@ const ProfileScreen = () => {
                     textStyle={styles.dropdownText}
                     dropDownContainerStyle={styles.dropdownContainer}
                     listItemLabelStyle={styles.dropdownItemText}
-                    listItemContainerStyle={{ backgroundColor: '#E8F0E2' }}
+                    listItemContainerStyle={styles.dropdownItemContainer}
+                    ArrowDownIconComponent={() => (
+                      <MaterialIcons name="keyboard-arrow-down" size={24} color="#4A6D51" />
+                    )}
+                    ArrowUpIconComponent={() => (
+                      <MaterialIcons name="keyboard-arrow-up" size={24} color="#4A6D51" />
+                    )}
                     zIndex={2000}
                   />
                 </View>
@@ -443,22 +461,47 @@ const ProfileScreen = () => {
                     textStyle={styles.dropdownText}
                     dropDownContainerStyle={styles.dropdownContainer}
                     listItemLabelStyle={styles.dropdownItemText}
-                    listItemContainerStyle={{ backgroundColor: '#E8F0E2' }}
+                    listItemContainerStyle={styles.dropdownItemContainer}
+                    ArrowDownIconComponent={() => (
+                      <MaterialIcons name="keyboard-arrow-down" size={24} color="#4A6D51" />
+                    )}
+                    ArrowUpIconComponent={() => (
+                      <MaterialIcons name="keyboard-arrow-up" size={24} color="#4A6D51" />
+                    )}
                     zIndex={1000}
                   />
                 </View>
               )}
             </View>
               
-              {/* Save/Edit Button */}
-              <TouchableOpacity 
-                style={isEditing ? styles.saveButton : styles.editButton}
-                onPress={isEditing ? handleSaveProfile : () => setIsEditing(true)}
-              >
-                <Text style={styles.buttonText}>
-                  {isEditing ? 'Save' : 'Edit Profile'}
-                </Text>
-              </TouchableOpacity>
+              {/* Action Buttons */}
+              {isEditing ? (
+                <>
+                  <TouchableOpacity 
+                    style={styles.saveButton}
+                    onPress={handleSaveProfile}
+                  >
+                    <Text style={styles.buttonText}>Save Profile</Text>
+                  </TouchableOpacity>
+                  
+                  <TouchableOpacity 
+                    style={styles.cancelButton}
+                    onPress={handleCancelEdit}
+                  >
+                    <Text style={styles.cancelButtonText}>Cancel</Text>
+                  </TouchableOpacity>
+                </>
+              ) : (
+                <TouchableOpacity 
+                  style={styles.editButton}
+                  onPress={() => setIsEditing(true)}
+                >
+                  <View style={styles.editButtonContent}>
+                    <MaterialIcons name="edit" size={20} color="white" />
+                    <Text style={styles.buttonText}>Edit Profile</Text>
+                  </View>
+                </TouchableOpacity>
+              )}
             </View>
           </View>
         </View>
@@ -470,16 +513,17 @@ const ProfileScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#F9F9F4',
   },
   headerContainer: {
-    height: 250,
-    backgroundColor: '#E8F0E2',
+    height: 220, // Reduced from 250
+    backgroundColor: '#F9F9F4',
     alignItems: 'center',
     justifyContent: 'center',
   },
   photoContainer: {
     marginTop: -20,
-    marginBottom: -4,
+    marginBottom: -20, // Reduced space under profile picture
   },
   profileImage: {
     width: 180,
@@ -497,22 +541,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 3,
     borderColor: 'white',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
   },
   placeholderText: {
-    color: '#666666',
+    color: '#4A6D51',
     fontSize: 14,
     textAlign: 'center',
-    padding: 10,
+    marginTop: 10,
     fontWeight: 'bold',
   },
   contentContainer: {
     flex: 1,
-    backgroundColor: '#E8F0E2',
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
+    backgroundColor: '#F9F9F4',
     paddingTop: 10,
-    paddingBottom: 40,
-    marginTop: -30,
+    paddingBottom: 20, // Reduced padding at bottom
   },
   formContainer: {
     paddingHorizontal: 25,
@@ -538,10 +584,10 @@ const styles = StyleSheet.create({
   },
   inputField: {
     height: 45,
-    backgroundColor: '#E8F0E2',
-    borderColor: '#AFC6A3',
+    backgroundColor: '#F9F9F4',
+    borderColor: '#E0E0E0',
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: 15,
     paddingHorizontal: 15,
     fontSize: 16,
     color: '#666666',
@@ -549,80 +595,128 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   inputLabel: {
-    fontSize: 16,
-    color: '#666666',
-    fontWeight: 'bold',
-    marginBottom: 5,
+    fontSize: 14,
+    color: '#4A6D51',
+    fontWeight: '500',
+    marginBottom: 8,
   },  
   bioField: {
     height: 100,
     textAlignVertical: 'top',
+    paddingTop: 15,
   },
   sectionTitle: {
-    fontSize: 25,
+    fontSize: 22,
     fontWeight: '600',
-    color: '#666666',
-    marginTop: 20,
-    marginVertical: 20,
+    color: '#4A6D51',
+    marginTop: 5,
+    marginVertical: 15,
   },
   dropdownWrapper: {
     marginBottom: 15,
     zIndex: 1,
   },
   dropdownLabel: {
-    fontSize: 16,
-    color: '#666666',
-    marginBottom: 5,
-    fontWeight: 'bold',
+    fontSize: 14,
+    color: '#4A6D51',
+    marginBottom: 8,
+    fontWeight: '500',
   },
   dropdown: {
-    borderColor: '#AFC6A3',
-    backgroundColor: '#E8F0E2',
+    borderColor: '#E0E0E0',
+    backgroundColor: '#F9F9F4',
     minHeight: 45,
+    borderRadius: 15,
+    paddingHorizontal: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
   dropdownDisabled: {
-    backgroundColor: '#E8F0E2',
+    backgroundColor: '#F9F9F4',
+    opacity: 0.8,
   },
   dropdownText: {
     fontSize: 16,
-    color: '#666666',
-    fontWeight: 'normal',
+    color: '#4A6D51',
+    fontWeight: '500',
   },
   dropdownItemText: {
-    color: '#666666',
-    fontWeight: 'normal', 
+    color: '#4A6D51',
+    fontWeight: '400', 
     fontSize: 16,
   },
   dropdownContainer: {
-    borderColor: '#AFC6A3',
-    backgroundColor: '#E8F0E2',
+    borderColor: '#E0E0E0',
+    backgroundColor: 'white',
+    borderRadius: 15,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+  },
+  dropdownItemContainer: {
+    backgroundColor: 'white', 
+    borderBottomWidth: 1,
+    borderBottomColor: '#F2F2F2',
+    paddingVertical: 10,
   },
   saveButton: {
-    backgroundColor: '#AFC6A3',
-    borderRadius: 10,
+    backgroundColor: '#4A6D51',
+    borderRadius: 15,
     padding: 15,
     alignItems: 'center',
-    marginTop: 5,
-    marginBottom: 5,
+    marginTop: 10,
+    marginBottom: 10, // Reduced from 15
+    elevation: 3,
+    shadowColor: '#4A6D51',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
   },
   editButton: {
-    backgroundColor: '#828282',
-    borderRadius: 10,
+    backgroundColor: '#4A6D51',
+    borderRadius: 15,
     padding: 15,
     alignItems: 'center',
-    marginTop: 5,
-    marginBottom: 5,
+    marginTop: 10,
+    marginBottom: 0,
+    elevation: 3,
+    shadowColor: '#4A6D51',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+  },
+  editButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cancelButton: {
+    borderRadius: 15,
+    padding: 15,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#4A6D51',
+    marginBottom: 0, // Reduced from 10
   },
   buttonText: {
     color: 'white',
     fontSize: 16,
     fontWeight: '600',
+    marginLeft: 8, // Add space between icon and text
+  },
+  cancelButtonText: {
+    color: '#4A6D51',
+    fontSize: 16,
+    fontWeight: '600',
   },
   detailsContainer: {
     backgroundColor: 'white',
-    borderRadius: 15,
+    borderRadius: 20,
     padding: 20,
-    marginBottom: 35,
+    marginBottom: 20, // Reduced from 25
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
