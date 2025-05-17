@@ -1,0 +1,113 @@
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+
+export default function Chat() {
+  const { friendName } = useLocalSearchParams();
+  const router = useRouter();
+  const [message, setMessage] = useState('');
+  const [allMessages, setAllMessages] = useState({});
+  const messages = allMessages[friendName] || [];
+
+  const handleSendMessage = () => {
+    if (message.trim()) {
+      const newMessage = { id: String(messages.length + 1), text: message };
+      setAllMessages({
+        ...allMessages,
+        [friendName]: [...messages, newMessage],
+      });
+      setMessage('');
+    }
+  };
+
+  const renderMessage = ({ item }) => (
+    <View style={styles.messageContainer}>
+      <Text style={styles.message}>{item.text}</Text>
+    </View>
+  );
+
+  return (
+    <View style={styles.container}>
+      <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <Text style={styles.backButtonText}>← Back</Text>
+      </TouchableOpacity>
+
+      <Text style={styles.header}>Chat with {friendName}</Text>
+
+      <FlatList
+        data={messages}
+        renderItem={renderMessage}
+        keyExtractor={(item) => item.id}
+        style={styles.messagesList}
+      />
+
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.textInput}
+          placeholder="Type a message..."
+          value={message}
+          onChangeText={setMessage}
+        />
+        <TouchableOpacity style={styles.sendButton} onPress={handleSendMessage}>
+          <Text style={styles.sendButtonText}>Send</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: 'white',
+  },
+  backButton: {
+    marginBottom: 10,
+  },
+  backButtonText: {
+    fontSize: 16,
+    color: '#4F46E5',
+    fontWeight: '500',
+  },
+  header: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  messagesList: {
+    flex: 1,
+    marginBottom: 20,
+  },
+  messageContainer: {
+    marginBottom: 10,
+    backgroundColor: '#f0f0f0',
+    padding: 10,
+    borderRadius: 5,
+  },
+  message: {
+    fontSize: 16,
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  textInput: {
+    flex: 1,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 20,
+    marginRight: 10,
+  },
+  sendButton: {
+    backgroundColor: '#007bff',
+    padding: 10,
+    borderRadius: 20,
+  },
+  sendButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+});
+
