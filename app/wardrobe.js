@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Image, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, StatusBar } from 'react-native';
 import { Link, useRouter } from 'expo-router';
 import { useWardrobe } from '../context/wardrobeContext';
 import { useState } from 'react';
@@ -55,7 +55,7 @@ export default function WardrobeScreen() {
   return (
     <>
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <View style={styles.container}>
         {/* Header Section */}
         <View style={styles.headerContainer}>
           <View style={styles.headerCard}>
@@ -179,7 +179,7 @@ export default function WardrobeScreen() {
             </View>
           </View>
         </View>
-      </ScrollView>
+      </View>
     </>
   );
 }
@@ -277,6 +277,8 @@ const styles = StyleSheet.create({
   },
   resultsContainer: {
     marginTop: 15,
+    marginLeft: 20,
+    marginRight: 20,
   },
   settingCard: {
     flexDirection: 'row',
@@ -350,9 +352,10 @@ const styles = StyleSheet.create({
   },
   categoryCard: {
     width: '48%',
+    height: '100%',
     backgroundColor: '#FFFFFF',
     borderRadius: 15,
-    padding: 15,
+    padding: 16.8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,

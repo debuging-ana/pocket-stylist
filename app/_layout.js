@@ -72,7 +72,7 @@ function TabsLayout() {
           name="userProfile"
           options={{
             tabBarIcon: ({ focused }) => <MaterialCommunityIcons name="account" size={28} color="#FFFFFF" />,
-            tabBarItemStyle: { marginHorizontal: 40 },
+            tabBarItemStyle: { marginLeft: 42, marginRight: 50 },
           }}
         />
 

@@ -237,12 +237,12 @@ const styles = StyleSheet.create({
   tabContainer: {
     paddingVertical: 15,
     paddingHorizontal: 0,
-    marginBottom: 5,
+    marginBottom: 3,
     backgroundColor: '#F9F9F4',
   },
   tab: {
-    paddingHorizontal: 15,
-    paddingVertical: 8.5,
+    paddingHorizontal: 11,
+    paddingVertical: 8,
     marginRight: 10,
     marginBottom: 7,
   },
@@ -267,7 +267,7 @@ const styles = StyleSheet.create({
   },
   imageCard: {
     width: '48%',
-    marginBottom: 15,
+    marginBottom: 20,
     backgroundColor: 'white',
     borderRadius: 12,
     overflow: 'hidden',
@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: 174,
+    height: 170, 
   },
   imageActions: {
     flexDirection: 'row',

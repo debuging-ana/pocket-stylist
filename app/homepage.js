@@ -53,7 +53,7 @@ export default function HomePage() {
           </View>
         </View>
 
-        <View style={styles.quickActions}>
+        <View style={styles.contentSection}>
           <View style={styles.sectionTitleContainer}>
             <Text style={styles.sectionTitle}>Quick Actions</Text>
           </View>
@@ -72,7 +72,7 @@ export default function HomePage() {
             </TouchableOpacity>
             <TouchableOpacity style={styles.actionButton} onPress={() => router.push('/contacts')}>
               <View style={[styles.actionIconContainer, { backgroundColor: '#E3D3C6' }]}>
-                <MaterialCommunityIcons name="account-group" size={22} color="#8B6E57" />
+                <Ionicons name="chatbubble-ellipses" size={22} color="#8B6E57" />
               </View>
               <Text style={styles.actionText}>Messages</Text>
             </TouchableOpacity>
@@ -85,7 +85,7 @@ export default function HomePage() {
           </View>
         </View>
 
-        <View style={styles.suggestionsSection}>
+        <View style={styles.contentSection}>
           <View style={styles.sectionTitleContainer}>
             <Text style={styles.sectionTitle}>Style Suggestions</Text>
             <TouchableOpacity onPress={() => router.push('/suggestions')}>
@@ -152,7 +152,7 @@ export default function HomePage() {
           </ScrollView>
         </View>
 
-        <View style={styles.recentSection}>
+        <View style={styles.contentSection}>
           <View style={styles.sectionTitleContainer}>
             <Text style={styles.sectionTitle}>Recent Items</Text>
             <TouchableOpacity onPress={() => router.push('/wardrobe')}>
@@ -197,16 +197,18 @@ export default function HomePage() {
           )}
         </View>
 
-        <TouchableOpacity style={styles.tipCard} onPress={() => router.push('/tips')}>
-          <View style={styles.tipIconContainer}>
-            <Ionicons name="bulb-outline" size={24} color="#FFFFFF" />
-          </View>
-          <View style={styles.tipContent}>
-            <Text style={styles.tipTitle}>Style Tip</Text>
-            <Text style={styles.tipText}>Try mixing textures within the same color family for a sophisticated monochromatic look</Text>
-          </View>
-          <Feather name="chevron-right" size={20} color="#CCCCCC" />
-        </TouchableOpacity>
+        <View style={styles.contentSection}>
+          <TouchableOpacity style={styles.tipCard} onPress={() => router.push('/tips')}>
+            <View style={styles.tipIconContainer}>
+              <Ionicons name="bulb-outline" size={24} color="#FFFFFF" />
+            </View>
+            <View style={styles.tipContent}>
+              <Text style={styles.tipTitle}>Style Tip</Text>
+              <Text style={styles.tipText}>Try mixing textures within the same color family for a sophisticated monochromatic look</Text>
+            </View>
+            <Feather name="chevron-right" size={20} color="#CCCCCC" />
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </>
   );
@@ -220,7 +222,7 @@ const styles = StyleSheet.create({
   headerContainer: {
     paddingHorizontal: 20,
     paddingTop: 20,
-    paddingBottom: 0,
+    paddingBottom: 10,
     backgroundColor: '#F9F9F4',
   },
   headerCard: {
@@ -278,15 +280,16 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
+  contentSection: {
+    paddingHorizontal: 20,
+    paddingTop: 15,
+    paddingBottom: 5,
+  },
   sectionTitleContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
-    marginTop: 2,
-  },
-  quickActions: {
-    padding: 20,
+    marginBottom: 20,
   },
   sectionTitle: {
     fontSize: 18,
@@ -302,11 +305,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     flexWrap: 'wrap',
+    marginBottom: 5,
   },
   actionButton: {
     alignItems: 'center',
     width: '22%',
-
   },
   actionIconContainer: {
     height: 60,
@@ -327,9 +330,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: '500',
   },
-  suggestionsSection: {
-    padding: 20,
-  },
   suggestionsScrollContent: {
     paddingRight: 20,
   },
@@ -339,11 +339,17 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginRight: 15,
     overflow: 'hidden',
+    // Enhanced shadows for suggestion cards
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 5,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 8,
+    // Additional shadow for iOS
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 6 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
   },
   cardContent: {
     flex: 1,
@@ -366,15 +372,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#FFFFFF',
     marginBottom: 8,
-    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
+    textShadowRadius: 3,
   },
   cardDescription: {
     fontSize: 13,
     color: '#FFFFFF',
     marginBottom: 12,
-    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
   },
@@ -386,15 +392,18 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     flexDirection: 'row',
     alignItems: 'center',
+    // Add subtle shadow to button
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 1,
   },
   cardButtonText: {
     color: '#4A6D51',
     fontWeight: '600',
     fontSize: 13,
     marginRight: 5,
-  },
-  recentSection: {
-    padding: 20,
   },
   recentItemCard: {
     flexDirection: 'row',
@@ -481,7 +490,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 15,
     padding: 15,
-    marginHorizontal: 20,
     marginBottom: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
@@ -512,12 +520,4 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#828282',
   },
-  footer: {
-    alignItems: 'center',
-    paddingVertical: 20,
-  },
-  footerText: {
-    fontSize: 12,
-    color: '#CCCCCC',
-  },
-});
+})
