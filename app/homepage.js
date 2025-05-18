@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar } from 'react-native';
 import { useRouter } from 'expo-router';
 import Feather from '@expo/vector-icons/Feather';
@@ -9,7 +9,6 @@ import { useAuth } from '../context/AuthContext';
 export default function HomePage() {
   const router = useRouter();
   const { user } = useAuth();
-  const [loading, setLoading] = useState(true);
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -17,12 +16,6 @@ export default function HomePage() {
     if (hour < 18) return 'Good Afternoon';
     return 'Good Evening';
   };
-
-  useEffect(() => {
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000);
-  }, []);
 
   const recentItems = [
     { id: 1, name: 'Blue Denim Jacket', category: 'Outerwear', lastWorn: '3 days ago' },
@@ -160,12 +153,7 @@ export default function HomePage() {
             </TouchableOpacity>
           </View>
 
-          {loading ? (
-            <View style={styles.loadingState}>
-              <MaterialCommunityIcons name="refresh" size={24} color="#828282" />
-              <Text style={styles.loadingStateText}>Loading your items...</Text>
-            </View>
-          ) : recentItems.length > 0 ? (
+          {recentItems.length > 0 ? (
             recentItems.map(item => (
               <TouchableOpacity key={item.id} style={styles.recentItemCard} onPress={() => router.push(`/wardrobe/item/${item.id}`)}>
                 <View style={styles.recentItemImagePlaceholder}>
@@ -447,18 +435,6 @@ const styles = StyleSheet.create({
   recentItemLastWorn: {
     fontSize: 12,
     color: '#AAAAAA',
-  },
-  loadingState: {
-    alignItems: 'center',
-    backgroundColor: '#F8F8F8',
-    borderRadius: 15,
-    padding: 30,
-    justifyContent: 'center',
-  },
-  loadingStateText: {
-    marginTop: 10,
-    color: '#828282',
-    textAlign: 'center',
   },
   emptyState: {
     alignItems: 'center',
