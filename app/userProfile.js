@@ -290,7 +290,8 @@ headerRightSection: {
   marginLeft: 15,
 },
 usernameContainer: {
-  marginBottom: 10,
+  marginTop: 13,
+  marginBottom: 5,
 },
 username: {
   fontSize: 22,
