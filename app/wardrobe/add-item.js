@@ -45,7 +45,7 @@ const getCategoryIcon = (category, size = 22) => {
     );
   }
   if (normalized.includes('accessories')) {
-    return <MaterialCommunityIcons name="necklace" size={size} color="#4A6D51" />;
+    return <MaterialCommunityIcons name="sunglasses" size={size} color="#4A6D51" />;
   }
   if (normalized.includes('shoe')) {
     return <MaterialCommunityIcons name="shoe-formal" size={size} color="#4A6D51" />;
