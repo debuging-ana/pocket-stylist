@@ -122,16 +122,17 @@ const FashionBrowseScreen = () => {
                   style={styles.actionButton}
                   onPress={() => {/* Will connect to userProfile.js boards later */}}
                 >
-                  <Text style={styles.actionText}>+ Add to Board</Text>
+                  <Text style={styles.actionButtonText}>Add to Board</Text>
+                  <Feather name="arrow-right" size={14} color="#4A6D51" style={{ marginLeft: 5 }} />
                 </TouchableOpacity>
                 <TouchableOpacity 
                   style={styles.heartButton}
                   onPress={() => toggleLike(image.id)}
                 >
                   <Ionicons
-                  name={likedImages.includes(image.id) ? "heart" : "heart-outline"}
-                  size={24}
-                  color="#DFBDBD"
+                    name={likedImages.includes(image.id) ? "heart" : "heart-outline"}
+                    size={24}
+                    color={likedImages.includes(image.id) ? "#995454" : "#DFBDBD"}
                   />
                 </TouchableOpacity>
               </View>
@@ -217,6 +218,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 12,
     marginTop: 10,
+    marginBottom: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
@@ -235,12 +237,14 @@ const styles = StyleSheet.create({
   tabContainer: {
     paddingVertical: 15,
     paddingHorizontal: 0,
+    marginBottom: 5,
     backgroundColor: '#F9F9F4',
   },
   tab: {
     paddingHorizontal: 15,
-    paddingVertical: 8,
+    paddingVertical: 8.5,
     marginRight: 10,
+    marginBottom: 7,
   },
   activeTab: {
     borderBottomWidth: 2,
@@ -259,6 +263,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     paddingHorizontal: 15,
+    paddingBottom: 20,
   },
   imageCard: {
     width: '48%',
@@ -274,22 +279,30 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: 180,
+    height: 174,
   },
   imageActions: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 10,
+    padding: 12,
   },
   actionButton: {
-    backgroundColor: '#AFC6A3',
-    paddingVertical: 5,
-    paddingHorizontal: 10,
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
     borderRadius: 15,
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 1,
+    elevation: 1,
   },
-  actionText: {
-    color: 'white',
+  actionButtonText: {
+    color: '#4A6D51',
+    fontWeight: '600',
     fontSize: 12,
   },
   heartButton: {
