@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     paddingHorizontal: 20,
-    paddingTop: 20, // Added more top padding to account for removed header
+    paddingTop: 20, 
     paddingBottom: 0,
     backgroundColor: '#F9F9F4',
   },
