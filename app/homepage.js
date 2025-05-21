@@ -5,7 +5,7 @@ import Feather from '@expo/vector-icons/Feather';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAuth } from '../context/AuthContext';
-import { doc, getDoc } from 'firebase/firestore'; // Add imports for Firestore
+import { doc, getDoc, collection, query, orderBy, limit, getDocs } from 'firebase/firestore'; // Add imports for Firestore
 import { db } from '../firebaseConfig'; // Import your Firebase configuration
 
 export default function HomePage() {
@@ -13,6 +13,8 @@ export default function HomePage() {
   const { user } = useAuth();
   const [profilePhotoUri, setProfilePhotoUri] = useState(null);
   const [userFirstName, setUserFirstName] = useState('');
+  const [recentItems, setRecentItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Fetch user profile data from Firestore when component mounts
@@ -33,7 +35,34 @@ export default function HomePage() {
       }
     };
 
+    // Fetch the 2 most recently added wardrobe items
+    const fetchRecentItems = async () => {
+      if (user?.uid) {
+        setIsLoading(true);
+        try {
+          const itemsRef = collection(db, "users", user.uid, "wardrobe");
+          const q = query(itemsRef, orderBy("createdAt", "desc"), limit(2));
+          const querySnapshot = await getDocs(q);
+
+          const items = [];
+          querySnapshot.forEach((doc) => {
+            items.push({
+              id: doc.id,
+              ...doc.data()
+            });
+          });
+          
+          setRecentItems(items);
+        } catch (error) {
+          console.log('Error fetching recent items:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+
     fetchUserProfile();
+    fetchRecentItems();
   }, [user]);
 
   const getGreeting = () => {
@@ -42,11 +71,6 @@ export default function HomePage() {
     if (hour < 18) return 'Good Afternoon';
     return 'Good Evening';
   };
-
-  const recentItems = [
-    { id: 1, name: 'Blue Denim Jacket', category: 'Outerwear', lastWorn: '3 days ago' },
-    { id: 2, name: 'White Sneakers', category: 'Footwear', lastWorn: '1 day ago' },
-  ];
 
   return (
     <>
@@ -188,34 +212,58 @@ export default function HomePage() {
           </View>
 
           {recentItems.length > 0 ? (
+            // Show actual recent items
             recentItems.map(item => (
-              <TouchableOpacity key={item.id} style={styles.recentItemCard} onPress={() => router.push(`/wardrobe/item/${item.id}`)}>
-                <View style={styles.recentItemImagePlaceholder}>
-                  <MaterialCommunityIcons 
-                    name={item.category === 'Footwear' ? 'shoe-formal' : 'tshirt-crew'} 
-                    size={24} 
-                    color="#AFC6A3" 
-                  />
+              <TouchableOpacity 
+                key={item.id} 
+                style={styles.recentItemCard} 
+                onPress={() => router.push(`/wardrobe/item/${item.id}`)}
+              >
+                <View style={styles.recentItemImageContainer}>
+                  {item.imageUri ? (
+                    <Image 
+                      source={{ uri: item.imageUri }} 
+                      style={styles.recentItemImage}
+                    />
+                  ) : (
+                    <View style={styles.recentItemImagePlaceholder}>
+                      <MaterialCommunityIcons 
+                        name={item.category === 'shoes' ? 'shoe-formal' : 'tshirt-crew'} 
+                        size={24} 
+                        color="#AFC6A3" 
+                      />
+                    </View>
+                  )}
                 </View>
                 <View style={styles.recentItemInfo}>
                   <Text style={styles.recentItemName}>{item.name}</Text>
                   <View style={styles.recentItemDetails}>
                     <Text style={styles.recentItemCategory}>{item.category}</Text>
-                    <Text style={styles.recentItemLastWorn}>Last worn: {item.lastWorn}</Text>
+                    <Text style={styles.recentItemLastWorn}>
+                      {item.lastWorn ? `Last worn: ${item.lastWorn}` : 'Not worn yet'}
+                    </Text>
                   </View>
                 </View>
                 <Feather name="chevron-right" size={20} color="#CCCCCC" />
               </TouchableOpacity>
             ))
           ) : (
-            <View style={styles.emptyState}>
-              <MaterialCommunityIcons name="tshirt-crew" size={40} color="#AFC6A3" />
-              <Text style={styles.emptyStateText}>Add items to your wardrobe to see them here</Text>
-              <TouchableOpacity style={styles.addItemButton} onPress={() => router.push('/camera')}>
-                <Text style={styles.addItemButtonText}>Add First Item</Text>
-                <Feather name="plus" size={16} color="#FFFFFF" style={{ marginLeft: 5 }} />
-              </TouchableOpacity>
-            </View>
+            // Show an "Add Item" button when no items exist
+            <TouchableOpacity 
+              style={styles.recentItemCard}
+              onPress={() => router.push('/wardrobe/add-item')}
+            >
+              <View style={styles.addItemIconContainer}>
+                <Feather name="plus" size={24} color="#AFC6A3" />
+              </View>
+              <View style={styles.recentItemInfo}>
+                <Text style={styles.recentItemName}>Add Your First Item</Text>
+                <Text style={styles.recentItemSubtext}>
+                  Start building your digital wardrobe
+                </Text>
+              </View>
+              <Feather name="chevron-right" size={20} color="#CCCCCC" />
+            </TouchableOpacity>
           )}
         </View>
 
@@ -368,7 +416,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginRight: 15,
     overflow: 'hidden',
-    // Enhanced shadows for suggestion cards
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
@@ -441,13 +488,38 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 1,
   },
-  recentItemImagePlaceholder: {
+  recentItemImageContainer: {
     width: 60,
     height: 60,
     borderRadius: 10,
-    backgroundColor: 'white',
+    overflow: 'hidden',
+    backgroundColor: '#F8F8F8',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  recentItemImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  recentItemImagePlaceholder: {
+    width: 60,
+    height: 60,
+    backgroundColor: '#F8F8F8',
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  addItemIconContainer: {
+    width: 60,
+    height: 60,
+    borderRadius: 10,
+    backgroundColor: '#F8F8F8',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
+    borderStyle: 'dashed',
   },
   recentItemInfo: {
     flex: 1,
@@ -459,6 +531,10 @@ const styles = StyleSheet.create({
     color: '#4A6D51',
     marginBottom: 4,
   },
+  recentItemSubtext: {
+    fontSize: 13,
+    color: '#828282',
+  },
   recentItemDetails: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -466,6 +542,7 @@ const styles = StyleSheet.create({
   recentItemCategory: {
     fontSize: 13,
     color: '#828282',
+    textTransform: 'capitalize',
   },
   recentItemLastWorn: {
     fontSize: 12,
