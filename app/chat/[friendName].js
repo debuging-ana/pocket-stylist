@@ -1,27 +1,61 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
+import { collection, addDoc, query, where, onSnapshot, orderBy } from 'firebase/firestore';
+import { db } from '../../firebaseConfig';  // Import your Firebase config
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { getAuth } from 'firebase/auth';
 
 export default function Chat() {
   const { friendName } = useLocalSearchParams();
   const router = useRouter();
   const [message, setMessage] = useState('');
-  const [allMessages, setAllMessages] = useState({});
-  const messages = allMessages[friendName] || [];
+  const [messages, setMessages] = useState([]);
+  const currentUser = getAuth().currentUser?.displayName;  // Get current user's display name
 
-  const handleSendMessage = () => {
+  // Fetch messages when the component mounts
+  useEffect(() => {
+    const q = query(
+      collection(db, 'messages'),
+      where('sender', 'in', [currentUser, friendName]),  // Messages sent by the current user or friend
+      where('receiver', 'in', [currentUser, friendName]),  // Messages received by the current user or friend
+      orderBy('timestamp')  // Order messages by timestamp
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const newMessages = snapshot.docs.map((doc) => doc.data());
+      setMessages(newMessages);
+    });
+
+    return () => unsubscribe();  // Unsubscribe from Firestore listener when component unmounts
+  }, [currentUser, friendName]);
+
+  // Send message to Firestore
+  const handleSendMessage = async () => {
     if (message.trim()) {
-      const newMessage = { id: String(messages.length + 1), text: message };
-      setAllMessages({
-        ...allMessages,
-        [friendName]: [...messages, newMessage],
+      try {
+      // Firestore write operation or any other API call
+      console.log('Sending message:', { text: message, sender: currentUser, receiver: friendName });
+      await addDoc(collection(db, 'messages'), {
+        text: message,
+        sender: currentUser, 
+        receiver: friendName,
+        timestamp: new Date(),
       });
-      setMessage('');
+      } catch (error) {
+      console.error('Error sending message:', error);
+      alert('Something went wrong. Please try again later.');
+      }
     }
   };
 
+  // Render each message in the chat
   const renderMessage = ({ item }) => (
-    <View style={styles.messageContainer}>
+    <View
+      style={[
+        styles.messageContainer,
+        { backgroundColor: item.sender === currentUser ? '#A9D1A9' : '#E8F0E2' },  // Different color based on sender
+      ]}
+    >
       <Text style={styles.message}>{item.text}</Text>
     </View>
   );
@@ -37,7 +71,7 @@ export default function Chat() {
       <FlatList
         data={messages}
         renderItem={renderMessage}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item, index) => index.toString()}
         style={styles.messagesList}
       />
 
@@ -46,7 +80,7 @@ export default function Chat() {
           style={styles.textInput}
           placeholder="Type a message..."
           value={message}
-          onChangeText={setMessage}
+          onChangeText={setMessage}  // Update the message as user types
         />
         <TouchableOpacity style={styles.sendButton} onPress={handleSendMessage}>
           <Text style={styles.sendButtonText}>Send</Text>
@@ -81,7 +115,6 @@ const styles = StyleSheet.create({
   },
   messageContainer: {
     marginBottom: 10,
-    backgroundColor: '#f0f0f0',
     padding: 10,
     borderRadius: 5,
   },

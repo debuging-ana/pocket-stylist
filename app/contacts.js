@@ -1,19 +1,39 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar } from 'react-native';
 import { useRouter } from 'expo-router';
 import Feather from '@expo/vector-icons/Feather';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { getAuth } from 'firebase/auth';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { db } from '../firebaseConfig';
 import { useAuth } from '../context/AuthContext';
 
 export default function ContactsScreen() {
   const router = useRouter();
   const { user } = useAuth();
+  const [friends, setFriends] = useState([]);
 
-  const friends = [
-    { id: '1', name: 'Alice Johnson' },
-    { id: '2', name: 'Bob Smith' },
-    { id: '3', name: 'Charlie Lee' },
-  ];
+  useEffect(() => {
+    const currentUser = getAuth().currentUser?.displayName;
+    if (!currentUser) return;
+
+    // Get messages where user is either sender or receiver
+    const q = query(
+      collection(db, 'messages'),
+      where('participants', 'array-contains', currentUser) // assuming you store participants array
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const allMessages = snapshot.docs.map(doc => doc.data());
+      const contacts = allMessages.map(msg =>
+        msg.sender === currentUser ? msg.receiver : msg.sender
+      );
+      const unique = [...new Set(contacts)];
+      const formatted = unique.map((name, index) => ({ id: index.toString(), name }));
+      setFriends(formatted);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   return (
     <>
@@ -32,7 +52,9 @@ export default function ContactsScreen() {
                 onPress={() => router.push('/profile')}
               >
                 <View style={styles.profileImageContainer}>
-                  <Text style={styles.profileInitial}>{(user?.email?.charAt(0) || 'S').toUpperCase()}</Text>
+                  <Text style={styles.profileInitial}>
+                    {(user?.email?.charAt(0) || 'S').toUpperCase()}
+                  </Text>
                 </View>
               </TouchableOpacity>
             </View>
@@ -72,6 +94,7 @@ export default function ContactsScreen() {
     </>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
