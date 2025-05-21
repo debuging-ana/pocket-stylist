@@ -9,7 +9,7 @@ import {
   StatusBar
 } from 'react-native';
 import { router } from 'expo-router';
-import { updatePassword } from '../screens/services/auth';
+import { updatePassword } from '../services/auth';
 import Feather from '@expo/vector-icons/Feather';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 

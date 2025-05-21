@@ -9,7 +9,7 @@ import {
   StatusBar
 } from 'react-native';
 import { Link, useRouter } from 'expo-router';
-import { signupUser } from '../screens/services/auth';
+import { signupUser } from '../services/auth';
 import Feather from '@expo/vector-icons/Feather';
 
 export default function SignupScreen() {
