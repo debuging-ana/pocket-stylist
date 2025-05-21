@@ -1,10 +1,7 @@
 import BackButton from '../components/BackButton';
 import { Tabs, usePathname } from 'expo-router';
-import Entypo from '@expo/vector-icons/Entypo';
-import Feather from '@expo/vector-icons/Feather';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons'; 
 import { WardrobeProvider } from '../context/wardrobeContext';
 import { AuthProvider, useAuth } from '../context/AuthContext';
 
@@ -16,6 +13,9 @@ function TabsLayout() {
     <WardrobeProvider>
       <Tabs
         screenOptions={{
+          headerLeft: () => {
+            return pathname === '/' ? null : <BackButton />;
+          },
           headerBackTitleVisible: false,
           headerTitle: 'Pocket Stylist', 
           headerStyle: {
