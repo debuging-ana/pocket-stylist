@@ -1,14 +1,40 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import Feather from '@expo/vector-icons/Feather';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAuth } from '../context/AuthContext';
+import { doc, getDoc } from 'firebase/firestore'; // Add imports for Firestore
+import { db } from '../firebaseConfig'; // Import your Firebase configuration
 
 export default function HomePage() {
   const router = useRouter();
   const { user } = useAuth();
+  const [profilePhotoUri, setProfilePhotoUri] = useState(null);
+  const [userFirstName, setUserFirstName] = useState('');
+
+  useEffect(() => {
+    // Fetch user profile data from Firestore when component mounts
+    const fetchUserProfile = async () => {
+      if (user?.uid) {
+        try {
+          const docRef = doc(db, "users", user.uid);
+          const docSnap = await getDoc(docRef);
+          
+          if (docSnap.exists()) {
+            const userData = docSnap.data();
+            setProfilePhotoUri(userData.profilePhotoUri || null);
+            setUserFirstName(userData.firstName || user?.email?.split('@')[0] || 'Stylist');
+          }
+        } catch (error) {
+          console.log('Error fetching user profile:', error);
+        }
+      }
+    };
+
+    fetchUserProfile();
+  }, [user]);
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -32,15 +58,23 @@ export default function HomePage() {
             <View style={styles.header}>
               <View style={styles.headerTextContainer}>
                 <Text style={styles.greeting}>{getGreeting()},</Text>
-                <Text style={styles.username}>{user?.email?.split('@')[0] || 'Stylist'}</Text>
+                <Text style={styles.username}>{userFirstName}</Text>
               </View>
               <TouchableOpacity 
                 style={styles.profileButton}
                 onPress={() => router.push('/profile')}
               >
-                <View style={styles.profileImageContainer}>
-                  <Text style={styles.profileInitial}>{(user?.email?.charAt(0) || 'S').toUpperCase()}</Text>
-                </View>
+                {profilePhotoUri ? (
+                  <Image 
+                    source={{ uri: profilePhotoUri }} 
+                    style={styles.profileImage} 
+                    accessibilityLabel="Profile photo"
+                  />
+                ) : (
+                  <View style={styles.profileImageContainer}>
+                    <Text style={styles.profileInitial}>{(user?.email?.charAt(0) || 'S').toUpperCase()}</Text>
+                  </View>
+                )}
               </TouchableOpacity>
             </View>
           </View>
@@ -246,7 +280,6 @@ const styles = StyleSheet.create({
     height: 45,
     width: 45,
     borderRadius: 22.5,
-    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
@@ -254,14 +287,22 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
+    backgroundColor: '#FFFFFF',
   },
   profileImageContainer: {
     height: 40,
     width: 40,
-    borderRadius: 20,
+    borderRadius: 50,
     backgroundColor: '#AFC6A3',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  profileImage: {
+    height: 48,
+    width: 48,
+    borderRadius: 50,
+    borderWidth: 3,
+    borderColor: '#FFFFFF',
   },
   profileInitial: {
     fontSize: 18,
@@ -333,11 +374,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 8,
     elevation: 8,
-    // Additional shadow for iOS
-    shadowColor: '#000',
-    shadowOffset: { width: 2, height: 6 },
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
   },
   cardContent: {
     flex: 1,
@@ -380,7 +416,6 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     flexDirection: 'row',
     alignItems: 'center',
-    // Add subtle shadow to button
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
@@ -496,4 +531,4 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#828282',
   },
-})
+});

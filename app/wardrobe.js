@@ -1,9 +1,11 @@
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, StatusBar } from 'react-native';
 import { Link, useRouter } from 'expo-router';
 import { useWardrobe } from '../context/wardrobeContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
+import { doc, getDoc } from 'firebase/firestore'; // Add imports for Firestore
+import { db } from '../firebaseConfig'; // Import your Firebase configuration
 
 // utility function to render category icons based on item category
 const getCategoryIcon = (category, size = 22) => {
@@ -45,6 +47,30 @@ export default function WardrobeScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const { wardrobeItems } = useWardrobe();
   const { user } = useAuth();
+  const [profilePhotoUri, setProfilePhotoUri] = useState(null);
+  const [userFirstName, setUserFirstName] = useState('');
+
+  useEffect(() => {
+    // Fetch user profile data from Firestore when component mounts
+    const fetchUserProfile = async () => {
+      if (user?.uid) {
+        try {
+          const docRef = doc(db, "users", user.uid);
+          const docSnap = await getDoc(docRef);
+          
+          if (docSnap.exists()) {
+            const userData = docSnap.data();
+            setProfilePhotoUri(userData.profilePhotoUri || null);
+            setUserFirstName(userData.firstName || user?.email?.split('@')[0] || 'Stylist');
+          }
+        } catch (error) {
+          console.log('Error fetching user profile:', error);
+        }
+      }
+    };
+
+    fetchUserProfile();
+  }, [user]);
 
   // Filter items based on user's search query, case-insensitive
   const filteredItems = wardrobeItems.filter(item => 
@@ -62,15 +88,23 @@ export default function WardrobeScreen() {
             <View style={styles.header}>
               <View style={styles.headerTextContainer}>
                 <Text style={styles.greeting}>My Wardrobe</Text>
-                <Text style={styles.username}>{user?.email?.split('@')[0] || 'Stylist'}</Text>
+                <Text style={styles.username}>{userFirstName}</Text>
               </View>
               <TouchableOpacity 
                 style={styles.profileButton}
                 onPress={() => router.push('/profile')}
               >
-                <View style={styles.profileImageContainer}>
-                  <Text style={styles.profileInitial}>{(user?.email?.charAt(0) || 'S').toUpperCase()}</Text>
-                </View>
+                {profilePhotoUri ? (
+                  <Image 
+                    source={{ uri: profilePhotoUri }} 
+                    style={styles.profileImage} 
+                    accessibilityLabel="Profile photo"
+                  />
+                ) : (
+                  <View style={styles.profileImageContainer}>
+                    <Text style={styles.profileInitial}>{(user?.email?.charAt(0) || 'S').toUpperCase()}</Text>
+                  </View>
+                )}
               </TouchableOpacity>
             </View>
           </View>
@@ -241,10 +275,17 @@ const styles = StyleSheet.create({
   profileImageContainer: {
     height: 40,
     width: 40,
-    borderRadius: 20,
+    borderRadius: 50,
     backgroundColor: '#AFC6A3',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  profileImage: {
+    height: 48,
+    width: 48,
+    borderRadius: 50,
+    borderWidth: 3,
+    borderColor: '#FFFFFF',
   },
   profileInitial: {
     fontSize: 18,
