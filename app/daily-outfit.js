@@ -13,7 +13,7 @@ export default function DailyOutFit() {
     setImageData(null);
 
     try {
-      const base64Image = await generateImageFromPrompt('can you suggest me an outfit to go to class today in Auckland? Make sure its an outfit for an adult woman that has red hair and likes neutral colours and classic looks.');
+      const base64Image = await generateImageFromPrompt('Create complete outfit suggestions based on the current weather in Auckland and the user’s most common style, with the goal of inspiring daily clothing choices through an app. Each outfit should include shoes, a top (such as blouses or shirts), a bottom (such as pants, shorts, or skirts), additional layers (such as jackets or blazers), and optional accessories, always taking into account the weather conditions (rain, cold, heat, wind) and has to be realistic. The visual representation does not need to include a face—just the idea of a complete look styled like a fashion display.');
       setImageData(base64Image);
     } catch (err) {
       setError('Failed to generate image. Try again.');
