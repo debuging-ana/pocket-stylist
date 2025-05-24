@@ -1,4 +1,10 @@
 <<<<<<< HEAD
+
+## About this Project
+
+This app is designed to help users manage their personal style choices by offering outfit suggestions, style tips, and customizable fashion preferences. It is built using React Native with Expo.
+
+
 # Welcome to your Expo app 👋
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
@@ -49,3 +55,11 @@ Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+
+## Contributors
+
+ - [@debuging-ana](https://github.com/debuging-ana) – original creator 
+ - [@MGHusein25](https://github.com/MGHusein25) – contributor
+ - [@wjt1878](https://github.com/wjt1878) – contributor
+ - [@Dineth02](https://github.com/Dineth02) – contributor
+ - [@ellisonyy](https://github.com/ellisonyy) – contributor
