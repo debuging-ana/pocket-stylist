@@ -344,6 +344,15 @@ export default function UserProfileScreen() {
             <View style={styles.sectionTitleContainer}>
               <Text style={styles.sectionTitle}>Recent Looks</Text>
             </View>
+
+            {/* View Saved Outfits Button */}
+            <TouchableOpacity
+              style={styles.saveButton}
+              onPress={() => router.push('/savedOutfits')}
+            >
+              <Text style={styles.saveButtonText}>View Saved Outfits</Text>
+            </TouchableOpacity>
+
             
             {/* We're removing the placeholder boxes but keeping the title */}
             {profileData.looks.length === 0 && (
@@ -657,4 +666,16 @@ const styles = StyleSheet.create({
     color: '#828282',
     fontStyle: 'italic',
   },
+  saveButton: {
+  backgroundColor: '#4A6D51',
+  paddingVertical: 12,
+  borderRadius: 12,
+  alignItems: 'center',
+  marginBottom: 15,
+},
+saveButtonText: {
+  color: 'white',
+  fontWeight: 'bold',
+  fontSize: 16,
+},
 });
