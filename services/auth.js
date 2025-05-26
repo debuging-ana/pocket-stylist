@@ -9,7 +9,7 @@ import {
   reauthenticateWithCredential,
   sendPasswordResetEmail
 } from 'firebase/auth';
-import { app } from '../../firebaseConfig';
+import { app } from '../firebaseConfig';
 
 const auth = getAuth(app);
 

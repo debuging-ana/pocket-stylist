@@ -9,14 +9,16 @@
 
   note: still need to integrate w firebase
 */
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, StatusBar, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, StatusBar, Alert, Image } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Feather from '@expo/vector-icons/Feather';
 import { useAuth } from '../context/AuthContext';
 import Entypo from '@expo/vector-icons/Entypo';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { doc, getDoc } from 'firebase/firestore'; // Add imports for Firestore
+import { db } from '../firebaseConfig'; // Import your Firebase configuration
 
 export default function UserProfileScreen() {
   const router = useRouter();
@@ -24,6 +26,7 @@ export default function UserProfileScreen() {
   const { user } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState('boards'); // 'boards' or 'looks'
+  const [profilePhotoUri, setProfilePhotoUri] = useState(null);
   const [profileData, setProfileData] = useState({
     name: user?.email?.split('@')[0] || 'Stylist',
     bio: '',
@@ -36,12 +39,31 @@ export default function UserProfileScreen() {
     looks: [],
   });
 
-  // component for displaying profile picture placeholder, shows user's initial if no image available
-  const ProfilePlaceholder = () => (
-    <View style={styles.profileImageContainer}>
-      <Text style={styles.profileInitial}>{(profileData.name?.charAt(0) || 'S').toUpperCase()}</Text>
-    </View>
-  );
+  useEffect(() => {
+    // Fetch user profile data from Firestore when component mounts
+    const fetchUserProfile = async () => {
+      if (user?.uid) {
+        try {
+          const docRef = doc(db, "users", user.uid);
+          const docSnap = await getDoc(docRef);
+          
+          if (docSnap.exists()) {
+            const userData = docSnap.data();
+            setProfilePhotoUri(userData.profilePhotoUri || null);
+            setProfileData(prevData => ({
+              ...prevData,
+              name: userData.firstName || user?.email?.split('@')[0] || 'Stylist',
+              bio: userData.bio || prevData.bio
+            }));
+          }
+        } catch (error) {
+          console.log('Error fetching user profile:', error);
+        }
+      }
+    };
+
+    fetchUserProfile();
+  }, [user]);
 
   // saves profile changes & exits the edit mode
   const handleSave = () => {
@@ -104,7 +126,17 @@ export default function UserProfileScreen() {
                 style={styles.profileButton}
                 onPress={() => router.push('/profile')}
               >
-                <ProfilePlaceholder />
+                {profilePhotoUri ? (
+                  <Image 
+                    source={{ uri: profilePhotoUri }} 
+                    style={styles.profileImage} 
+                    accessibilityLabel="Profile photo"
+                  />
+                ) : (
+                  <View style={styles.profileImageContainer}>
+                    <Text style={styles.profileInitial}>{(profileData.name?.charAt(0) || 'S').toUpperCase()}</Text>
+                  </View>
+                )}
               </TouchableOpacity>
               
               {/* Stats and username on the right */}
@@ -312,6 +344,15 @@ export default function UserProfileScreen() {
             <View style={styles.sectionTitleContainer}>
               <Text style={styles.sectionTitle}>Recent Looks</Text>
             </View>
+
+            {/* View Saved Outfits Button */}
+            <TouchableOpacity
+              style={styles.saveButton}
+              onPress={() => router.push('/savedOutfits')}
+            >
+              <Text style={styles.saveButtonText}>View Saved Outfits</Text>
+            </TouchableOpacity>
+
             
             {/* We're removing the placeholder boxes but keeping the title */}
             {profileData.looks.length === 0 && (
@@ -389,6 +430,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#AFC6A3',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  profileImage: {
+    height: 94,
+    width: 94,
+    borderRadius: 50,
+    borderWidth: 3,
+    borderColor: '#FFFFFF',
   },
   profileInitial: {
     fontSize: 32, 
@@ -618,4 +666,16 @@ const styles = StyleSheet.create({
     color: '#828282',
     fontStyle: 'italic',
   },
+  saveButton: {
+  backgroundColor: '#4A6D51',
+  paddingVertical: 12,
+  borderRadius: 12,
+  alignItems: 'center',
+  marginBottom: 15,
+},
+saveButtonText: {
+  color: 'white',
+  fontWeight: 'bold',
+  fontSize: 16,
+},
 });
