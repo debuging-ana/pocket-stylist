@@ -3,6 +3,7 @@ import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet } from 'r
 import { collection, query, where, getDocs, startAt, endAt } from 'firebase/firestore';
 import { db } from '../firebaseConfig';  // Import your Firebase config
 import { useRouter } from 'expo-router';
+import { getAuth } from "firebase/auth";
 
 export default function AddContactScreen() {
   const router = useRouter();
@@ -17,22 +18,26 @@ export default function AddContactScreen() {
     }
 
     try {
-      const usersRef = collection(db, 'users');  // Collection for user data
+      const usersRef = collection(db, 'users');
       const q = query(
         usersRef,
-        where('firstName', '>=', term),  // Match the beginning of the first name
-        where('firstName', '<=', term + '\uf8ff')  // Match the first name lexicographically
+        where('firstName', '>=', term),
+        where('firstName', '<=', term + '\uf8ff')
       );
       const querySnapshot = await getDocs(q);
+      const currentUserEmail = getAuth().currentUser?.email; // Get current user's email
 
       const users = querySnapshot.docs.map((doc) => ({
-        id: doc.id,  // Firestore document ID (you may store other fields depending on the data)
-        firstName: doc.data().firstName,  // Access firstName from Firestore
-        lastName: doc.data().lastName,    // Access lastName from Firestore
-        email: doc.data().email,          // Access email from Firestore
+        id: doc.id,
+        firstName: doc.data().firstName,
+        lastName: doc.data().lastName,
+        email: doc.data().email,
       }));
 
-      setUserResults(users); // Set the search results
+      // Exclude current user from results
+      const filteredUsers = users.filter(user => user.email !== currentUserEmail);
+
+      setUserResults(filteredUsers);
     } catch (error) {
       console.error("Error fetching users: ", error);
     }
@@ -47,7 +52,7 @@ export default function AddContactScreen() {
     // Navigate to the chat page when a user is selected
     router.push({
       pathname: '/chat/[friendName]',
-      params: { friendName: userName },  // Pass the selected user's name to the chat screen
+      params: { friendName : userName },  // Pass the selected user's name to the chat screen
     });
   };
 

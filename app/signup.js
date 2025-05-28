@@ -11,6 +11,8 @@ import {
 import { Link, useRouter } from 'expo-router';
 import { signupUser } from '../services/auth';
 import Feather from '@expo/vector-icons/Feather';
+import { db } from '../firebaseConfig';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 export default function SignupScreen() {
   const [firstName, setFirstName] = useState('');
@@ -58,7 +60,18 @@ export default function SignupScreen() {
     
     //actual firebase integration
     try {
-      await signupUser(email, password);
+      const user = await signupUser(email, password);
+
+       //Save user info to Firestore
+      /*
+       await setDoc(doc(db, 'users', user.uid), {
+        uid: user.uid,
+        email: user.email,
+        firstName,
+        lastName,
+        createdAt: serverTimestamp()
+      });
+      */
       // Show success alert
       alert('Account created successfully! Please log in.');
       router.push('/login');

@@ -13,7 +13,7 @@ export default function ContactsScreen() {
   const [friends, setFriends] = useState([]);
 
   useEffect(() => {
-    const currentUser = getAuth().currentUser?.displayName;
+    const currentUser = getAuth().currentUser?.displayName || getAuth().currentUser?.email;
     if (!currentUser) return;
 
     // Get messages where user is either sender or receiver
