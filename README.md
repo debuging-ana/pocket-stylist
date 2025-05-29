@@ -1,17 +1,41 @@
-<<<<<<< HEAD
+# Pocket Stylist
+### Your AI-Powered Personal Stylist
 
-## About this Project
+Pocket Stylist is an AI-powered styling assistant designed to help users curate outfits effortlessly based on their personal wardrobe, body type, location, weather, and events.
+Help students look their best with little to no effort and never be late to a class again trying to find an outfit.
 
-This app is designed to help users manage their personal style choices by offering outfit suggestions, style tips, and customizable fashion preferences. It is built using React Native with Expo.
+## Tech Stack
 
+### Frontend
+- Expo
+- React Native
 
-# Welcome to your Expo app 👋
+### Backend
+- Node.js
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+### Authentication & Database
+- Firebase Authentication
+
+## Features
+- Personalized outfit suggestions
+- Weather-based styling
+- Event-based recommendations
+- Quick wardrobe curation
+- Works with your real closet
 
 ## Get started
 
-1. Install dependencies
+### Prerequisites
+- Node.js
+- Expo CLI
+- Firebase account
+
+1. Clone the Repository
+   ```
+   git clone https://github.com/debuging-ana/pocket-stylist.git
+   ```
+
+2. Install dependencies
 
    ```bash
    npm install
@@ -23,43 +47,15 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
     npx expo start
    ```
 
-In the output, you'll find options to open the app in a
-
 - [development build](https://docs.expo.dev/develop/development-builds/introduction/)
 - [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
 - [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- [Expo Go](https://expo.dev/go)
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Contributers
 
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
-
-## Contributors
-
- - [@debuging-ana](https://github.com/debuging-ana) – original creator 
- - [@MGHusein25](https://github.com/MGHusein25) – contributor
- - [@wjt1878](https://github.com/wjt1878) – contributor
- - [@Dineth02](https://github.com/Dineth02) – contributor
- - [@ellisonyy](https://github.com/ellisonyy) – contributor
+- Ellison Yong
+- Ana Carolina
+- Juliana Binondo
+- Dineth Beneragama
+- Mohumad Hussain
