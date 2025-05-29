@@ -16,7 +16,19 @@ Help students look their best with little to no effort and never be late to a cl
 ### Authentication & Database
 - Firebase Authentication
 
+## Features
+- Personalized outfit suggestions
+- Weather-based styling
+- Event-based recommendations
+- Quick wardrobe curation
+- Works with your real closet
+
 ## Get started
+
+### Prerequisites
+- Node.js
+- Expo CLI
+- Firebase account
 
 1. Clone the Repository
    ```
