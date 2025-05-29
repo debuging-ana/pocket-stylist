@@ -1,11 +1,28 @@
-<<<<<<< HEAD
-# Welcome to your Expo app 👋
+# Pocket Stylist
+Your AI-Powered Personal Stylist
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Pocket Stylist is an AI-powered styling assistant designed to help users curate outfits effortlessly based on their personal wardrobe, body type, location, weather, and events.
+Help students look their best with little to no effort and never be late to a class again trying to find an outfit.
+
+## Tech Stack
+
+### Frontend
+- React Native
+
+### Backend
+- Node.js
+
+### Authentication & Database
+- Firebase Authentication
 
 ## Get started
 
-1. Install dependencies
+1. Clone the Repository
+   ```
+   git clone https://github.com/debuging-ana/pocket-stylist.git
+   ```
+
+2. Install dependencies
 
    ```bash
    npm install
@@ -26,26 +43,10 @@ In the output, you'll find options to open the app in a
 
 You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
-## Get a fresh project
+## Contributers
 
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- Ellison Yong
+- Ana Carolina
+- Juliana Binondo
+- Dineth Beneragama
+- Mohumad Hussain
