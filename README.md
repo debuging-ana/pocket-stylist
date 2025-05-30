@@ -44,7 +44,7 @@ Help students look their best with little to no effort and never be late to a cl
 2. Start the app
 
    ```bash
-    npx expo start
+   npx expo start
    ```
 
 - [development build](https://docs.expo.dev/develop/development-builds/introduction/)
