@@ -3,12 +3,10 @@ import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet, TextInput,
 import { useRouter } from 'expo-router';
 import Feather from '@expo/vector-icons/Feather';
 import { useAuth } from '../context/AuthContext';
-import { Ionicons } from '@expo/vector-icons';
 
 const ExplorePage = () => {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('All');
-  const [likedImages, setLikedImages] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [showBoardSelection, setShowBoardSelection] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
@@ -27,8 +25,15 @@ const ExplorePage = () => {
     { id: 10, uri: require('../assets/images/image10.jpeg'), category: ['All', 'Streetwear'] },
     { id: 11, uri: require('../assets/images/image11.jpeg'), category: ['All', 'Formal'] },
     { id: 12, uri: require('../assets/images/image12.jpeg'), category: ['All', 'Formal'] },
+    { id: 13, uri: require('../assets/images/image13.jpeg'), category: ['All', 'Sporty'] },
+    { id: 14, uri: require('../assets/images/image14.jpeg'), category: ['All', 'Sporty'] },
+    { id: 15, uri: require('../assets/images/image15.jpeg'), category: ['All', 'Sporty'] },
+    { id: 16, uri: require('../assets/images/image16.jpeg'), category: ['All', 'Streetwear'] },
+    { id: 17, uri: require('../assets/images/image17.jpeg'), category: ['All', 'Streetwear'] },
+    { id: 18, uri: require('../assets/images/image18.jpeg'), category: ['All', 'Streetwear'] },
+    { id: 19, uri: require('../assets/images/image19.jpeg'), category: ['All', 'Streetwear'] },
+    { id: 20, uri: require('../assets/images/image20.jpeg'), category: ['All', 'Formal'] },
   ]);
-
   /*
   handles the add to board button press for an image
   this function initiates the saving process
@@ -81,11 +86,6 @@ const ExplorePage = () => {
     } finally {
       setShowBoardSelection(false);
     }
-  };
-
-  // toggles like state for an image local only
-  const toggleLike = (id) => {
-    setLikedImages(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
   };
 
   const filteredImages = activeTab === 'All'
@@ -144,17 +144,6 @@ const ExplorePage = () => {
                 >
                   <Text style={styles.actionButtonText}>Add to Board</Text>
                   <Feather name="arrow-right" size={14} color="#4A6D51" style={{ marginLeft: 5 }} />
-                </TouchableOpacity>
-                {/* like button local only */}
-                <TouchableOpacity
-                  style={styles.heartButton}
-                  onPress={() => toggleLike(image.id)}
-                >
-                  <Ionicons
-                    name={likedImages.includes(image.id) ? "heart" : "heart-outline"}
-                    size={24}
-                    color={likedImages.includes(image.id) ? "#995454" : "#DFBDBD"}
-                  />
                 </TouchableOpacity>
               </View>
             </View>
@@ -282,7 +271,7 @@ const styles = StyleSheet.create({
   },
   imageActions: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
     padding: 12,
   },
@@ -303,9 +292,6 @@ const styles = StyleSheet.create({
     color: '#4A6D51',
     fontWeight: '600',
     fontSize: 12,
-  },
-  heartButton: {
-    padding: 5,
   },
   modalOverlay: {
     flex: 1,
