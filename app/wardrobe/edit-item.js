@@ -69,6 +69,20 @@ export default function EditItemScreen() {
   const [category, setCategory] = useState(params.category || 'tops');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null); // added for error handling
+  const [itemData, setItemData] = useState(null);
+
+  // initialize with full item data
+  useEffect(() => {
+    if (params.id) {
+      setItemData({
+        id: params.id,
+        name: params.name || '',
+        category: params.category || 'tops',
+        imageUri: params.imageUri || null,
+        ownerId: params.ownerId || '' // Add ownerId
+      });
+    }
+  }, [params]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -127,7 +141,7 @@ export default function EditItemScreen() {
     
     try {
       const updatedItem = {
-        id: params.id, // keep the same ID
+        ...itemData,
         name,
         category,
         imageUri,

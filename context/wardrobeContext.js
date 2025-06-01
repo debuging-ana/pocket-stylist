@@ -49,7 +49,7 @@ export const WardrobeProvider = ({ children }) => {
 
     try {
       const newId = Date.now() + '-' + Math.floor(Math.random() * 1000);
-      const completeItem = { ...newItem, id: newId };
+      const completeItem = { ...newItem, id: newId, ownerId: user.uid };
       
       // save the new item in Firestore under the user's wardrobe subcollection
       await setDoc(doc(db, "users", user.uid, "wardrobe", newId), completeItem);
@@ -73,12 +73,16 @@ export const WardrobeProvider = ({ children }) => {
     }
 
     try {
+      // merge with existing data to preserve ownerId
+      const existingItem = wardrobeItems.find(item => item.id === updatedItem.id);
+      const mergedItem = { ...existingItem, ...updatedItem };
+    
       // overwrite the item in Firestore w the updated data
-      await setDoc(doc(db, "users", user.uid, "wardrobe", updatedItem.id), updatedItem);
+      await setDoc(doc(db, "users", user.uid, "wardrobe", updatedItem.id), mergedItem);
       
       // update local state
       setWardrobeItems(wardrobeItems.map(item => 
-        item.id === updatedItem.id ? updatedItem : item
+        item.id === updatedItem.id ? mergedItem : item
       ));
     } catch (error) {
       console.error("Error updating item: ", error);

@@ -2,7 +2,6 @@
   this is a reusable component for all clothing category screens - DRY
  It shows items from one specific category (like tops, bottoms, etc.)
 */
-import React from 'react';
 import { 
     View, 
     Text, 
@@ -53,7 +52,8 @@ export default function CategoryScreen({ category }) {
     router.push({
       pathname: '/wardrobe/edit-item',
       params: { 
-        id: item.id,
+        ...item,  // pass all item properties
+        ownerId: item.ownerId,  // ensure ownerId is included
         name: item.name,
         category: item.category,
         imageUri: item.imageUri
