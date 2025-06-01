@@ -1,14 +1,3 @@
-/*
-  User Profile Screen - Displays user information, boards, and allows editing
-  Key Features:
-   - View/edit profile info (name, bio)
-   - Create/manage style boards
-   - Search saved pins
-   - Profile stats (followers, views)
-   - julz
-
-  note: still need to integrate w firebase
-*/
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, StatusBar, Alert, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useState, useEffect } from 'react';
@@ -17,180 +6,299 @@ import { useAuth } from '../context/AuthContext';
 import Entypo from '@expo/vector-icons/Entypo';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { doc, getDoc } from 'firebase/firestore'; // Add imports for Firestore
-import { db } from '../firebaseConfig'; // Import your Firebase configuration
+import { doc, updateDoc, arrayUnion, setDoc } from 'firebase/firestore';
+import { db } from '../firebaseConfig';
 
 export default function UserProfileScreen() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
-  const { user } = useAuth();
+  const { user, userData } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
-  const [activeTab, setActiveTab] = useState('boards'); // 'boards' or 'looks'
+  const [activeTab, setActiveTab] = useState('boards');
   const [profilePhotoUri, setProfilePhotoUri] = useState(null);
-  const [profileData, setProfileData] = useState({
-    name: user?.email?.split('@')[0] || 'Stylist',
-    bio: '',
-    followers: 0,
-    following: 0,
-    monthlyViews: 0,
-    boards: [
-      { id: '2', title: 'Favorites', pins: 0, updated: 'Just now', isSecret: true, isFavorite: true },
-    ],
-    looks: [],
+  const [editingState, setEditingState] = useState({
+    name: '',
+    bio: ''
   });
 
+  // initializes profile data when userData changes
   useEffect(() => {
-    // Fetch user profile data from Firestore when component mounts
-    const fetchUserProfile = async () => {
-      if (user?.uid) {
-        try {
-          const docRef = doc(db, "users", user.uid);
-          const docSnap = await getDoc(docRef);
-          
-          if (docSnap.exists()) {
-            const userData = docSnap.data();
-            setProfilePhotoUri(userData.profilePhotoUri || null);
-            setProfileData(prevData => ({
-              ...prevData,
-              name: userData.firstName || user?.email?.split('@')[0] || 'Stylist',
-              bio: userData.bio || prevData.bio
-            }));
-          }
-        } catch (error) {
-          console.log('Error fetching user profile:', error);
-        }
-      }
-    };
+    if (userData === null) {
+      // set up default values for new users
+      setEditingState({
+        name: user?.email?.split('@')[0] || 'Stylist',
+        bio: ''
+      });
+      setProfilePhotoUri(null);
+    } else {
+      // use existing profile data from Firestore
+      setEditingState({
+        name: userData?.firstName || user?.email?.split('@')[0] || 'Stylist',
+        bio: userData?.bio || ''
+      });
+      setProfilePhotoUri(userData?.profilePhotoUri || null);
+    }
+  }, [userData, user]);
 
-    fetchUserProfile();
-  }, [user]);
-
-  // saves profile changes & exits the edit mode
-  const handleSave = () => {
-    setIsEditing(false);
-    // will save to firebase later
+  const handleSave = async () => {
+    if (!user?.uid) return;
+    
+    try {
+      const userRef = doc(db, "users", user.uid);
+      // check if document exists first
+      await setDoc(userRef, {}, { merge: true });
+      // then update it
+      await updateDoc(userRef, {
+        firstName: editingState.name,
+        bio: editingState.bio,
+        lastUpdated: new Date().toISOString()
+      });
+      setIsEditing(false);
+      Alert.alert("Success", "Profile updated successfully!");
+    } catch (error) {
+      console.error("Error saving profile:", error);
+      Alert.alert("Error", "Failed to save profile");
+    }
   };
 
-  // creates new style board using Alert dialog
+  /*
+      BOARD MANAGEMENT FUNCTIONS
+  */
+
+  // shows a dialog to create a new board
   const showAddBoardDialog = () => {
     Alert.prompt(
-      "New board name...",
-      "",
+      "New Board",
+      "Enter a name for your new board:",
       [
+        { text: "Cancel", style: "cancel" },
         {
-          text: "Cancel",
-          style: "cancel"
-        },
-        {
-          text: "Done",
+          text: "Create",
           onPress: (boardName) => {
-            if (boardName && boardName.trim() !== '') {
-              addBoard(boardName);
+            if (boardName?.trim()) {
+              addBoard(boardName.trim());
+            } else {
+              Alert.alert("Error", "Board name cannot be empty");
             }
-          }
-        }
+          },
+        },
       ],
-      "plain-text"
+      "plain-text",
+      "",
+      "default"
     );
   };
 
-  // helper function to add the board
-  const addBoard = (boardName) => {
-    const newBoard = {
-      id: Date.now().toString(), // unique id
-      title: boardName,
-      pins: 0,
-      updated: 'Just now',
-      isSecret: false,
-    };
-    
-    // update state with new board
-    setProfileData({
-      ...profileData,
-      boards: [...profileData.boards, newBoard],
-    });
+  // creates a new board & saves it to Firestore
+  const addBoard = async (boardName) => {
+    try {
+      const userRef = doc(db, "users", user.uid);
+      // create a new board object with all required properties
+      const newBoard = {
+        id: `${Date.now()}-${Math.floor(Math.random() * 1000)}`, // Unique ID using timestamp + random
+        title: boardName,
+        pins: [], // start with empty pins array
+        updated: new Date().toISOString(), // last update timestamp
+        isSecret: false, // default visibility
+        isFavorite: false, // not favourited by default
+        ownerId: user.uid,  // critical for Firestore security rules
+        createdAt: new Date().toISOString(), // creation timestamp
+        lastUpdated: new Date().toISOString() // tracks modifications
+      };
+
+      // to ensure the user document exists (doesnt overwrite existing fields)
+      await setDoc(userRef, {}, { merge: true }); 
+
+      // then update new board to users boards array in Firestore
+      await updateDoc(userRef, {
+        boards: arrayUnion(newBoard), // arrayUnion safely adds to existing array
+        lastUpdated: new Date().toISOString() // update users last modified timestamp
+      });
+    } catch (error) {
+      console.error("Error creating board:", error);
+      Alert.alert("Error", "Failed to create board. Please try again!");
+    }
   };
+
+  /*
+    BOARD DISPLAY FUNCTIONS
+  */
+
+  // renders the users boards in a responsive grid layout
+  const renderBoards = () => (
+    <View style={styles.categoriesContainer}>
+      {/* checks if user has any boards */}
+      {(userData?.boards || []).length > 0 ? (
+        // create rows with 2 boards each
+        Array(Math.ceil(userData.boards.length / 2)).fill().map((_, rowIndex) => {
+          const rowBoards = userData.boards.slice(rowIndex * 2, rowIndex * 2 + 2);
+          return (
+            <View key={`row-${rowIndex}`} style={styles.row}>
+              {/* render each board in the row */}
+              {rowBoards.map((board) => (
+                <TouchableOpacity 
+                  key={board.id} 
+                  style={styles.categoryCard}
+                  // navigate to board detail screen when pressed
+                  onPress={() => router.push({ pathname: '/boards/[id]', params: { id: board.id } })}
+                >
+                  {/* board icon - heart for favorite, pin for normal */}
+                  <View style={styles.categoryIconContainer}>
+                    {board.isFavorite ? 
+                      <MaterialCommunityIcons name="heart" size={30} color="#DFBDBD" /> : 
+                      <Entypo name="pin" size={30} color="#DFBDBD" />
+                    }
+                  </View>
+                  
+                  {/* board title & privacy indicator */}
+                  <View style={styles.categoryNameContainer}>
+                    <Text style={styles.categoryName} numberOfLines={1}>
+                      {board.title}
+                    </Text>
+                    {/* show lock icon for secret boards */}
+                    {board.isSecret && <Feather name="lock" size={14} color="#4A6D51" />}
+                  </View>
+                  
+                  {/* Pin count display */}
+                  <Text style={styles.boardStats}>
+                    {board.pins?.length || 0} {board.pins?.length === 1 ? 'Pin' : 'Pins'}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+              
+              {/* empty space filler for last row with single board */}
+              {rowBoards.length < 2 && <View style={styles.emptyGridItem} />}
+            </View>
+          );
+        })
+      ) : (
+        // show empty state message when no boards exist
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>
+            No boards yet. Tap the '+' button to create your first style board!
+          </Text>
+        </View>
+      )}
+    </View>
+  );
+
+  // looks section
+  const renderLooks = () => (
+    <View style={styles.settingsSection}>
+      {/* Search Section with Add Button - positioned under tabs for looks tab */}
+      <View style={styles.searchContainer}>
+        <View style={styles.searchInputContainer}>
+          <Feather name="search" size={20} color="#7D7D7D" style={styles.searchIcon} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search your looks..."
+            placeholderTextColor="#828282"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+        </View>
+        <TouchableOpacity 
+          style={styles.addBoardButton} 
+          onPress={() => router.push('/add-look')}
+        >
+          <Text style={styles.addBoardButtonText}>+</Text>
+        </TouchableOpacity>
+      </View>
+      
+      <View style={styles.sectionTitleContainer}>
+        <Text style={styles.sectionTitle}>Recent Looks</Text>
+      </View>
+
+      {/* View Saved Outfits Button */}
+      <TouchableOpacity
+        style={styles.saveButton}
+        onPress={() => router.push('/savedOutfits')}
+      >
+        <Text style={styles.saveButtonText}>View Saved Outfits</Text>
+      </TouchableOpacity>
+
+      {/* Empty state for looks */}
+      {(userData?.looks || []).length === 0 && (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>
+            Add your first look to your profile!
+          </Text>
+        </View>
+      )}
+    </View>
+  );
 
   return (
     <>
-      {/* Status bar styling */}
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        {/* Header Section */}
+        {/* profile Header Section */}
         <View style={styles.headerContainer}>
           <View style={styles.headerCard}>
-            {/* Instagram-style layout */}
+            {/* profile image and basic info */}
             <View style={styles.profileHeaderContainer}>
-              {/* Profile Picture on the left */}
-              <TouchableOpacity 
-                style={styles.profileButton}
-                onPress={() => router.push('/profile')}
-              >
+              <TouchableOpacity style={styles.profileButton} onPress={() => router.push('/profile')}>
                 {profilePhotoUri ? (
-                  <Image 
-                    source={{ uri: profilePhotoUri }} 
-                    style={styles.profileImage} 
-                    accessibilityLabel="Profile photo"
-                  />
+                  <Image source={{ uri: profilePhotoUri }} style={styles.profileImage} />
                 ) : (
                   <View style={styles.profileImageContainer}>
-                    <Text style={styles.profileInitial}>{(profileData.name?.charAt(0) || 'S').toUpperCase()}</Text>
+                    <Text style={styles.profileInitial}>
+                      {(editingState.name?.charAt(0) || 'S').toUpperCase()}
+                    </Text>
                   </View>
                 )}
               </TouchableOpacity>
               
-              {/* Stats and username on the right */}
               <View style={styles.headerRightSection}>
-                {/* Username at top */}
                 <View style={styles.usernameContainer}>
                   {isEditing ? (
                     <TextInput
                       style={[styles.username, styles.editInput]}
-                      value={profileData.name}
-                      onChangeText={(text) => setProfileData({ ...profileData, name: text })}
+                      value={editingState.name}
+                      onChangeText={(text) => setEditingState(prev => ({...prev, name: text}))}
                     />
                   ) : (
-                    <Text style={styles.username}>{profileData.name}</Text>
+                    <Text style={styles.username}>{editingState.name}</Text>
                   )}
                 </View>
                 
-                {/* Stats in a row */}
+                {/* profile stats */}
                 <View style={styles.statsContainer}>
                   <View style={styles.stat}>
-                    <Text style={styles.statNumber}>{profileData.followers}</Text>
+                    <Text style={styles.statNumber}>{userData?.followers || 0}</Text>
                     <Text style={styles.statLabel}>Followers</Text>
                   </View>
                   <View style={styles.stat}>
-                    <Text style={styles.statNumber}>{profileData.following}</Text>
+                    <Text style={styles.statNumber}>{userData?.following || 0}</Text>
                     <Text style={styles.statLabel}>Following</Text>
                   </View>
                   <View style={styles.stat}>
-                    <Text style={styles.statNumber}>{profileData.monthlyViews}</Text>
+                    <Text style={styles.statNumber}>{userData?.monthlyViews || 0}</Text>
                     <Text style={styles.statLabel}>Views</Text>
                   </View>
                 </View>
               </View>
             </View>
             
-            {/* Bio Section below profile header */}
+            {/* bio section */}
             <View style={styles.bioContainer}>
               {isEditing ? (
                 <TextInput
                   style={[styles.bioInput, styles.editInput]}
                   placeholder="Tell us about your style..."
                   placeholderTextColor="#828282"
-                  value={profileData.bio}
-                  onChangeText={(text) => setProfileData({ ...profileData, bio: text })}
+                  value={editingState.bio}
+                  onChangeText={(text) => setEditingState(prev => ({...prev, bio: text}))}
                   multiline
                 />
               ) : (
                 <Text style={styles.bioText}>
-                  {profileData.bio || 'Add a bio...'}
+                  {editingState.bio || 'Add a bio...'}
                 </Text>
               )}
             </View>
             
-            {/* Edit/Save Button and Settings Button */}
+            {/* action buttons */}
             <View style={styles.buttonContainer}>
               <TouchableOpacity 
                 style={styles.editButton}
@@ -211,7 +319,7 @@ export default function UserProfileScreen() {
           </View>
         </View>
 
-        {/* Tabs for Boards and Looks */}
+        {/* boards/looks tabs */}
         <View style={styles.tabsContainer}>
           <TouchableOpacity 
             style={[styles.tab, activeTab === 'boards' && styles.activeTab]}
@@ -227,10 +335,10 @@ export default function UserProfileScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Content based on active tab */}
-        {activeTab === 'boards' && (
+        {/* boards tab content */}
+        {activeTab === 'boards' ? (
           <View style={styles.settingsSection}>
-            {/* Search Section with Add Button - positioned under tabs */}
+            {/* Search & add board bar */}
             <View style={styles.searchContainer}>
               <View style={styles.searchInputContainer}>
                 <Feather name="search" size={20} color="#7D7D7D" style={styles.searchIcon} />
@@ -242,6 +350,7 @@ export default function UserProfileScreen() {
                   onChangeText={setSearchQuery}
                 />
               </View>
+              {/* add new board button */}
               <TouchableOpacity 
                 style={styles.addBoardButton} 
                 onPress={showAddBoardDialog}
@@ -250,119 +359,17 @@ export default function UserProfileScreen() {
               </TouchableOpacity>
             </View>
             
+            {/* section title */}
             <View style={styles.sectionTitleContainer}>
               <Text style={styles.sectionTitle}>Your Style Boards</Text>
             </View>
 
-            {/* Boards displayed in grid layout */}
-            <View style={styles.categoriesContainer}>
-              {profileData.boards.length > 0 ? (
-                <>
-                  {/* Display boards in rows of 2 */}
-                  {Array(Math.ceil(profileData.boards.length / 2)).fill().map((_, rowIndex) => (
-                    <View key={`row-${rowIndex}`} style={styles.row}>
-                      {profileData.boards.slice(rowIndex * 2, rowIndex * 2 + 2).map((board) => (
-                        <TouchableOpacity 
-                          key={board.id} 
-                          style={styles.categoryCard}
-                          onPress={() => router.push(`/boards/${board.id}`)}
-                        >
-                          <View style={styles.categoryIconContainer}>
-                            {board.isFavorite ? 
-                              <MaterialCommunityIcons name="heart" size={30} color="#DFBDBD" /> : 
-                              <Entypo name="pin" size={30} color="#DFBDBD" />
-                            }
-                          </View>
-                          {isEditing ? (
-                            <TextInput
-                              style={styles.editBoardTitle}
-                              value={board.title}
-                              onChangeText={(text) => {
-                                const updatedBoards = profileData.boards.map(b => 
-                                  b.id === board.id ? { ...b, title: text } : b
-                                );
-                                setProfileData({ ...profileData, boards: updatedBoards });
-                              }}
-                            />
-                          ) : (
-                            <View style={styles.categoryNameContainer}>
-                              <Text style={styles.categoryName} numberOfLines={1}>
-                                {board.title}
-                              </Text>
-                              {board.isSecret && (
-                                <Feather name="lock" size={14} color="#4A6D51" />
-                              )}
-                            </View>
-                          )}
-                          <Text style={styles.boardStats}>
-                            {board.pins} {board.pins === 1 ? 'Pin' : 'Pins'}
-                          </Text>
-                        </TouchableOpacity>
-                      ))}
-                      
-                      {/* Add empty grid item if odd number of boards */}
-                      {rowIndex * 2 + 1 >= profileData.boards.length && profileData.boards.length % 2 !== 0 && (
-                        <View style={styles.emptyGridItem}></View>
-                      )}
-                    </View>
-                  ))}
-                </>
-              ) : (
-                <View style={styles.emptyContainer}>
-                  <Text style={styles.emptyText}>
-                    No boards yet. Tap the '+' button to create your first style board!
-                  </Text>
-                </View>
-              )}
-            </View>
+            {/* render boards grid */}
+            {renderBoards()}
           </View>
-        )}
-
-        {/* Looks Tab Content */}
-        {activeTab === 'looks' && (
-          <View style={styles.settingsSection}>
-            {/* Search Section with Add Button - positioned under tabs for looks tab */}
-            <View style={styles.searchContainer}>
-              <View style={styles.searchInputContainer}>
-                <Feather name="search" size={20} color="#7D7D7D" style={styles.searchIcon} />
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder="Search your looks..."
-                  placeholderTextColor="#828282"
-                  value={searchQuery}
-                  onChangeText={setSearchQuery}
-                />
-              </View>
-              <TouchableOpacity 
-                style={styles.addBoardButton} 
-                onPress={() => router.push('/add-look')}
-              >
-                <Text style={styles.addBoardButtonText}>+</Text>
-              </TouchableOpacity>
-            </View>
-            
-            <View style={styles.sectionTitleContainer}>
-              <Text style={styles.sectionTitle}>Recent Looks</Text>
-            </View>
-
-            {/* View Saved Outfits Button */}
-            <TouchableOpacity
-              style={styles.saveButton}
-              onPress={() => router.push('/savedOutfits')}
-            >
-              <Text style={styles.saveButtonText}>View Saved Outfits</Text>
-            </TouchableOpacity>
-
-            
-            {/* We're removing the placeholder boxes but keeping the title */}
-            {profileData.looks.length === 0 && (
-              <View style={styles.emptyContainer}>
-                <Text style={styles.emptyText}>
-                  Add your first look to your profile!
-                </Text>
-              </View>
-            )}
-          </View>
+        ) : (
+          // LOOKS SECTION ADDED HERE
+          renderLooks()
         )}
       </ScrollView>
     </>
@@ -391,7 +398,6 @@ const styles = StyleSheet.create({
     elevation: 3,
     marginBottom: 15,
   },
-  // Center profile picture container
   profileHeaderContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -468,28 +474,26 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#828282',
   },
-  // New container for buttons
   buttonContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 10, // Space between buttons
+    gap: 10,
   },
   editButton: {
     backgroundColor: '#AFC6A3',
     paddingVertical: 10,
     borderRadius: 12,
     alignItems: 'center',
-    flex: 1, // Takes available space
+    flex: 1,
   },
   editButtonText: {
     color: 'white',
     fontWeight: 'bold',
   },
-  // New settings button
   settingsButton: {
     backgroundColor: '#AFC6A3',
-    width: 40, // Square button with the same height as edit button
+    width: 40,
     height: 40,
     borderRadius: 15,
     justifyContent: 'center',
@@ -501,10 +505,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 8,
     backgroundColor: '#fff',
-  },
-  centeredInput: {
-    textAlign: 'center',
-    width: '80%', // Not full width to keep it centered nicely
   },
   bioInput: {
     height: 60,
@@ -524,7 +524,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#4A6D51',
   },
-  // Search container with add button
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -553,7 +552,6 @@ const styles = StyleSheet.create({
     padding: 0,
     color: '#4A6D51',
   },
-  // Add board button next to search
   addBoardButton: {
     width: 50,
     height: 50,
@@ -572,7 +570,6 @@ const styles = StyleSheet.create({
     color: '#4A6D51',
     fontWeight: 'bold',
   },
-  // Tab navigation styles
   tabsContainer: {
     flexDirection: 'row',
     marginTop: 10,
@@ -667,15 +664,15 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   saveButton: {
-  backgroundColor: '#4A6D51',
-  paddingVertical: 12,
-  borderRadius: 12,
-  alignItems: 'center',
-  marginBottom: 15,
-},
-saveButtonText: {
-  color: 'white',
-  fontWeight: 'bold',
-  fontSize: 16,
-},
+    backgroundColor: '#4A6D51',
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  saveButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
 });
