@@ -3,11 +3,12 @@ import {
   getAuth,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  updateEmail as firebaseUpdateEmail,
   updatePassword as firebaseUpdatePassword,
   EmailAuthProvider,
   reauthenticateWithCredential,
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
+  verifyBeforeUpdateEmail as firebaseVerifyBeforeUpdateEmail,
+  GoogleAuthProvider
 } from 'firebase/auth';
 import { app } from '../firebaseConfig';
 
@@ -33,7 +34,7 @@ export const signupUser = async (email, password) => {
   }
 };
 
-// Update email
+// Update email - UPDATED FUNCTION
 export const updateEmail = async (newEmail) => {
   const user = auth.currentUser;
   
@@ -42,13 +43,11 @@ export const updateEmail = async (newEmail) => {
   }
   
   try {
-    await firebaseUpdateEmail(user, newEmail);
+    // used Firebase's verifyBeforeUpdateEmail method
+    await firebaseVerifyBeforeUpdateEmail(user, newEmail);
     return true;
   } catch (error) {
-    // For operations that require recent authentication
-    if (error.code === 'auth/requires-recent-login') {
-      throw error; // Handle reauthentication in the component
-    }
+    console.error('Email update error:', error);
     throw error;
   }
 };
@@ -101,6 +100,27 @@ export const signOutUser = async () => {
 // Get current user
 export const getCurrentUser = () => {
   return auth.currentUser;
+};
+
+// for email user story: checks if email is verified
+export const isEmailVerified = () => {
+  const user = auth.currentUser;
+  return user ? user.emailVerified : false;
+};
+
+// for email user story: checks if user is Google-authenticated
+export const isGoogleProvider = (user) => {
+  return user.providerData.some(
+    provider => provider.providerId === GoogleAuthProvider.PROVIDER_ID
+  );
+};
+
+// for email user story: get authentication provider
+export const getAuthProvider = () => {
+  const user = auth.currentUser;
+  if (!user) return null;
+  
+  return user.providerData[0]?.providerId;
 };
 
 export { auth }; // Export auth instance for use elsewhere
