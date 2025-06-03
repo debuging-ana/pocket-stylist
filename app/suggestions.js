@@ -1,12 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar } from 'react-native';
 import { useRouter } from 'expo-router';
 import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { generateWithLlama } from '../services/ollamaService';
+import { ActivityIndicator } from 'react-native';
 
 export default function SuggestionsPage() {
   const router = useRouter();
+  const [testStatus, setTestStatus] = useState({
+    loading: false,
+    result: '',
+    showResult: false
+  });
   const suggestions = [
     {
       id: 1,
@@ -58,11 +65,48 @@ export default function SuggestionsPage() {
     }
   ];
 
+  //temporary!
+  const runOllamaTest = async () => {
+    setTestStatus(prev => ({ ...prev, loading: true, showResult: true }));
+    
+    try {
+      const prompt = "As a fashion assistant, suggest one outfit idea for a college student's business casual presentation. Include 3 specific clothing items.";
+      const response = await generateWithLlama(prompt);
+      setTestStatus(prev => ({ ...prev, loading: false, result: response || "No response received" }));
+    } catch (error) {
+      console.error("Ollama Error:", error);
+      setTestStatus(prev => ({ ...prev, loading: false, result: "Failed to connect to Ollama. Make sure it's running and check your network connection." }));
+    }
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
-      
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
+        {/* Test Button */}
+        <TouchableOpacity 
+          style={styles.testButton}
+          onPress={runOllamaTest}
+          disabled={testStatus.loading}
+        >
+          {testStatus.loading ? (
+            <ActivityIndicator color="#FFFFFF" />
+          ) : (
+            <Text style={styles.testButtonText}>Test Ollama Integration</Text>
+          )}
+        </TouchableOpacity>
+
+        {/* Test Result Display */}
+        {testStatus.showResult && (
+          <View style={styles.testResultContainer}>
+            <Text style={styles.testResultTitle}>Ollama Test Result:</Text>
+            <Text style={styles.testResultText}>
+              {testStatus.result}
+            </Text>
+          </View>
+        )}
+
+        {/* Suggestions Cards */}
         <View style={styles.suggestionsContainer}>
           {suggestions.map(suggestion => (
             <TouchableOpacity 
@@ -86,6 +130,7 @@ export default function SuggestionsPage() {
           ))}
         </View>
 
+        {/* Tip Card */}
         <TouchableOpacity style={styles.tipCard} onPress={() => router.push('/tips')}>
           <View style={styles.tipIconContainer}>
             <Ionicons name="bulb-outline" size={24} color="#FFFFFF" />
@@ -211,5 +256,37 @@ const styles = StyleSheet.create({
   tipText: {
     fontSize: 13,
     color: '#828282',
+  },
+  testButton: {
+    backgroundColor: '#4A6D51',
+    padding: 15,
+    borderRadius: 15,
+    alignItems: 'center',
+    marginBottom: 20,
+    flexDirection: 'row',
+    justifyContent: 'center'
+  },
+  testButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  testResultContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 15,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#E0E0E0'
+  },
+  testResultTitle: {
+    fontWeight: 'bold',
+    color: '#4A6D51',
+    marginBottom: 8
+  },
+  testResultText: {
+    color: '#333',
+    fontSize: 14,
+    lineHeight: 20
   },
 });

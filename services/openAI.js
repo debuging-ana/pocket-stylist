@@ -1,4 +1,4 @@
-import OpenAI from 'openai';
+/*import OpenAI from 'openai';
 import Constants from "expo-constants";
 
 const { openAiSecretKey } = Constants.expoConfig.extra;
@@ -23,4 +23,4 @@ export async function generateImageFromPrompt(prompt) {
     console.error('OpenAI image generation error:', error);
     throw error;
   }
-}
+*/
