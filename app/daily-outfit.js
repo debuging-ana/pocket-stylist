@@ -17,7 +17,7 @@ export default function DailyOutFit() {
 
     try {
       const base64Image = await generateImageFromPrompt(
-        'Create complete outfit suggestions based on the current weather in Auckland and the user’s most common style...'
+        "A fashion full body model wearing an outfit based on the current weather in Auckland, high fashion photography, photorealistic, 4K detail, make sure there is no background in the image"
       );
       setImageData(base64Image);
     } catch (err) {
