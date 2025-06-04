@@ -1,4 +1,4 @@
-/*import OpenAI from 'openai';
+import OpenAI from 'openai';
 import Constants from "expo-constants";
 
 const { openAiSecretKey } = Constants.expoConfig.extra;
@@ -13,9 +13,10 @@ const openai = new OpenAI({
 export async function generateImageFromPrompt(prompt) {
   try {
     const response = await openai.images.generate({
+      model: 'dall-e-3',
       prompt,
       n: 1,
-      size: '512x512',
+      size: '1024x1024',
       response_format: 'b64_json',
     });
     return `data:image/png;base64,${response.data[0].b64_json}`;
@@ -23,4 +24,4 @@ export async function generateImageFromPrompt(prompt) {
     console.error('OpenAI image generation error:', error);
     throw error;
   }
-*/
+}
