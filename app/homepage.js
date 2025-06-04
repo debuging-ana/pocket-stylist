@@ -186,16 +186,16 @@ export default function HomePage() {
                 </View>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.suggestionCard, { backgroundColor: '#DFBDBD' }]} onPress={() => router.push('/personalized-styles')}>
+            <TouchableOpacity style={[styles.suggestionCard, { backgroundColor: '#DFBDBD' }]} onPress={() => router.push('/made-for-you')}>
               <View style={styles.cardContent}>
                 <View style={styles.cardHeader}>
                   <Ionicons name="person-outline" size={18} color="#FFFFFF" />
                   <Text style={styles.cardTag}>Personalized</Text>
                 </View>
                 <Text style={styles.cardTitle}>Made for You</Text>
-                <Text style={styles.cardDescription}>Custom style recommendations based on your preferences, style, and wardrobe items</Text>
+                <Text style={styles.cardDescription}>Custom style recommendations based on your preferences.</Text>
                 <View style={styles.cardButton}>
-                  <Text style={styles.cardButtonText}>See Recommendations</Text>
+                  <Text style={styles.cardButtonText}>Generate now!</Text>
                   <Feather name="arrow-right" size={14} color="#4A6D51" />
                 </View>
               </View>
