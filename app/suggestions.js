@@ -57,11 +57,11 @@ export default function SuggestionsPage() {
       tag: "Personalized",
       icon: "person-outline",
       iconColor: "#FFFFFF",
-      description: "Custom style recommendations based on your preferences, style, and wardrobe items",
+      description: "Custom style recommendations based on your preferences.",
       backgroundColor: "#DFBDBD",
       accentColor: "#4A6D51",
-      route: "/personalized-styles",
-      buttonText: "See Recommendations"
+      route: "/made-for-you",
+      buttonText: "Generate now!"
     }
   ];
 
