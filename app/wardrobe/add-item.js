@@ -13,12 +13,14 @@ import {
   Alert,
   ScrollView,
   StatusBar,
-  ActivityIndicator
+  ActivityIndicator,
+  Modal
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import { useWardrobe } from '../../context/wardrobeContext';
 import { MaterialCommunityIcons, Feather } from '@expo/vector-icons';
+import * as FileSystem from 'expo-file-system';
 
 // utility function to render category icons based on item category (matches wardrobe.js)
 const getCategoryIcon = (category, size = 22) => {
@@ -65,6 +67,8 @@ export default function AddItemScreen() {
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
   const [imageLoading, setImageLoading] = useState(false);
+  const [isProcessingBackground, setIsProcessingBackground] = useState(false);
+  const [showImageOptions, setShowImageOptions] = useState(false);
 
   // configure custom back button in header
   useLayoutEffect(() => {
@@ -82,34 +86,112 @@ export default function AddItemScreen() {
     { id: 'shoes', name: 'Shoes' },
   ];
 
-  // to handle selecting an image from user's gallery/photos
-  const pickImage = async () => {
+  const removeBackground = async (uri) => {
+    setIsProcessingBackground(true);
+    try {
+      const formData = new FormData();
+      formData.append('image_file', {
+        uri: uri,
+        type: 'image/jpeg',
+        name: 'image.jpg'
+      });
+
+      console.log('Sending request to Remove.bg...');
+      const response = await fetch('https://api.remove.bg/v1.0/removebg', {
+        method: 'POST',
+        headers: {
+          'X-Api-Key': '7Dgo1Q5WVJr2WJE39YKZmMSN',
+          'Accept': 'application/json'
+        },
+        body: formData
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API Error:', errorText);
+        throw new Error('Failed to remove background');
+      }
+
+      const data = await response.json();
+      console.log('Received response:', data);
+
+      if (!data.data || !data.data.result_url) {
+        console.error('Invalid response format:', data);
+        throw new Error('Invalid response from server');
+      }
+
+      // Download the image from the result URL
+      console.log('Downloading image from:', data.data.result_url);
+      const imageResponse = await fetch(data.data.result_url);
+      
+      if (!imageResponse.ok) {
+        throw new Error('Failed to download processed image');
+      }
+
+      // Save to local file
+      const base64Data = await imageResponse.blob().then(blob => {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const base64 = reader.result.split(',')[1];
+            resolve(base64);
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+      });
+
+      const fileName = `processed_${Date.now()}.png`;
+      const fileUri = `${FileSystem.cacheDirectory}${fileName}`;
+      
+      await FileSystem.writeAsStringAsync(fileUri, base64Data, {
+        encoding: FileSystem.EncodingType.Base64
+      });
+
+      console.log('Saved processed image to:', fileUri);
+      setImageUri(fileUri);
+
+    } catch (error) {
+      console.error('Background removal error:', error);
+      Alert.alert(
+        'Error',
+        'Failed to remove background. Please try again with a different image.'
+      );
+    } finally {
+      setIsProcessingBackground(false);
+    }
+  };
+
+  const handleImageSelection = async (shouldRemoveBackground = false) => {
     setImageLoading(true);
     try {
-      // check/request permissions
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== 'granted') {
         Alert.alert('Permission required', 'Please allow photo access to select images');
         return;
       }
 
-      // launch image picker with modern configuration
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: 'Images', // updated from deprecated Media TypeOptions (warnings)
+        mediaTypes: 'Images',
         allowsEditing: true,
         aspect: [4, 3],
         quality: 1,
       });
 
-      // handle result using current Expo format
       if (!result.canceled && result.assets?.length > 0) {
-        setImageUri(result.assets[0].uri);
+        console.log('Selected image:', result.assets[0].uri);
+        if (shouldRemoveBackground) {
+          await removeBackground(result.assets[0].uri);
+        } else {
+          setImageUri(result.assets[0].uri);
+        }
       }
     } catch (error) {
       console.error('Image picker error:', error);
       Alert.alert('Error', 'Failed to select image');
     } finally {
       setImageLoading(false);
+      setShowImageOptions(false);
     }
   };
 
@@ -172,27 +254,24 @@ export default function AddItemScreen() {
                   <Text style={styles.placeholderText}>No image selected</Text>
                 </View>
               )}
-              {imageLoading && (
+              {(imageLoading || isProcessingBackground) && (
                 <View style={styles.loadingOverlay}>
                   <ActivityIndicator size="large" color="#4A6D51" />
+                  {isProcessingBackground && (
+                    <Text style={styles.processingText}>Removing background...</Text>
+                  )}
                 </View>
               )}
             </View>
 
             {/* image selection button */}
             <TouchableOpacity 
-              style={[styles.imageButton, imageLoading && styles.disabledButton]} 
-              onPress={pickImage}
-              disabled={imageLoading}
+              style={[styles.imageButton, (imageLoading || isProcessingBackground) && styles.disabledButton]} 
+              onPress={() => setShowImageOptions(true)}
+              disabled={imageLoading || isProcessingBackground}
             >
-              {imageLoading ? (
-                <ActivityIndicator color="#4A6D51" />
-              ) : (
-                <>
-                  <Feather name="image" size={18} color="#4A6D51" style={styles.buttonIcon} />
-                  <Text style={styles.buttonText}>Choose from Gallery</Text>
-                </>
-              )}
+              <Feather name="image" size={18} color="#4A6D51" style={styles.buttonIcon} />
+              <Text style={styles.buttonText}>Choose from Gallery</Text>
             </TouchableOpacity>
           </View>
 
@@ -219,8 +298,8 @@ export default function AddItemScreen() {
                 placeholderTextColor="#828282"
                 value={description}
                 onChangeText={setDescription}
-                multiline={true}
-                numberOfLines={3}
+                multiline={false}
+                returnKeyType="done"
               />
             </View>
 
@@ -264,6 +343,41 @@ export default function AddItemScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      {/* Image Options Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={showImageOptions}
+        onRequestClose={() => setShowImageOptions(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Choose Option</Text>
+            
+            <TouchableOpacity 
+              style={styles.modalButton}
+              onPress={() => handleImageSelection(false)}
+            >
+              <Text style={styles.modalButtonText}>Upload Original Image</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.modalButton}
+              onPress={() => handleImageSelection(true)}
+            >
+              <Text style={styles.modalButtonText}>Remove Background</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={[styles.modalButton, styles.cancelButton]}
+              onPress={() => setShowImageOptions(false)}
+            >
+              <Text style={styles.cancelButtonText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </>
   );
 }
@@ -413,8 +527,54 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   descriptionInput: {
-    height: 80,
-    textAlignVertical: 'top',
-    paddingTop: 10,
+    height: 50,
+    fontSize: 16,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    paddingBottom: 30,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#4A6D51',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  modalButton: {
+    backgroundColor: '#CADBC1',
+    padding: 15,
+    borderRadius: 15,
+    marginBottom: 10,
+    alignItems: 'center',
+  },
+  modalButtonText: {
+    color: '#4A6D51',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  cancelButton: {
+    backgroundColor: '#F8F8F8',
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
+  },
+  cancelButtonText: {
+    color: '#666',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  processingText: {
+    marginTop: 10,
+    color: '#4A6D51',
+    fontSize: 14,
+    fontWeight: '500',
   },
 });
