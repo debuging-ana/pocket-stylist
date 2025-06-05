@@ -136,7 +136,7 @@ export default function WardrobeScreen() {
                 backgroundColor: '#CADBC1',
                 borderColor: '#4A6D51',
               }]} 
-              onPress={() => router.push('/looks/create')}
+              onPress={() => router.push('/wardrobe/add-outfit')}
             >
               <Feather name="plus" size={18} color="#4A6D51" />
               <Text style={[styles.buttonText, { color: '#4A6D51' }]}>Outfit</Text>
@@ -147,7 +147,7 @@ export default function WardrobeScreen() {
                 backgroundColor: '#E3D3C6',
                 borderColor: '#8B6E57',
               }]} 
-              onPress={() => router.push('/looks')}
+              onPress={() => router.push('/savedOutfits')}
             >
               <MaterialCommunityIcons name="hanger" size={18} color="#8B6E57" />
               <Text style={[styles.buttonText, { color: '#8B6E57' }]}>See Outfits</Text>
@@ -186,7 +186,7 @@ export default function WardrobeScreen() {
               <Link href="/wardrobe/tops" asChild>
                 <TouchableOpacity style={styles.categoryCard}>
                   <View style={styles.categoryIconContainer}>
-                    {getCategoryIcon('tops', 45)}
+                    {getCategoryIcon('tops', 35)}
                   </View>
                   <Text style={styles.categoryName}>Tops</Text>
                 </TouchableOpacity>
@@ -195,7 +195,7 @@ export default function WardrobeScreen() {
               <Link href="/wardrobe/bottoms" asChild>
                 <TouchableOpacity style={styles.categoryCard}>
                   <View style={styles.categoryIconContainer}>
-                    {getCategoryIcon('bottoms', 45)}
+                    {getCategoryIcon('bottoms', 35)}
                   </View>
                   <Text style={styles.categoryName}>Bottoms</Text>
                 </TouchableOpacity>
@@ -206,7 +206,7 @@ export default function WardrobeScreen() {
               <Link href="/wardrobe/jackets" asChild>
                 <TouchableOpacity style={styles.categoryCard}>
                   <View style={styles.categoryIconContainer}>
-                    {getCategoryIcon('jackets', 45)}
+                    {getCategoryIcon('jackets', 35)}
                   </View>
                   <Text style={styles.categoryName}>Jackets</Text>
                 </TouchableOpacity>
@@ -215,7 +215,7 @@ export default function WardrobeScreen() {
               <Link href="/wardrobe/accessories" asChild>
                 <TouchableOpacity style={styles.categoryCard}>
                   <View style={styles.categoryIconContainer}>
-                    {getCategoryIcon('accessories', 45)}
+                    {getCategoryIcon('accessories', 35)}
                   </View>
                   <Text style={styles.categoryName}>Accessories</Text>
                 </TouchableOpacity>
@@ -226,7 +226,7 @@ export default function WardrobeScreen() {
               <Link href="/wardrobe/shoes" asChild>
                 <TouchableOpacity style={styles.categoryCard}>
                   <View style={styles.categoryIconContainer}>
-                    {getCategoryIcon('shoes', 45)}
+                    {getCategoryIcon('shoes', 35)}
                   </View>
                   <Text style={styles.categoryName}>Shoes</Text>
                 </TouchableOpacity>
@@ -421,7 +421,7 @@ const styles = StyleSheet.create({
   },
   categoryCard: {
     width: '48%',
-    height: 158,
+    height: 158.8,
     backgroundColor: '#FFFFFF',
     borderColor: '#4A6D51',
     borderWidth: 1,
@@ -436,7 +436,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   categoryIconContainer: {
-    height: '60%',
+    height: '55%',
     aspectRatio: 1,
     borderRadius: 15,
     justifyContent: 'center',
@@ -445,7 +445,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   categoryName: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
     color: '#4A6D51',
     textAlign: 'center',
