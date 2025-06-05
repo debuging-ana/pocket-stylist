@@ -47,9 +47,8 @@ const ProfileScreen = () => {
     {label: 'Triangle', value: 'Triangle'},
     {label: 'Rectangle', value: 'Rectangle'},
     {label: 'Hour Glass', value: 'Hour Glass'},
-    {label: 'Ectomorph', value: 'Ectomorph'},
-    {label: 'Mesomorph', value: 'Mesomorph'},
-    {label: 'Endomorph', value: 'Endomorph'}
+    {label: 'Pear Shape', value: 'Pear Shape'},
+    {label: 'Inverted Triangle', value: 'Inverted Triangle'}
   ]);
 
   const [lifestyleOpen, setLifestyleOpen] = useState(false);
@@ -371,33 +370,45 @@ const ProfileScreen = () => {
               <View style={styles.dropdownWrapper}>
                 <Text style={styles.dropdownLabel}>Gender</Text>
                 <DropDownPicker
-                  listMode="MODAL"
-                  open={genderOpen}
-                  value={profile.gender}
-                  items={genderItems}
-                  setOpen={(open) => {
-                    setGenderOpen(open);
-                    if (open) {
-                      setBodyTypeOpen(false);
-                      setLifestyleOpen(false);
-                    }
-                  }}
-                  setValue={(value) => setProfile({...profile, gender: value()})}
-                  setItems={setGenderItems}
-                  disabled={!isEditing}
-                  placeholder="Select Gender"
-                  style={[styles.dropdown, !isEditing && styles.dropdownDisabled]}
-                  textStyle={styles.dropdownText}
-                  dropDownContainerStyle={styles.dropdownContainer}
-                  listItemLabelStyle={styles.dropdownItemText}
-                  listItemContainerStyle={styles.dropdownItemContainer}
-                  ArrowDownIconComponent={() => (
-                    <MaterialIcons name="keyboard-arrow-down" size={24} color="#4A6D51" />
-                  )}
-                  ArrowUpIconComponent={() => (
-                    <MaterialIcons name="keyboard-arrow-up" size={24} color="#4A6D51" />
-                  )}
-                  zIndex={3000}
+                listMode="MODAL"
+                open={genderOpen}
+                value={profile.gender}
+                items={genderItems}
+                setOpen={(open) => {
+                  setGenderOpen(open);
+                  if (open) {
+                    setBodyTypeOpen(false);
+                    setLifestyleOpen(false);
+                  }
+                }}
+                setValue={(value) => setProfile({...profile, gender: value()})}
+                setItems={setGenderItems}
+                disabled={!isEditing}
+                placeholder="Select Gender"
+                style={[styles.dropdown, !isEditing && styles.dropdownDisabled]}
+                textStyle={styles.dropdownText}
+                dropDownContainerStyle={styles.dropdownOpenContainer}
+                listItemLabelStyle={[styles.dropdownItemText,{ color: 'white'}]}
+                listItemContainerStyle={[styles.dropdownItemContainer,{ backgroundColor: '#AFC6A3' }]}
+                modalProps={{animationType: 'slide'}}
+                modalTitle="Select Gender"
+                modalTitleStyle={styles.dropdownModalTitle}
+                modalContentContainerStyle={styles.dropdownModalContainer}
+                ArrowDownIconComponent={() => (
+                <MaterialIcons name="keyboard-arrow-down" size={24} color="#4A6D51" />)}
+                ArrowUpIconComponent={() => (
+                <MaterialIcons name="keyboard-arrow-up" size={24} color="#4A6D51" />)}
+                CloseIconComponent={() => (
+                <MaterialIcons name="close" size={24} color="#4A6D51" />)}
+                modalTitleContainerStyle={styles.modalTitleContainer}
+                modalHeaderContainerStyle={styles.modalHeaderContainer}
+                zIndex={3000}
+                itemSeparator={true}
+                itemSeparatorStyle={{ backgroundColor: '#E0E0E0' }}
+                activeItemContainerStyle={{backgroundColor: '#C7D9BD'}}
+                activeItemLabelStyle={{
+                  color: 'white', 
+                  fontWeight: 'bold',}}
                 />
               </View>
 
@@ -406,33 +417,45 @@ const ProfileScreen = () => {
                 <View style={styles.dropdownWrapper}>
                   <Text style={styles.dropdownLabel}>Body Type</Text>
                   <DropDownPicker
-                    listMode="MODAL"
-                    open={bodyTypeOpen}
-                    value={profile.bodyType}
-                    items={bodyTypeItems}
-                    setOpen={(open) => {
-                      setBodyTypeOpen(open);
-                      if (open) {
-                        setGenderOpen(false);
-                        setLifestyleOpen(false);
-                      }
-                    }}
-                    setValue={(value) => setProfile({...profile, bodyType: value()})}
-                    setItems={setBodyTypeItems}
-                    disabled={!isEditing}
-                    placeholder="Select Body Type"
-                    style={[styles.dropdown, !isEditing && styles.dropdownDisabled]}
-                    textStyle={styles.dropdownText}
-                    dropDownContainerStyle={styles.dropdownContainer}
-                    listItemLabelStyle={styles.dropdownItemText}
-                    listItemContainerStyle={styles.dropdownItemContainer}
-                    ArrowDownIconComponent={() => (
-                      <MaterialIcons name="keyboard-arrow-down" size={24} color="#4A6D51" />
-                    )}
-                    ArrowUpIconComponent={() => (
-                      <MaterialIcons name="keyboard-arrow-up" size={24} color="#4A6D51" />
-                    )}
-                    zIndex={2000}
+                  listMode="MODAL"
+                  open={bodyTypeOpen}
+                  value={profile.bodyType}
+                  items={bodyTypeItems}
+                  setOpen={(open) => {
+                    setBodyTypeOpen(open);
+                    if (open) {
+                      setGenderOpen(false);
+                      setLifestyleOpen(false);
+                    }
+                  }}
+                  setValue={(value) => setProfile({...profile, bodyType: value()})}
+                  setItems={setBodyTypeItems}
+                  disabled={!isEditing}
+                  placeholder="Select Body Type"
+                  style={[styles.dropdown, !isEditing && styles.dropdownDisabled]}
+                  textStyle={styles.dropdownText}
+                  dropDownContainerStyle={[styles.dropdownContainer, bodyTypeOpen && styles.dropdownOpenContainer]}
+                  listItemLabelStyle={[styles.dropdownItemText, { color: 'white' }]}
+                  listItemContainerStyle={[styles.dropdownItemContainer, { backgroundColor: '#AFC6A3' }]}
+                  modalProps={{animationType: 'slide'}}
+                  modalTitle="Select Body Type"
+                  modalTitleStyle={styles.dropdownModalTitle}
+                  modalContentContainerStyle={styles.dropdownModalContainer}
+                  ArrowDownIconComponent={() => (
+                  <MaterialIcons name="keyboard-arrow-down" size={24} color="#4A6D51" />)}
+                  ArrowUpIconComponent={() => (
+                  <MaterialIcons name="keyboard-arrow-up" size={24} color="#4A6D51" />)}
+                  CloseIconComponent={() => (
+                  <MaterialIcons name="close" size={24} color="#4A6D51" />)}
+                  modalTitleContainerStyle={styles.modalTitleContainer}
+                  modalHeaderContainerStyle={styles.modalHeaderContainer}
+                  zIndex={2000}
+                  itemSeparator={true}
+                  itemSeparatorStyle={{ backgroundColor: '#E0E0E0' }}
+                  activeItemContainerStyle={{backgroundColor: '#C7D9BD'}}
+                  activeItemLabelStyle={{
+                    color: 'white',
+                    fontWeight: 'bold',}}
                   />
                 </View>
               )}
@@ -442,33 +465,46 @@ const ProfileScreen = () => {
                 <View style={styles.dropdownWrapper}>
                   <Text style={styles.dropdownLabel}>LifeStyle Information</Text>
                   <DropDownPicker
-                    listMode="MODAL"
-                    open={lifestyleOpen}
-                    value={profile.lifestyle}
-                    items={lifestyleItems}
-                    setOpen={(open) => {
-                      setLifestyleOpen(open);
-                      if (open) {
-                        setGenderOpen(false);
-                        setBodyTypeOpen(false);
-                      }
+                  listMode="MODAL"
+                  open={lifestyleOpen}
+                  value={profile.lifestyle}
+                  items={lifestyleItems}
+                  setOpen={(open) => {
+                    setLifestyleOpen(open);
+                    if (open) {
+                      setGenderOpen(false);
+                      setBodyTypeOpen(false);
+                    }
+                  }}
+                  setValue={(value) => setProfile({...profile, lifestyle: value()})}
+                  setItems={setLifestyleItems}
+                  disabled={!isEditing}
+                  placeholder="Select Lifestyle"
+                  style={[styles.dropdown, !isEditing && styles.dropdownDisabled]}
+                  textStyle={styles.dropdownText}
+                  dropDownContainerStyle={[styles.dropdownContainer, lifestyleOpen && styles.dropdownOpenContainer]}
+                  listItemLabelStyle={[styles.dropdownItemText,{ color: 'white' }]}
+                  listItemContainerStyle={[styles.dropdownItemContainer, { backgroundColor: '#AFC6A3' }]}
+                  modalProps={{animationType: 'slide',}}
+                  modalTitle="Select Lifestyle"
+                  modalTitleStyle={styles.dropdownModalTitle}
+                  modalContentContainerStyle={styles.dropdownModalContainer}
+                  ArrowDownIconComponent={() => (
+                  <MaterialIcons name="keyboard-arrow-down" size={24} color="#4A6D51" />)}
+                  ArrowUpIconComponent={() => (
+                  <MaterialIcons name="keyboard-arrow-up" size={24} color="#4A6D51" />)}
+                  CloseIconComponent={() => (
+                  <MaterialIcons name="close" size={24} color="#4A6D51" />)}
+                  modalTitleContainerStyle={styles.modalTitleContainer}
+                  modalHeaderContainerStyle={styles.modalHeaderContainer}
+                  zIndex={1000}
+                  itemSeparator={true}
+                  itemSeparatorStyle={{ backgroundColor: '#E0E0E0' }}
+                  activeItemContainerStyle={{backgroundColor: '#C7D9BD'}}
+                  activeItemLabelStyle={{
+                    color: 'white',
+                    fontWeight: 'bold',
                     }}
-                    setValue={(value) => setProfile({...profile, lifestyle: value()})}
-                    setItems={setLifestyleItems}
-                    disabled={!isEditing}
-                    placeholder="Select Lifestyle"
-                    style={[styles.dropdown, !isEditing && styles.dropdownDisabled]}
-                    textStyle={styles.dropdownText}
-                    dropDownContainerStyle={styles.dropdownContainer}
-                    listItemLabelStyle={styles.dropdownItemText}
-                    listItemContainerStyle={styles.dropdownItemContainer}
-                    ArrowDownIconComponent={() => (
-                      <MaterialIcons name="keyboard-arrow-down" size={24} color="#4A6D51" />
-                    )}
-                    ArrowUpIconComponent={() => (
-                      <MaterialIcons name="keyboard-arrow-up" size={24} color="#4A6D51" />
-                    )}
-                    zIndex={1000}
                   />
                 </View>
               )}
@@ -659,11 +695,42 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
   },
   dropdownItemContainer: {
-    backgroundColor: 'white', 
-    borderBottomWidth: 1,
-    borderBottomColor: '#F2F2F2',
-    paddingVertical: 10,
-  },
+  borderBottomWidth: 1,
+  borderBottomColor: '#F2F2F2',
+  paddingVertical: 10,
+},
+dropdownModalContainer: {
+  backgroundColor: 'white', 
+  paddingHorizontal: 20,
+  paddingTop: 10,
+  paddingBottom: 20,
+},
+dropdownModalTitle: {
+  fontSize: 18,
+  fontWeight: 'bold', 
+  color: '#4A6D51',
+  marginLeft:130,
+},
+dropdownOpenContainer: {
+  backgroundColor: 'white', 
+},
+modalHeaderContainer: {
+  backgroundColor: '#AFC6A3',
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  paddingHorizontal: 15,
+  paddingVertical: 10,
+  borderBottomWidth: 1,
+  borderBottomColor: '#E0E0E0',
+},
+modalTitleContainer: {
+  flex: 1,
+  alignItems: 'center', 
+  position: 'absolute', 
+  left: 0,
+  right: 0,
+},
   saveButton: {
     backgroundColor: '#4A6D51',
     borderRadius: 15,
