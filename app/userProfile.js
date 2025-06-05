@@ -201,7 +201,7 @@ export default function UserProfileScreen() {
           style={styles.addBoardButton} 
           onPress={() => router.push('/add-look')}
         >
-          <Text style={styles.addBoardButtonText}>+</Text>
+          <Feather name="plus" size={24} color="#4A6D51" />
         </TouchableOpacity>
       </View>
       
@@ -313,7 +313,7 @@ export default function UserProfileScreen() {
                 style={styles.settingsButton}
                 onPress={() => router.push('/settings')}
               >
-                <Ionicons name="settings-outline" size={24} color="white" />
+                <Ionicons name="settings-outline" size={24} color="#4A6D51" />
               </TouchableOpacity>
             </View>
           </View>
@@ -355,7 +355,7 @@ export default function UserProfileScreen() {
                 style={styles.addBoardButton} 
                 onPress={showAddBoardDialog}
               >
-                <Text style={styles.addBoardButtonText}>+</Text>
+                <Feather name="plus" size={24} color="#4A6D51" />
               </TouchableOpacity>
             </View>
             
@@ -481,18 +481,22 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   editButton: {
-    backgroundColor: '#AFC6A3',
+    backgroundColor: '#CADBC1',
+    borderColor: '#4A6D51',
+    borderWidth: 1,
     paddingVertical: 10,
     borderRadius: 12,
     alignItems: 'center',
     flex: 1,
   },
   editButtonText: {
-    color: 'white',
+    color: '#4A6D51',
     fontWeight: 'bold',
   },
   settingsButton: {
-    backgroundColor: '#AFC6A3',
+    backgroundColor: '#CADBC1',
+    borderColor: '#4A6D51',
+    borderWidth: 1,
     width: 40,
     height: 40,
     borderRadius: 15,
@@ -553,22 +557,20 @@ const styles = StyleSheet.create({
     color: '#4A6D51',
   },
   addBoardButton: {
-    width: 50,
-    height: 50,
-    backgroundColor: 'white',
+    backgroundColor: '#CADBC1',
+    borderColor: '#4A6D51',
+    borderWidth: 1,
+    width: 40,
+    height: 40,
     borderRadius: 15,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 1,
+    marginLeft: 10,
   },
   addBoardButtonText: {
-    fontSize: 30,
+    fontSize: 24,
     color: '#4A6D51',
-    fontWeight: 'bold',
+    fontWeight: '500',
   },
   tabsContainer: {
     flexDirection: 'row',
@@ -664,15 +666,18 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   saveButton: {
-    backgroundColor: '#4A6D51',
-    paddingVertical: 12,
-    borderRadius: 12,
+    backgroundColor: '#CADBC1',
+    borderColor: '#4A6D51',
+    borderWidth: 1,
+    padding: 15,
+    borderRadius: 15,
     alignItems: 'center',
-    marginBottom: 15,
+    marginTop: 10,
+    marginBottom: 20,
   },
   saveButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: '#4A6D51',
+    fontWeight: '600',
     fontSize: 16,
   },
 });
