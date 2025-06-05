@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
   category: {
     fontSize: 16,
     color: '#666',
-    marginBottom: 20,
+    marginBottom: 9,
     textTransform: 'capitalize',
   },
   descriptionContainer: {
