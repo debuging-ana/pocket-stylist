@@ -103,6 +103,25 @@ export default function WardrobeScreen() {
             <Text style={styles.addButtonText}>Add Item</Text>
           </TouchableOpacity>
           
+          {/* Looks Section */}
+          <View style={styles.looksButtonsRow}>
+            <TouchableOpacity 
+              style={[styles.lookButton, styles.createLookButton]} 
+              onPress={() => router.push('/looks/create')}
+            >
+              <Feather name="plus" size={18} color="#FFFFFF" />
+              <Text style={styles.createLookButtonText}>Create a Look</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={[styles.lookButton, styles.seeLooksButton]} 
+              onPress={() => router.push('/looks')}
+            >
+              <MaterialCommunityIcons name="hanger" size={18} color="#4A6D51" />
+              <Text style={styles.seeLooksButtonText}>See Looks</Text>
+            </TouchableOpacity>
+          </View>
+          
           {/* Search Results (only show when searching) */}
           {searchQuery && (
             <View style={styles.resultsContainer}>
@@ -126,7 +145,7 @@ export default function WardrobeScreen() {
         {/* Categories Section */}
         <View style={styles.settingsSection}>
           <View style={styles.sectionTitleContainer}>
-            <Text style={styles.sectionTitle}>Categories</Text>
+            <Text style={styles.sectionTitle}>Clothing Categories</Text>
           </View>
 
           <View style={styles.categoriesContainer}>
@@ -334,7 +353,7 @@ const styles = StyleSheet.create({
   },
   addButton: {
     flexDirection: 'row',
-    backgroundColor: '#AFC6A3',
+    backgroundColor: '#4A6D51',
     marginTop: 20,
     marginBottom: 20,
     marginLeft: 20,
@@ -365,7 +384,7 @@ const styles = StyleSheet.create({
   },
   categoryCard: {
     width: '48%',
-    height: '150',
+    height: '147',
     backgroundColor: '#FFFFFF',
     borderRadius: 15,
     padding: 16,
@@ -393,5 +412,46 @@ const styles = StyleSheet.create({
   },
   emptyGridItem: {
     width: '48%',
+  },
+  // Looks Section Styles
+  looksButtonsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 15,
+    marginHorizontal: 20,
+    marginBottom: 5,
+  },
+  lookButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 15,
+    borderRadius: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  createLookButton: {
+    backgroundColor: '#4A6D51',
+  },
+  seeLooksButton: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#4A6D51',
+  },
+  createLookButtonText: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+    fontSize: 14,
+    marginLeft: 8,
+  },
+  seeLooksButtonText: {
+    color: '#4A6D51',
+    fontWeight: '600',
+    fontSize: 14,
+    marginLeft: 8,
   },
 });
