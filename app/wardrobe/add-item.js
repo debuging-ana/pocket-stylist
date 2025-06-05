@@ -184,10 +184,10 @@ export default function AddItemScreen() {
               disabled={imageLoading}
             >
               {imageLoading ? (
-                <ActivityIndicator color="white" />
+                <ActivityIndicator color="#4A6D51" />
               ) : (
                 <>
-                  <Feather name="image" size={18} color="white" style={styles.buttonIcon} />
+                  <Feather name="image" size={18} color="#4A6D51" style={styles.buttonIcon} />
                   <Text style={styles.buttonText}>Choose from Gallery</Text>
                 </>
               )}
@@ -200,18 +200,17 @@ export default function AddItemScreen() {
             
             {/* name input */}
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Name</Text>
               <TextInput
                 style={styles.input}
                 placeholder="Give your item a name (e.g. vintage denim)"
-                placeholderTextColor="#8a8b8a"
+                placeholderTextColor="#828282"
                 value={name}
                 onChangeText={setName}
               />
             </View>
 
             {/* category selection */}
-            <View style={styles.inputContainer}>
+            <View style={[styles.inputContainer, { marginBottom: 0 }]}>
               <Text style={styles.inputLabel}>Category</Text>
               <View style={styles.categoryContainer}>
                 {categories.map((cat) => (
@@ -245,9 +244,8 @@ export default function AddItemScreen() {
             disabled={isLoading}
           >
             <Text style={styles.saveButtonText}> 
-              {isLoading ? 'Saving...' : 'Saved to Wardrobe!'}
+              {isLoading ? 'Saving...' : 'Save Item'}
             </Text>
-            {!isLoading && <Feather name="check" size={18} color="white" style={{ marginLeft: 5 }} />}
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -308,7 +306,9 @@ const styles = StyleSheet.create({
   },
   imageButton: {
     flexDirection: 'row',
-    backgroundColor: '#AFC6A3',
+    backgroundColor: '#CADBC1',
+    borderColor: '#4A6D51',
+    borderWidth: 1,
     padding: 12,
     borderRadius: 15,
     alignItems: 'center',
@@ -318,7 +318,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   buttonText: {
-    color: 'white',
+    color: '#4A6D51',
     fontWeight: '600',
     fontSize: 14,
   },
@@ -336,6 +336,8 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 15,
     color: '#4A6D51',
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
   },
   categoryContainer: {
     flexDirection: 'row',
@@ -346,35 +348,42 @@ const styles = StyleSheet.create({
     width: '48%',
     padding: 15,
     borderRadius: 15,
-    backgroundColor: '#F8F8F8',
-    marginBottom: 10,
+    backgroundColor: '#FFFFFF',
+    marginBottom: 6.5,
     flexDirection: 'row',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
   },
   selectedCategory: {
-    backgroundColor: '#AFC6A3',
+    backgroundColor: '#CADBC1',
+    borderColor: '#4A6D51',
   },
   categoryIcon: {
     marginRight: 10,
   },
   categoryText: {
-    color: '#7D7D7D',
+    color: '#4A6D51',
     fontWeight: '500',
   },
   selectedCategoryText: {
-    color: 'white',
+    color: '#4A6D51',
+    fontWeight: '600',
   },
   saveButton: {
-    backgroundColor: '#AFC6A3',
+    backgroundColor: '#CADBC1',
+    borderColor: '#4A6D51',
+    borderWidth: 1,
     padding: 15,
     borderRadius: 15,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 10,
+    marginTop: 5,
+    marginBottom: -5,
   },
   saveButtonText: {
-    color: 'white',
+    color: '#4A6D51',
     fontWeight: '600',
     fontSize: 16,
   },
