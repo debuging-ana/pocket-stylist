@@ -94,31 +94,39 @@ export default function WardrobeScreen() {
             />
           </View>
           
-          {/* Add Item Button */}
-          <TouchableOpacity 
-            style={styles.addButton} 
-            onPress={() => router.push('/wardrobe/add-item')}
-          >
-            <Feather name="plus" size={18} color="#FFFFFF" />
-            <Text style={styles.addButtonText}>Add Item</Text>
-          </TouchableOpacity>
-          
-          {/* Looks Section */}
-          <View style={styles.looksButtonsRow}>
+          {/* Buttons Row */}
+          <View style={styles.buttonsRow}>
             <TouchableOpacity 
-              style={[styles.lookButton, styles.createLookButton]} 
-              onPress={() => router.push('/looks/create')}
+              style={[styles.actionButton, { 
+                backgroundColor: '#CDD7E4',
+                borderColor: '#536C8C',
+              }]} 
+              onPress={() => router.push('/wardrobe/add-item')}
             >
-              <Feather name="plus" size={18} color="#FFFFFF" />
-              <Text style={styles.createLookButtonText}>Create a Look</Text>
+              <Feather name="plus" size={18} color="#536C8C" />
+              <Text style={[styles.buttonText, { color: '#536C8C' }]}>Add Item</Text>
             </TouchableOpacity>
 
             <TouchableOpacity 
-              style={[styles.lookButton, styles.seeLooksButton]} 
+              style={[styles.actionButton, { 
+                backgroundColor: '#CADBC1',
+                borderColor: '#4A6D51',
+              }]} 
+              onPress={() => router.push('/looks/create')}
+            >
+              <Feather name="plus" size={18} color="#4A6D51" />
+              <Text style={[styles.buttonText, { color: '#4A6D51' }]}>Outfit</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={[styles.actionButton, { 
+                backgroundColor: '#E3D3C6',
+                borderColor: '#8B6E57',
+              }]} 
               onPress={() => router.push('/looks')}
             >
-              <MaterialCommunityIcons name="hanger" size={18} color="#4A6D51" />
-              <Text style={styles.seeLooksButtonText}>See Looks</Text>
+              <MaterialCommunityIcons name="hanger" size={18} color="#8B6E57" />
+              <Text style={[styles.buttonText, { color: '#8B6E57' }]}>See Outfits</Text>
             </TouchableOpacity>
           </View>
           
@@ -351,28 +359,28 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#4A6D51',
   },
-  addButton: {
+  buttonsRow: {
     flexDirection: 'row',
-    backgroundColor: '#4A6D51',
-    marginTop: 20,
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    height: 50,
+    marginTop: 40,
     marginBottom: 20,
-    marginLeft: 20,
-    marginRight: 20,
-    padding: 15,
-    borderRadius: 15,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 5,
-    elevation: 3,
+    gap: 20,
   },
-  addButtonText: {
-    color: '#FFFFFF',
-    fontWeight: '600',
+  actionButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    gap: 6,
+  },
+  buttonText: {
     fontSize: 14,
-    marginLeft: 8,
+    fontWeight: '600',
   },
   categoriesContainer: {
     marginTop: 5,
@@ -384,7 +392,7 @@ const styles = StyleSheet.create({
   },
   categoryCard: {
     width: '48%',
-    height: '147',
+    height: '158',
     backgroundColor: '#FFFFFF',
     borderRadius: 15,
     padding: 16,
@@ -412,46 +420,5 @@ const styles = StyleSheet.create({
   },
   emptyGridItem: {
     width: '48%',
-  },
-  // Looks Section Styles
-  looksButtonsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 15,
-    marginHorizontal: 20,
-    marginBottom: 5,
-  },
-  lookButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 15,
-    borderRadius: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  createLookButton: {
-    backgroundColor: '#4A6D51',
-  },
-  seeLooksButton: {
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#4A6D51',
-  },
-  createLookButtonText: {
-    color: '#FFFFFF',
-    fontWeight: '600',
-    fontSize: 14,
-    marginLeft: 8,
-  },
-  seeLooksButtonText: {
-    color: '#4A6D51',
-    fontWeight: '600',
-    fontSize: 14,
-    marginLeft: 8,
   },
 });

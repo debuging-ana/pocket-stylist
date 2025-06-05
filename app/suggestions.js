@@ -23,6 +23,7 @@ export default function SuggestionsPage() {
       iconColor: "#FFFFFF",
       description: "Perfect outfit suggestions based on today's weather and your style preferences",
       backgroundColor: "#CDD7E4",
+      borderColor: "#536C8C",
       accentColor: "#4A6D51",
       route: "/daily-outfit",
       buttonText: "View Outfit"
@@ -35,6 +36,7 @@ export default function SuggestionsPage() {
       iconColor: "#FFFFFF",
       description: "Outfit ideas perfect for your upcoming events and occasions",
       backgroundColor: "#CADBC1",
+      borderColor: "#4A6D51",
       accentColor: "#4A6D51",
       route: "/occasion-outfits",
       buttonText: "Explore"
@@ -47,6 +49,7 @@ export default function SuggestionsPage() {
       iconColor: "#FFFFFF",
       description: "Find the perfect look for any occasion, from office meetings to weekend brunches",
       backgroundColor: "#E3D3C6",
+      borderColor: "#8B6E57",
       accentColor: "#4A6D51",
       route: "/occasion-styles",
       buttonText: "Browse Occasions"
@@ -59,6 +62,7 @@ export default function SuggestionsPage() {
       iconColor: "#FFFFFF",
       description: "Custom style recommendations based on your preferences.",
       backgroundColor: "#DFBDBD",
+      borderColor: "#995454",
       accentColor: "#4A6D51",
       route: "/made-for-you",
       buttonText: "Generate now!"
@@ -111,7 +115,14 @@ export default function SuggestionsPage() {
           {suggestions.map(suggestion => (
             <TouchableOpacity 
               key={suggestion.id} 
-              style={[styles.suggestionCard, { backgroundColor: suggestion.backgroundColor }]}
+              style={[
+                styles.suggestionCard, 
+                { 
+                  backgroundColor: suggestion.backgroundColor,
+                  borderColor: suggestion.borderColor,
+                  borderWidth: 1,
+                }
+              ]}
               onPress={() => router.push(suggestion.route)}
             >
               <View style={styles.cardContent}>
