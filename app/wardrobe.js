@@ -82,35 +82,7 @@ export default function WardrobeScreen() {
     <>
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
       <View style={styles.container}>
-        {/* Header Section */}
-        <View style={styles.headerContainer}>
-          <View style={styles.headerCard}>
-            <View style={styles.header}>
-              <View style={styles.headerTextContainer}>
-                <Text style={styles.greeting}>My Wardrobe</Text>
-                <Text style={styles.username}>{userFirstName}</Text>
-              </View>
-              <TouchableOpacity 
-                style={styles.profileButton}
-                onPress={() => router.push('/profile')}
-              >
-                {profilePhotoUri ? (
-                  <Image 
-                    source={{ uri: profilePhotoUri }} 
-                    style={styles.profileImage} 
-                    accessibilityLabel="Profile photo"
-                  />
-                ) : (
-                  <View style={styles.profileImageContainer}>
-                    <Text style={styles.profileInitial}>{(user?.email?.charAt(0) || 'S').toUpperCase()}</Text>
-                  </View>
-                )}
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-          
-          {/* Search Bar in Header */}
+          {/* Search Bar */}
           <View style={styles.searchInputContainer}>
             <Feather name="search" size={20} color="#7D7D7D" style={styles.searchIcon} />
             <TextInput
@@ -122,7 +94,7 @@ export default function WardrobeScreen() {
             />
           </View>
           
-          {/* Add Item Button in Header */}
+          {/* Add Item Button */}
           <TouchableOpacity 
             style={styles.addButton} 
             onPress={() => router.push('/wardrobe/add-item')}
@@ -298,7 +270,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 15,
     padding: 12,
-    marginTop: 10,
+    marginTop: 20,
     marginLeft:20,
     marginRight: 20,
     shadowColor: '#000',
@@ -364,7 +336,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: '#AFC6A3',
     marginTop: 20,
-    marginBottom: 0,
+    marginBottom: 20,
     marginLeft: 20,
     marginRight: 20,
     padding: 15,
@@ -393,29 +365,31 @@ const styles = StyleSheet.create({
   },
   categoryCard: {
     width: '48%',
-    height: '100%',
+    height: '150',
     backgroundColor: '#FFFFFF',
     borderRadius: 15,
-    padding: 16.8,
+    padding: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 1,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   categoryIconContainer: {
-    height: 70,
-    width: 70,
+    height: '60%',
+    aspectRatio: 1,
     borderRadius: 15,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 8,
   },
   categoryName: {
     fontSize: 16,
     fontWeight: '600',
     color: '#4A6D51',
+    textAlign: 'center',
   },
   emptyGridItem: {
     width: '48%',
