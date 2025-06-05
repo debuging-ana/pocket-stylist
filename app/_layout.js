@@ -1,22 +1,19 @@
-import BackButton from '../components/BackButton';
-import { Tabs, usePathname } from 'expo-router';
+import { Tabs } from 'expo-router';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { WardrobeProvider } from '../context/wardrobeContext';
 import { AuthProvider, useAuth } from '../context/AuthContext';
+import { Platform } from 'react-native';
 
 function TabsLayout() {
   const { user } = useAuth();
-  const pathname = usePathname();
 
   return (
     <WardrobeProvider>
       <Tabs
         screenOptions={{
-          headerLeft: () => {
-            return pathname === '/' ? null : <BackButton />;
-          },
-          headerBackTitleVisible: false,
+          headerShown: true,
+          headerBackVisible: false,
           headerTitle: 'Pocket Stylist', 
           headerStyle: {
             backgroundColor: '#AFC6A3',
@@ -38,6 +35,16 @@ function TabsLayout() {
           } : { display: 'none' },
           tabBarActiveTintColor: '#FFFFFF',
           tabBarInactiveTintColor: '#FFFFFF',
+          ...Platform.select({
+            ios: {
+              presentation: 'card',
+              gestureEnabled: true,
+              animationEnabled: true,
+            },
+            android: {
+              animation: 'slide_from_right',
+            },
+          }),
         }}
       >
         <Tabs.Screen

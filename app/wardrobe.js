@@ -1,24 +1,46 @@
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, StatusBar } from 'react-native';
 import { Link, useRouter } from 'expo-router';
 import { useWardrobe } from '../context/wardrobeContext';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 import { doc, getDoc } from 'firebase/firestore'; // Add imports for Firestore
 import { db } from '../firebaseConfig'; // Import your Firebase configuration
 
-// utility function to render category icons based on item category
+// Pre-load and cache images
+const CATEGORY_ICONS = {
+  pants: require('../assets/images/pants.png'),
+  jacket: require('../assets/images/jacket.png'),
+};
+
+// Pre-define icon components for better performance
+const TopIcon = ({ size }) => (
+  <MaterialCommunityIcons name="tshirt-crew" size={size} color="#4A6D51" />
+);
+
+const AccessoryIcon = ({ size }) => (
+  <MaterialCommunityIcons name="sunglasses" size={size} color="#4A6D51" />
+);
+
+const ShoeIcon = ({ size }) => (
+  <MaterialCommunityIcons name="shoe-formal" size={size} color="#4A6D51" />
+);
+
+const DefaultIcon = ({ size }) => (
+  <MaterialCommunityIcons name="folder" size={size} color="#4A6D51" />
+);
+
+// Optimized category icon function
 const getCategoryIcon = (category, size = 22) => {
   const normalized = category.toLowerCase();
 
-  // return appropriate icon/component based on category
   if (normalized.includes('top')) {
-    return <MaterialCommunityIcons name="tshirt-crew" size={size} color="#4A6D51" />;
+    return <TopIcon size={size} />;
   }
   if (normalized.includes('bottom')) {
     return (
       <Image 
-        source={require('../assets/images/pants.png')}
+        source={CATEGORY_ICONS.pants}
         style={{ width: size, height: size, resizeMode: 'contain' }}
       />
     );
@@ -26,20 +48,19 @@ const getCategoryIcon = (category, size = 22) => {
   if (normalized.includes('jacket')) {
     return (
       <Image 
-        source={require('../assets/images/jacket.png')}
+        source={CATEGORY_ICONS.jacket}
         style={{ width: size, height: size, resizeMode: 'contain' }}
       />
     );
   }
   if (normalized.includes('accessories')) {
-    return <MaterialCommunityIcons name="sunglasses" size={size} color="#4A6D51" />;
+    return <AccessoryIcon size={size} />;
   }
   if (normalized.includes('shoe')) {
-    return <MaterialCommunityIcons name="shoe-formal" size={size} color="#4A6D51" />;
+    return <ShoeIcon size={size} />;
   }
 
-  // default icon
-  return <MaterialCommunityIcons name="folder" size={size} color="#4A6D51" />;
+  return <DefaultIcon size={size} />;
 };
 
 export default function WardrobeScreen() {
@@ -72,10 +93,13 @@ export default function WardrobeScreen() {
     fetchUserProfile();
   }, [user]);
 
-  // Filter items based on user's search query, case-insensitive
-  const filteredItems = wardrobeItems.filter(item => 
-    item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.category.toLowerCase().includes(searchQuery.toLowerCase())
+  // Memoize filtered items to prevent unnecessary recalculations
+  const filteredItems = useMemo(() => 
+    wardrobeItems.filter(item => 
+      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.category.toLowerCase().includes(searchQuery.toLowerCase())
+    ),
+    [wardrobeItems, searchQuery]
   );
 
   return (
@@ -136,11 +160,12 @@ export default function WardrobeScreen() {
               {filteredItems.length > 0 ? (
                 filteredItems.map(item => (
                   <Link href={`/wardrobe/${item.id}`} asChild key={item.id}>
-                    <TouchableOpacity style={styles.settingCard}>
-                      <View style={[styles.settingIconContainer, { backgroundColor: '#E8F0E2' }]}>
-                        {getCategoryIcon(item.category)}
-                      </View>
-                      <Text style={styles.categoryName}>{item.name}</Text>
+                    <TouchableOpacity style={styles.searchResultCard}>
+                      <Image 
+                        source={{ uri: item.imageUri }} 
+                        style={styles.searchResultImage}
+                      />
+                      <Text style={styles.searchResultText}>{item.name}</Text>
                     </TouchableOpacity>
                   </Link>
                 ))
@@ -316,34 +341,38 @@ const styles = StyleSheet.create({
     color: '#4A6D51',
   },
   resultsContainer: {
-    marginTop: 15,
-    marginLeft: 20,
-    marginRight: 20,
+    marginTop: 10,
+    marginHorizontal: 20,
   },
-  settingCard: {
+  searchResultCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    padding: 12,
     borderRadius: 15,
-    padding: 15,
-    marginBottom: 12,
+    marginBottom: 10,
+    backgroundColor: '#FFFFFF',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 1,
   },
-  settingIconContainer: {
-    height: 45,
-    width: 45,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
+  searchResultImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 8,
+    marginRight: 15,
+  },
+  searchResultText: {
+    fontSize: 16,
+    color: '#333',
+    flex: 1,
   },
   noResults: {
     textAlign: 'center',
-    color: '#828282',
-    padding: 15,
+    color: '#666',
+    padding: 20,
+    fontSize: 16,
   },
   settingsSection: {
     padding: 20,

@@ -140,20 +140,6 @@ export default function SuggestionsPage() {
             </TouchableOpacity>
           ))}
         </View>
-
-        {/* Tip Card */}
-        <TouchableOpacity style={styles.tipCard} onPress={() => router.push('/tips')}>
-          <View style={styles.tipIconContainer}>
-            <Ionicons name="bulb-outline" size={24} color="#FFFFFF" />
-          </View>
-          <View style={styles.tipContent}>
-            <Text style={styles.tipTitle}>Style Tip</Text>
-            <Text style={styles.tipText}>
-              Try mixing textures within the same color family for a sophisticated monochromatic look
-            </Text>
-          </View>
-          <Feather name="chevron-right" size={20} color="#CCCCCC" />
-        </TouchableOpacity>
       </ScrollView>
     </View>
   );
@@ -232,72 +218,33 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginRight: 5,
   },
-  tipCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 15,
-    padding: 15,
-    marginTop: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  tipIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: '#4A6D51',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  tipContent: {
-    flex: 1,
-    marginLeft: 15,
-    marginRight: 10,
-  },
-  tipTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#4A6D51',
-    marginBottom: 3,
-  },
-  tipText: {
-    fontSize: 13,
-    color: '#828282',
-  },
   testButton: {
     backgroundColor: '#4A6D51',
     padding: 15,
-    borderRadius: 15,
+    borderRadius: 12,
     alignItems: 'center',
-    marginBottom: 20,
-    flexDirection: 'row',
-    justifyContent: 'center'
+    marginBottom: 15,
   },
   testButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: '#FFFFFF',
+    fontWeight: '600',
     fontSize: 16,
   },
   testResultContainer: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
     padding: 15,
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: '#E0E0E0'
+    borderRadius: 12,
+    marginBottom: 15,
   },
   testResultTitle: {
-    fontWeight: 'bold',
+    fontSize: 16,
+    fontWeight: '600',
     color: '#4A6D51',
-    marginBottom: 8
+    marginBottom: 8,
   },
   testResultText: {
-    color: '#333',
     fontSize: 14,
-    lineHeight: 20
+    color: '#666666',
+    lineHeight: 20,
   },
 });
