@@ -120,35 +120,17 @@ export default function ItemDetailScreen() {
                   style={styles.descriptionInput}
                   value={editedDescription}
                   onChangeText={setEditedDescription}
-                  multiline={true}
                   placeholder="Add a description..."
                   placeholderTextColor="#828282"
+                  multiline={false}
+                  returnKeyType="done"
+                  onSubmitEditing={() => {
+                    handleSaveDescription();
+                  }}
                 />
-                <View style={styles.editActionButtons}>
-                  <TouchableOpacity 
-                    style={[styles.editActionButton, styles.cancelButton]} 
-                    onPress={() => {
-                      setIsEditing(false);
-                      setEditedDescription(item.description || '');
-                    }}
-                  >
-                    <Text style={styles.cancelButtonText}>Cancel</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity 
-                    style={[styles.editActionButton, styles.saveButton]} 
-                    onPress={handleSaveDescription}
-                    disabled={isSaving}
-                  >
-                    {isSaving ? (
-                      <ActivityIndicator color="#4A6D51" size="small" />
-                    ) : (
-                      <Text style={styles.saveButtonText}>Save</Text>
-                    )}
-                  </TouchableOpacity>
-                </View>
               </View>
             ) : (
-              <Text style={styles.description}>
+              <Text style={styles.description} numberOfLines={1} ellipsizeMode="tail">
                 {item.description || 'No description provided.'}
               </Text>
             )}
@@ -161,6 +143,14 @@ export default function ItemDetailScreen() {
           >
             <Feather name="trash-2" size={20} color="#995454" />
             <Text style={styles.deleteButtonText}>Delete Item</Text>
+          </TouchableOpacity>
+
+          {/* Back Button */}
+          <TouchableOpacity 
+            style={styles.cancelButton} 
+            onPress={() => navigation.goBack()}
+          >
+            <Text style={styles.cancelButtonText}>Back</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -242,36 +232,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
     backgroundColor: '#FFFFFF',
-    minHeight: 120,
-    textAlignVertical: 'top',
-    marginBottom: 10,
-  },
-  editActionButtons: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: 10,
-  },
-  editActionButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    borderWidth: 1,
-  },
-  cancelButton: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#4A6D51',
-  },
-  saveButton: {
-    backgroundColor: '#CADBC1',
-    borderColor: '#4A6D51',
-  },
-  cancelButtonText: {
-    color: '#4A6D51',
-    fontWeight: '600',
-  },
-  saveButtonText: {
-    color: '#4A6D51',
-    fontWeight: '600',
+    height: 50,
   },
   editButton: {
     padding: 8,
@@ -286,9 +247,24 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#995454',
     gap: 8,
+    marginBottom: 10,
   },
   deleteButtonText: {
     color: '#995454',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  cancelButton: {
+    backgroundColor: '#CADBC1',
+    borderColor: '#4A6D51',
+    borderWidth: 1,
+    padding: 15,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cancelButtonText: {
+    color: '#4A6D51',
     fontSize: 16,
     fontWeight: '600',
   },
