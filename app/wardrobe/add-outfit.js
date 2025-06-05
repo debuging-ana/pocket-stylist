@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -7,10 +7,21 @@ import {
   TouchableOpacity,
   Image,
   StatusBar,
+  Dimensions,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useWardrobe } from '../../context/wardrobeContext';
 import { MaterialCommunityIcons, Feather } from '@expo/vector-icons';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  runOnJS,
+} from 'react-native-reanimated';
+import { GestureDetector, Gesture, GestureHandlerRootView } from 'react-native-gesture-handler';
+
+const WINDOW_WIDTH = Dimensions.get('window').width;
+const GRID_SIZE = (WINDOW_WIDTH - 40) / 2; // 2 columns with 20px padding on each side
 
 export default function AddOutfitScreen() {
   const router = useRouter();
@@ -23,6 +34,7 @@ export default function AddOutfitScreen() {
     accessories: [],
   });
   const [step, setStep] = useState('selection'); // 'selection' or 'preview'
+  const [outfitLayout, setOutfitLayout] = useState([]);
 
   // Group items by category
   const itemsByCategory = wardrobeItems.reduce((acc, item) => {
@@ -46,6 +58,66 @@ export default function AddOutfitScreen() {
         ? prev[category].filter(i => i.id !== item.id)
         : [...prev[category], item]
     }));
+  };
+
+  // Function to handle dropping an item into the outfit layout
+  const addToOutfitLayout = useCallback((item) => {
+    setOutfitLayout(current => [...current, { ...item, position: current.length }]);
+  }, []);
+
+  // Render draggable item component
+  const DraggableItem = ({ item }) => {
+    const translateX = useSharedValue(0);
+    const translateY = useSharedValue(0);
+    const scale = useSharedValue(1);
+    const isDropZone = useSharedValue(false);
+
+    const panGesture = Gesture.Pan()
+      .onBegin(() => {
+        scale.value = withSpring(1.1);
+      })
+      .onUpdate((event) => {
+        translateX.value = event.translationX;
+        translateY.value = event.translationY;
+        
+        // Check if over drop zone
+        const isOverDropZone = event.absoluteY > 300 && event.absoluteY < 600;
+        if (isOverDropZone !== isDropZone.value) {
+          isDropZone.value = isOverDropZone;
+          scale.value = withSpring(isOverDropZone ? 1.2 : 1.1);
+        }
+      })
+      .onEnd(() => {
+        if (isDropZone.value) {
+          runOnJS(addToOutfitLayout)(item);
+        }
+        translateX.value = withSpring(0);
+        translateY.value = withSpring(0);
+        scale.value = withSpring(1);
+        isDropZone.value = false;
+      });
+
+    const animatedStyle = useAnimatedStyle(() => ({
+      transform: [
+        { translateX: translateX.value },
+        { translateY: translateY.value },
+        { scale: scale.value },
+      ],
+    }));
+
+    return (
+      <GestureDetector gesture={panGesture}>
+        <Animated.View style={[styles.previewItemCard, animatedStyle]}>
+          <Image
+            source={{ uri: item.imageUri }}
+            style={styles.previewItemImage}
+          />
+          <Text style={styles.previewItemName} numberOfLines={1}>
+            {item.name}
+          </Text>
+        </Animated.View>
+      </GestureDetector>
+    );
   };
 
   const renderCategorySection = (category, items) => {
@@ -91,10 +163,10 @@ export default function AddOutfitScreen() {
     // Flatten all selected items into a single array
     const allSelectedItems = Object.values(selectedItems)
       .flat()
-      .filter(item => item); // Remove any undefined/null items
+      .filter(item => item);
 
     return (
-      <View style={styles.previewContainer}>
+      <GestureHandlerRootView style={styles.previewContainer}>
         <View style={styles.previewContent}>
           <Text style={styles.previewTitle}>Selected Items</Text>
           
@@ -105,17 +177,31 @@ export default function AddOutfitScreen() {
               contentContainerStyle={styles.selectedItemsScroll}
             >
               {allSelectedItems.map(item => (
-                <View key={item.id} style={styles.previewItemCard}>
-                  <Image
-                    source={{ uri: item.imageUri }}
-                    style={styles.previewItemImage}
-                  />
-                  <Text style={styles.previewItemName} numberOfLines={1}>
-                    {item.name}
-                  </Text>
-                </View>
+                <DraggableItem key={item.id} item={item} />
               ))}
             </ScrollView>
+          </View>
+
+          <View style={styles.outfitLayoutContainer}>
+            <Text style={styles.layoutTitle}>Arrange Your Outfit</Text>
+            <View style={styles.dropZone}>
+              {outfitLayout.length === 0 ? (
+                <Text style={styles.dropZoneText}>
+                  Drag and drop items here to arrange your outfit
+                </Text>
+              ) : (
+                <View style={styles.outfitGrid}>
+                  {outfitLayout.map((item, index) => (
+                    <View key={`${item.id}-${index}`} style={styles.gridItem}>
+                      <Image
+                        source={{ uri: item.imageUri }}
+                        style={styles.gridItemImage}
+                      />
+                    </View>
+                  ))}
+                </View>
+              )}
+            </View>
           </View>
         </View>
 
@@ -130,14 +216,14 @@ export default function AddOutfitScreen() {
           <TouchableOpacity
             style={[styles.button, styles.saveButton]}
             onPress={() => {
-              // TODO: Implement save functionality
+              // TODO: Save the outfit with the layout
               router.push('/wardrobe');
             }}
           >
             <Text style={styles.saveButtonText}>Save Outfit</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </GestureHandlerRootView>
     );
   };
 
@@ -210,21 +296,21 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   categorySection: {
-    marginBottom: 5,
+    marginBottom: 20,
   },
   categoryTitle: {
     fontSize: 18,
     fontWeight: '600',
     color: '#4A6D51',
-    marginBottom: 5,
+    marginBottom: 12,
   },
   itemsRow: {
     flexDirection: 'row',
     paddingVertical: 8,
   },
   itemCard: {
-    width: 113,
-    height: 143,
+    width: 120,
+    height: 150,
     marginRight: 12,
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
@@ -238,8 +324,8 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   itemImage: {
-    width: 98,
-    height: 98,
+    width: 104,
+    height: 104,
     borderRadius: 8,
     resizeMode: 'cover',
   },
@@ -261,7 +347,7 @@ const styles = StyleSheet.create({
   bottomButtons: {
     flexDirection: 'row',
     padding: 20,
-    backgroundColor: '#AFC6A3',
+    backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
     borderTopColor: '#E0E0E0',
     gap: 12,
@@ -273,7 +359,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cancelButton: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#CADBC1',
     borderWidth: 1,
     borderColor: '#4A6D51',
   },
@@ -293,6 +379,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  // Updated preview screen styles
   previewContainer: {
     flex: 1,
     backgroundColor: '#F9F9F4',
@@ -340,13 +427,13 @@ const styles = StyleSheet.create({
   previewButtonsContainer: {
     flexDirection: 'row',
     padding: 20,
-    backgroundColor: '#AFC6A3',
+    backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
     borderTopColor: '#E0E0E0',
     gap: 12,
   },
   editButton: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#CADBC1',
     borderWidth: 1,
     borderColor: '#4A6D51',
   },
@@ -362,5 +449,48 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
+  },
+  outfitLayoutContainer: {
+    marginTop: 20,
+  },
+  layoutTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#4A6D51',
+    marginBottom: 12,
+  },
+  dropZone: {
+    height: 300,
+    backgroundColor: '#F5F5F5',
+    borderRadius: 12,
+    borderWidth: 2,
+    borderStyle: 'dashed',
+    borderColor: '#4A6D51',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+  },
+  dropZoneText: {
+    color: '#666',
+    textAlign: 'center',
+    fontSize: 16,
+  },
+  outfitGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-around',
+    width: '100%',
+  },
+  gridItem: {
+    width: GRID_SIZE - 16,
+    height: GRID_SIZE - 16,
+    margin: 8,
+    borderRadius: 8,
+    overflow: 'hidden',
+  }, 
+  gridItemImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
   },
 }); 
