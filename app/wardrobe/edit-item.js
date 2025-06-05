@@ -61,7 +61,7 @@ const getCategoryIcon = (category, size = 22) => {
 export default function EditItemScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const { updateItem } = useWardrobe();
+  const { updateItem, wardrobeItems } = useWardrobe();
   const navigation = useNavigation();
   // initialize state with the item's current values
   const [imageUri, setImageUri] = useState(null);
@@ -70,19 +70,21 @@ export default function EditItemScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null); // added for error handling
   const [itemData, setItemData] = useState(null);
+  const [description, setDescription] = useState('');
 
   // initialize with full item data
   useEffect(() => {
     if (params.id) {
-      setItemData({
-        id: params.id,
-        name: params.name || '',
-        category: params.category || 'tops',
-        imageUri: params.imageUri || null,
-        ownerId: params.ownerId || '' // Add ownerId
-      });
+      const item = wardrobeItems.find((i) => i.id === params.id);
+      if (item) {
+        setItemData(item);
+        setName(item.name || '');
+        setCategory(item.category || 'tops');
+        setImageUri(item.imageUri || null);
+        setDescription(item.description || '');
+      }
     }
-  }, [params]);
+  }, [params, wardrobeItems]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -145,6 +147,7 @@ export default function EditItemScreen() {
         name,
         category,
         imageUri,
+        description: description.trim(),
       };
       
       await updateItem(updatedItem);
@@ -158,6 +161,14 @@ export default function EditItemScreen() {
       setIsLoading(false);
     }
   };
+
+  if (!itemData) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.errorText}>Item not found.</Text>
+      </View>
+    );
+  }
 
   return (
     <>
@@ -240,6 +251,20 @@ export default function EditItemScreen() {
                   </TouchableOpacity>
                 ))}
               </View>
+            </View>
+
+            {/* Description Input */}
+            <View style={styles.descriptionContainer}>
+              <Text style={styles.descriptionLabel}>Description</Text>
+              <TextInput
+                style={styles.descriptionInput}
+                placeholder="Add a description for your item..."
+                placeholderTextColor="#828282"
+                value={description}
+                onChangeText={setDescription}
+                multiline={true}
+                numberOfLines={4}
+              />
             </View>
           </View>
 
@@ -408,5 +433,25 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.7)',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  descriptionContainer: {
+    marginBottom: 20,
+  },
+  descriptionLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#4A6D51',
+    marginBottom: 8,
+  },
+  descriptionInput: {
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    borderRadius: 12,
+    padding: 15,
+    fontSize: 16,
+    color: '#333',
+    backgroundColor: '#FFFFFF',
+    minHeight: 120,
+    textAlignVertical: 'top',
   },
 });

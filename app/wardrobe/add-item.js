@@ -61,6 +61,7 @@ export default function AddItemScreen() {
   const [imageUri, setImageUri] = useState(null);
   const [name, setName] = useState('');
   const [category, setCategory] = useState('tops'); // default
+  const [description, setDescription] = useState('');
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
   const [imageLoading, setImageLoading] = useState(false);
@@ -131,6 +132,7 @@ export default function AddItemScreen() {
         name,
         category,
         imageUri,
+        description,
       };
       
       // handles Firebase storage upload & Firestore document creation
@@ -206,6 +208,19 @@ export default function AddItemScreen() {
                 placeholderTextColor="#828282"
                 value={name}
                 onChangeText={setName}
+              />
+            </View>
+
+            {/* description input */}
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={[styles.input, styles.descriptionInput]}
+                placeholder="Add a description (optional)"
+                placeholderTextColor="#828282"
+                value={description}
+                onChangeText={setDescription}
+                multiline={true}
+                numberOfLines={3}
               />
             </View>
 
@@ -379,8 +394,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 5,
-    marginBottom: -5,
+    marginTop: 10,
   },
   saveButtonText: {
     color: '#4A6D51',
@@ -397,5 +411,10 @@ const styles = StyleSheet.create({
   },
   disabledButton: {
     opacity: 0.6,
+  },
+  descriptionInput: {
+    height: 80,
+    textAlignVertical: 'top',
+    paddingTop: 10,
   },
 });
