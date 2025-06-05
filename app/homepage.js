@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar, Image, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import Feather from '@expo/vector-icons/Feather';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
@@ -7,14 +7,24 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAuth } from '../context/AuthContext';
 import { doc, getDoc, collection, query, orderBy, limit, getDocs } from 'firebase/firestore'; // Add imports for Firestore
 import { db } from '../firebaseConfig'; // Import your Firebase configuration
+import { useWardrobe } from '../context/wardrobeContext';
 
 export default function HomePage() {
   const router = useRouter();
   const { user } = useAuth();
+  const { wardrobeItems } = useWardrobe(); // Get wardrobe items from context
   const [profilePhotoUri, setProfilePhotoUri] = useState(null);
   const [userFirstName, setUserFirstName] = useState('');
-  const [recentItems, setRecentItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Derive recent items from wardrobeItems
+  const recentItems = wardrobeItems
+    .sort((a, b) => {
+      const dateA = a.createdAt instanceof Date ? a.createdAt : new Date(a.createdAt?.seconds * 1000);
+      const dateB = b.createdAt instanceof Date ? b.createdAt : new Date(b.createdAt?.seconds * 1000);
+      return dateB - dateA;
+    })
+    .slice(0, 2);
 
   useEffect(() => {
     // Fetch user profile data from Firestore when component mounts
@@ -31,30 +41,6 @@ export default function HomePage() {
           }
         } catch (error) {
           console.log('Error fetching user profile:', error);
-        }
-      }
-    };
-
-    // Fetch the 2 most recently added wardrobe items
-    const fetchRecentItems = async () => {
-      if (user?.uid) {
-        setIsLoading(true);
-        try {
-          const itemsRef = collection(db, "users", user.uid, "wardrobe");
-          const q = query(itemsRef, orderBy("createdAt", "desc"), limit(2));
-          const querySnapshot = await getDocs(q);
-
-          const items = [];
-          querySnapshot.forEach((doc) => {
-            items.push({
-              id: doc.id,
-              ...doc.data()
-            });
-          });
-          
-          setRecentItems(items);
-        } catch (error) {
-          console.log('Error fetching recent items:', error);
         } finally {
           setIsLoading(false);
         }
@@ -62,7 +48,6 @@ export default function HomePage() {
     };
 
     fetchUserProfile();
-    fetchRecentItems();
   }, [user]);
 
   const getGreeting = () => {
@@ -104,6 +89,7 @@ export default function HomePage() {
           </View>
         </View>
 
+        {/* Quick Actions Section */}
         <View style={styles.contentSection}>
           <View style={styles.sectionTitleContainer}>
             <Text style={styles.sectionTitle}>Quick Actions</Text>
@@ -136,6 +122,7 @@ export default function HomePage() {
           </View>
         </View>
 
+        {/* Style Suggestions Section */}
         <View style={styles.contentSection}>
           <View style={styles.sectionTitleContainer}>
             <Text style={styles.sectionTitle}>Style Suggestions</Text>
@@ -203,6 +190,7 @@ export default function HomePage() {
           </ScrollView>
         </View>
 
+        {/* Recent Items Section */}
         <View style={styles.contentSection}>
           <View style={styles.sectionTitleContainer}>
             <Text style={styles.sectionTitle}>Recent Items</Text>
@@ -211,44 +199,11 @@ export default function HomePage() {
             </TouchableOpacity>
           </View>
 
-          {recentItems.length > 0 ? (
-            // Show actual recent items
-            recentItems.map(item => (
-              <TouchableOpacity 
-                key={item.id} 
-                style={styles.recentItemCard} 
-                onPress={() => router.push(`/wardrobe/item/${item.id}`)}
-              >
-                <View style={styles.recentItemImageContainer}>
-                  {item.imageUri ? (
-                    <Image 
-                      source={{ uri: item.imageUri }} 
-                      style={styles.recentItemImage}
-                    />
-                  ) : (
-                    <View style={styles.recentItemImagePlaceholder}>
-                      <MaterialCommunityIcons 
-                        name={item.category === 'shoes' ? 'shoe-formal' : 'tshirt-crew'} 
-                        size={24} 
-                        color="#AFC6A3" 
-                      />
-                    </View>
-                  )}
-                </View>
-                <View style={styles.recentItemInfo}>
-                  <Text style={styles.recentItemName}>{item.name}</Text>
-                  <View style={styles.recentItemDetails}>
-                    <Text style={styles.recentItemCategory}>{item.category}</Text>
-                    <Text style={styles.recentItemLastWorn}>
-                      {item.lastWorn ? `Last worn: ${item.lastWorn}` : 'Not worn yet'}
-                    </Text>
-                  </View>
-                </View>
-                <Feather name="chevron-right" size={20} color="#CCCCCC" />
-              </TouchableOpacity>
-            ))
-          ) : (
-            // Show an "Add Item" button when no items exist
+          {isLoading ? (
+            <View style={styles.recentItemCard}>
+              <ActivityIndicator size="small" color="#4A6D51" />
+            </View>
+          ) : recentItems.length === 0 ? (
             <TouchableOpacity 
               style={styles.recentItemCard}
               onPress={() => router.push('/wardrobe/add-item')}
@@ -264,20 +219,39 @@ export default function HomePage() {
               </View>
               <Feather name="chevron-right" size={20} color="#CCCCCC" />
             </TouchableOpacity>
+          ) : (
+            recentItems.map((item) => (
+              <TouchableOpacity 
+                key={item.id} 
+                style={styles.recentItemCard} 
+                onPress={() => router.push(`/wardrobe/${item.id}`)}
+              >
+                <View style={styles.recentItemImageContainer}>
+                  {item.imageUri ? (
+                    <Image 
+                      source={{ uri: item.imageUri }} 
+                      style={styles.recentItemImage}
+                    />
+                  ) : (
+                    <View style={styles.recentItemImagePlaceholder}>
+                      <MaterialCommunityIcons 
+                        name={getCategoryIcon(item.category)} 
+                        size={24} 
+                        color="#AFC6A3" 
+                      />
+                    </View>
+                  )}
+                </View>
+                <View style={styles.recentItemInfo}>
+                  <Text style={styles.recentItemName}>{item.name}</Text>
+                  <Text style={styles.recentItemCategory}>
+                    {item.category}
+                  </Text>
+                </View>
+                <Feather name="chevron-right" size={20} color="#CCCCCC" />
+              </TouchableOpacity>
+            ))
           )}
-        </View>
-
-        <View style={styles.contentSection}>
-          <TouchableOpacity style={styles.tipCard} onPress={() => router.push('/tips')}>
-            <View style={styles.tipIconContainer}>
-              <Ionicons name="bulb-outline" size={24} color="#FFFFFF" />
-            </View>
-            <View style={styles.tipContent}>
-              <Text style={styles.tipTitle}>Style Tip</Text>
-              <Text style={styles.tipText}>Try mixing textures within the same color family for a sophisticated monochromatic look</Text>
-            </View>
-            <Feather name="chevron-right" size={20} color="#CCCCCC" />
-          </TouchableOpacity>
         </View>
       </ScrollView>
     </>
@@ -544,68 +518,9 @@ const styles = StyleSheet.create({
     color: '#828282',
     textTransform: 'capitalize',
   },
-  recentItemLastWorn: {
-    fontSize: 12,
-    color: '#AAAAAA',
-  },
-  emptyState: {
-    alignItems: 'center',
-    backgroundColor: '#F8F8F8',
-    borderRadius: 15,
-    padding: 30,
-  },
-  emptyStateText: {
-    marginTop: 10,
-    color: '#828282',
-    textAlign: 'center',
-    marginBottom: 15,
-  },
-  addItemButton: {
-    backgroundColor: '#4A6D51',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 15,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  addItemButtonText: {
-    color: 'white',
-    fontWeight: '600',
-  },
-  tipCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 15,
-    padding: 15,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  tipIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: '#4A6D51',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  tipContent: {
-    flex: 1,
-    marginLeft: 15,
-    marginRight: 10,
-  },
-  tipTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#4A6D51',
-    marginBottom: 3,
-  },
-  tipText: {
-    fontSize: 13,
-    color: '#828282',
-  },
+  tipCard: null,
+  tipIconContainer: null,
+  tipContent: null,
+  tipTitle: null,
+  tipText: null,
 });

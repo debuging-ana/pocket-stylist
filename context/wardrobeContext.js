@@ -1,6 +1,6 @@
 import { createContext, useState, useContext, useEffect } from 'react';
 import { db } from '../firebaseConfig';
-import { collection, doc, setDoc, getDocs, deleteDoc } from "firebase/firestore"; 
+import { collection, doc, setDoc, getDocs, deleteDoc, serverTimestamp, onSnapshot, query, orderBy } from "firebase/firestore"; 
 import { useAuth } from './AuthContext';
 
 const WardrobeContext = createContext();
@@ -9,32 +9,37 @@ export const WardrobeProvider = ({ children }) => {
   const [wardrobeItems, setWardrobeItems] = useState([]);
   const { user } = useAuth();
 
-  // load items from Firestore when user logs in
+  // Set up real-time listener for wardrobe items
   useEffect(() => {
     if (user) {
-      loadItems();
+      // Create a query to order items by creation time
+      const q = query(
+        collection(db, "users", user.uid, "wardrobe"),
+        orderBy("createdAt", "desc")
+      );
+
+      // Set up real-time listener
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        const items = [];
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          items.push({
+            id: doc.id,
+            ...data,
+            createdAt: data.createdAt?.toDate() || new Date()
+          });
+        });
+        setWardrobeItems(items);
+      }, (error) => {
+        console.error("Error listening to wardrobe updates:", error);
+      });
+
+      // Cleanup listener on unmount
+      return () => unsubscribe();
     } else {
       setWardrobeItems([]); // clear items from state if user logs out
     }
   }, [user]);
-
-  //function to load wardrobe items from Firestore
-  const loadItems = async () => {
-    if (!user) return;
-    
-    try {
-      // get all documents from wardrobe subcollection under current user's document
-      const querySnapshot = await getDocs(collection(db, "users", user.uid, "wardrobe"));
-      const items = [];
-      //iterate thru the returned documents & format them
-      querySnapshot.forEach((doc) => {
-        items.push({ id: doc.id, ...doc.data() });
-      });
-      setWardrobeItems(items);
-    } catch (error) {
-      console.error("Error loading items: ", error);
-    }
-  };
 
   const addItem = async (newItem) => {
     if (!newItem.name || !newItem.category || !newItem.imageUri) {
@@ -49,13 +54,17 @@ export const WardrobeProvider = ({ children }) => {
 
     try {
       const newId = Date.now() + '-' + Math.floor(Math.random() * 1000);
-      const completeItem = { ...newItem, id: newId, ownerId: user.uid };
+      const completeItem = { 
+        ...newItem, 
+        id: newId, 
+        ownerId: user.uid,
+        createdAt: serverTimestamp()
+      };
       
       // save the new item in Firestore under the user's wardrobe subcollection
       await setDoc(doc(db, "users", user.uid, "wardrobe", newId), completeItem);
       
-      // adds the new item to local state
-      setWardrobeItems([...wardrobeItems, completeItem]);
+      // No need to update local state as the onSnapshot listener will handle it
     } catch (error) {
       console.error("Error adding item: ", error);
     }
