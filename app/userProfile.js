@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, StatusBar, Alert, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, StatusBar, Alert, Image, Dimensions, FlatList } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useState, useEffect } from 'react';
 import Feather from '@expo/vector-icons/Feather';
@@ -8,6 +8,8 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { doc, updateDoc, arrayUnion, setDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
+
+const WINDOW_WIDTH = Dimensions.get('window').width;
 
 export default function UserProfileScreen() {
   const router = useRouter();
@@ -20,6 +22,7 @@ export default function UserProfileScreen() {
     name: '',
     bio: ''
   });
+  const [deleteMode, setDeleteMode] = useState(false);
 
   // initializes profile data when userData changes
   useEffect(() => {
@@ -183,50 +186,120 @@ export default function UserProfileScreen() {
   );
 
   // looks section
-  const renderLooks = () => (
-    <View style={styles.settingsSection}>
-      {/* Search Section with Add Button - positioned under tabs for looks tab */}
-      <View style={styles.searchContainer}>
-        <View style={styles.searchInputContainer}>
-          <Feather name="search" size={20} color="#7D7D7D" style={styles.searchIcon} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search your looks..."
-            placeholderTextColor="#828282"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-        </View>
-        <TouchableOpacity 
-          style={styles.addBoardButton} 
-          onPress={() => router.push('/add-look')}
-        >
-          <Feather name="plus" size={24} color="#4A6D51" />
-        </TouchableOpacity>
-      </View>
-      
-      <View style={styles.sectionTitleContainer}>
-        <Text style={styles.sectionTitle}>Recent Looks</Text>
-      </View>
+  const renderLooks = () => {
+    const filteredLooks = (userData?.looks || []).filter(look => 
+      searchQuery === '' || 
+      look.outfitName?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
-      {/* View Saved Outfits Button */}
-      <TouchableOpacity
-        style={styles.saveButton}
-        onPress={() => router.push('/savedOutfits')}
+    const renderLookItem = ({ item: look }) => (
+      <TouchableOpacity 
+        style={styles.outfitContainer}
+        onPress={() => router.push({ pathname: '/outfit/[id]', params: { id: look.outfitId } })}
+        activeOpacity={0.8}
       >
-        <Text style={styles.saveButtonText}>View Saved Outfits</Text>
+        {look.outfitImageUri ? (
+          <Image 
+            source={{ uri: look.outfitImageUri }} 
+            style={styles.outfitImage}
+            resizeMode="cover"
+          />
+        ) : (
+          <View style={styles.placeholderImage}>
+            <MaterialCommunityIcons name="tshirt-crew" size={40} color="#CCCCCC" />
+          </View>
+        )}
+        
+        {deleteMode && (
+          <TouchableOpacity
+            style={styles.deleteLookButton}
+            onPress={() => deleteLook(look.id)}
+          >
+            <Feather name="minus" size={16} color="#FFFFFF" />
+          </TouchableOpacity>
+        )}
       </TouchableOpacity>
+    );
 
-      {/* Empty state for looks */}
-      {(userData?.looks || []).length === 0 && (
-        <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>
-            Add your first look to your profile!
-          </Text>
+    return (
+      <>
+        {/* Search Section with Add Button - positioned under tabs for looks tab */}
+        <View style={styles.looksSearchContainer}>
+          <View style={styles.searchInputContainer}>
+            <Feather name="search" size={20} color="#7D7D7D" style={styles.searchIcon} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search your looks..."
+              placeholderTextColor="#828282"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+          </View>
+          
+          <View style={styles.buttonsGroup}>
+            <TouchableOpacity 
+              style={styles.addBoardButton} 
+              onPress={() => setDeleteMode(!deleteMode)}
+            >
+              <Feather name={deleteMode ? "check" : "minus"} size={24} color="#4A6D51" />
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.addBoardButton} 
+              onPress={() => router.push('/add-look')}
+            >
+              <Feather name="plus" size={24} color="#4A6D51" />
+            </TouchableOpacity>
+          </View>
         </View>
-      )}
-    </View>
-  );
+        
+        <View style={styles.looksSectionTitleContainer}>
+          <Text style={styles.sectionTitle}>Recent Looks</Text>
+        </View>
+
+        {/* Display profile looks if they exist */}
+        {(userData?.looks || []).length > 0 ? (
+          <View style={styles.looksGridContainer}>
+            <FlatList
+              data={filteredLooks}
+              keyExtractor={(item, index) => item.id || index.toString()}
+              renderItem={renderLookItem}
+              numColumns={3}
+              contentContainerStyle={styles.list}
+              showsVerticalScrollIndicator={false}
+              scrollEnabled={false}
+            />
+          </View>
+        ) : (
+          /* Empty state for looks */
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>
+              Add your first look to your profile!
+            </Text>
+          </View>
+        )}
+      </>
+    );
+  };
+
+  // Function to delete a look from user's profile
+  const deleteLook = async (lookId) => {
+    if (!user?.uid) return;
+    
+    try {
+      const userRef = doc(db, "users", user.uid);
+      // Filter out the look to delete from the looks array
+      const updatedLooks = (userData?.looks || []).filter(look => look.id !== lookId);
+      
+      await updateDoc(userRef, {
+        looks: updatedLooks,
+        lastUpdated: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("Error deleting look:", error);
+      Alert.alert("Error", "Failed to delete look");
+    }
+  };
 
   return (
     <>
@@ -679,5 +752,90 @@ const styles = StyleSheet.create({
     color: '#4A6D51',
     fontWeight: '600',
     fontSize: 16,
+  },
+  list: {
+    padding: 20,
+    paddingTop: 0,
+  },
+  outfitContainer: {
+    flex: 1,
+    margin: 5,
+    maxWidth: (WINDOW_WIDTH - 60) / 3,
+    padding: 4,
+    alignItems: 'center',
+    height: 128,
+    position: 'relative',
+  },
+  outfitImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 8,
+    backgroundColor: '#F5F5F5',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  placeholderImage: {
+    width: 120,
+    height: 120,
+    backgroundColor: '#F5F5F5',
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  looksSearchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+    gap: 1,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+  },
+  looksSectionTitleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 15,
+    paddingHorizontal: 20,
+  },
+  looksButtonContainer: {
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    marginTop: 20,
+  },
+  deleteLookButton: {
+    position: 'absolute',
+    top: 5,
+    right: 5,
+    backgroundColor: 'rgba(255, 0, 0, 0.8)',
+    borderRadius: 12,
+    width: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5,
+  },
+  looksGridContainer: {
+    flex: 1,
+  },
+  buttonsGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 0,
   },
 });
