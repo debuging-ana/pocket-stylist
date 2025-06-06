@@ -223,7 +223,7 @@ export default function AddOutfitScreen() {
       if (!isMountedRef.current) return;
       
       // Show success message and navigate immediately
-      Alert.alert('Outfit Saved', 'You can now view your saved outfit in the "See Outfits" page.', [
+      Alert.alert('Outfit Saved', 'View your outfit in your saved outfit collection', [
         {
           text: 'OK',
           onPress: () => {

@@ -71,7 +71,6 @@ return (
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.itemContainer}>
-            <Text style={styles.itemName}>{item.name}</Text>
             <Image source={{ uri: item.imageUri }} style={styles.itemImage} />
             
             {/* Action Buttons */}
@@ -93,6 +92,7 @@ return (
             </View>
           </View>
         )}
+        columnWrapperStyle={styles.row}
         contentContainerStyle={styles.listContent}
       />
     )}
@@ -132,33 +132,24 @@ listContent: {
   paddingBottom: 20,
 },
 itemContainer: {
-  flex: 1,
   margin: 5,
   backgroundColor: 'white',
   borderRadius: 10,
   padding: 10,
   alignItems: 'center',
   width: '48%',
-  height: 280,
-},
-itemName: {
-  marginBottom: 8,
-  color: '#4A6D51',
-  textAlign: 'center',
-  fontSize: 14,
-  height: 20,
-  fontWeight: '500',
+  height: 250,
 },
 itemImage: {
   width: '100%',
   height: 180,
   borderRadius: 5,
   resizeMode: 'cover',
-  marginBottom: 10,
+  marginBottom: 5,
 },
 buttonsContainer: {
   flexDirection: 'row',
-  gap: 8,
+  gap: 10,
   marginTop: 'auto',
   justifyContent: 'center',
   width: '100%',
@@ -168,7 +159,7 @@ editButton: {
   alignItems: 'center',
   justifyContent: 'center',
   backgroundColor: '#CADBC1',
-  width: 100,
+  width: 115,
   height: 40,
   borderRadius: 8,
   borderWidth: 1,
@@ -194,5 +185,8 @@ deleteButtonText: {
   color: '#995454',
   fontSize: 12,
   fontWeight: '600',
+},
+row: {
+  justifyContent: 'flex-start',
 },
 });

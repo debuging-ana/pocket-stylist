@@ -29,27 +29,47 @@ export default function SavedOutfits() {
     router.push(`/outfit/${outfitId}`);
   };
 
-  const renderItem = ({ item }) => (
-    <TouchableOpacity 
-      style={styles.outfitContainer}
-      onPress={() => handleOutfitPress(item.id)}
-      activeOpacity={0.8}
-    >
-      {item.imageUri ? (
-        <Image 
-          source={{ uri: item.imageUri }} 
-          style={styles.outfitImage} 
-          resizeMode="cover"
-          onLoad={() => console.log('Image loaded successfully for outfit:', item.name)}
-          onError={(error) => console.log('Image failed to load for outfit:', item.name, error.nativeEvent.error)}
-        />
-      ) : (
-        <View style={styles.placeholderImage}>
-          <MaterialCommunityIcons name="tshirt-crew" size={40} color="#CCCCCC" />
-        </View>
-      )}
-    </TouchableOpacity>
-  );
+  const renderItem = ({ item, index }) => {
+    // Calculate column position (0 = left, 1 = middle, 2 = right)
+    const columnIndex = index % 3;
+    
+    // Apply different margins based on column position
+    const getContainerStyle = () => {
+      const baseStyle = styles.outfitContainer;
+      switch (columnIndex) {
+        case 0: // First column (left) - fixed left position
+          return [baseStyle, { marginLeft: 0, marginRight: 0 }];
+        case 1: // Middle column - perfectly centered with fixed margins
+          return [baseStyle, { marginLeft: 5, marginRight: 5 }];
+        case 2: // Right column - fixed right position
+          return [baseStyle, { marginLeft: 0, marginRight: 0 }];
+        default:
+          return baseStyle;
+      }
+    };
+
+    return (
+      <TouchableOpacity 
+        style={getContainerStyle()}
+        onPress={() => handleOutfitPress(item.id)}
+        activeOpacity={0.8}
+      >
+        {item.imageUri ? (
+          <Image 
+            source={{ uri: item.imageUri }} 
+            style={styles.outfitImage} 
+            resizeMode="cover"
+            onLoad={() => console.log('Image loaded successfully for outfit:', item.name)}
+            onError={(error) => console.log('Image failed to load for outfit:', item.name, error.nativeEvent.error)}
+          />
+        ) : (
+          <View style={styles.placeholderImage}>
+            <MaterialCommunityIcons name="tshirt-crew" size={40} color="#CCCCCC" />
+          </View>
+        )}
+      </TouchableOpacity>
+    );
+  };
 
   if (loading) {
     return (
@@ -179,11 +199,12 @@ const styles = StyleSheet.create({
   },
   outfitContainer: {
     flex: 1,
-    margin: 5,
     maxWidth: (WINDOW_WIDTH - 60) / 3,
+    width: (WINDOW_WIDTH - 60) / 3,
     padding: 4,
     alignItems: 'center',
     height: 128,
+    marginBottom: 1,
   },
   outfitImage: {
     width: 120,
