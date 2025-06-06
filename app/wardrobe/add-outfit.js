@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   Image,
   StatusBar,
   Dimensions,
+  TextInput,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useWardrobe } from '../../context/wardrobeContext';
@@ -19,6 +20,8 @@ import Animated, {
   runOnJS,
 } from 'react-native-reanimated';
 import { GestureDetector, Gesture, GestureHandlerRootView } from 'react-native-gesture-handler';
+import { captureRef } from 'react-native-view-shot';
+import * as FileSystem from 'expo-file-system';
 
 const WINDOW_WIDTH = Dimensions.get('window').width;
 const DROP_ZONE_SIZE = WINDOW_WIDTH - 40;
@@ -26,7 +29,7 @@ const ITEM_SIZE = 60;
 
 export default function AddOutfitScreen() {
   const router = useRouter();
-  const { wardrobeItems } = useWardrobe();
+  const { wardrobeItems, addOutfit } = useWardrobe();
   const [selectedItems, setSelectedItems] = useState({
     tops: [],
     bottoms: [],
@@ -37,6 +40,13 @@ export default function AddOutfitScreen() {
   const [step, setStep] = useState('selection'); // 'selection' or 'arrangement'
   const [outfitLayout, setOutfitLayout] = useState([]);
   const [selectedItemId, setSelectedItemId] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [outfitName, setOutfitName] = useState('');
+  const [outfitDescription, setOutfitDescription] = useState('');
+  const [isCapturing, setIsCapturing] = useState(false);
+  
+  // Ref for capturing the drop zone
+  const dropZoneRef = useRef();
 
   // Group items by category
   const itemsByCategory = wardrobeItems.reduce((acc, item) => {
@@ -95,6 +105,100 @@ export default function AddOutfitScreen() {
     setOutfitLayout(current => current.filter(item => item.id !== itemId));
     setSelectedItemId(null);
   }, []);
+
+  // Function to capture the outfit arrangement as an image
+  const captureOutfitImage = async () => {
+    try {
+      if (!dropZoneRef.current) {
+        throw new Error('Drop zone ref not available');
+      }
+
+      // Hide buttons during capture
+      setIsCapturing(true);
+      
+      // Wait a brief moment for the state change to take effect
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Capture the drop zone as an image
+      const uri = await captureRef(dropZoneRef, {
+        format: 'png',
+        quality: 1.0,
+        result: 'tmpfile',
+      });
+
+      // Show buttons again
+      setIsCapturing(false);
+
+      return uri;
+    } catch (error) {
+      console.error('Error capturing outfit image:', error);
+      setIsCapturing(false); // Make sure to reset state on error
+      throw error;
+    }
+  };
+
+  // Function to save the complete outfit
+  const saveOutfit = async () => {
+    if (outfitLayout.length === 0) {
+      alert('Please add at least one item to your outfit before saving.');
+      return;
+    }
+
+    if (!outfitName.trim()) {
+      alert('Please enter a name for your outfit before saving.');
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      console.log('Starting outfit save process...');
+      console.log('Current outfit layout:', outfitLayout);
+      
+      // Capture the outfit arrangement as an image
+      console.log('Capturing outfit image...');
+      const outfitImageUri = await captureOutfitImage();
+      console.log('Outfit image captured:', outfitImageUri);
+      
+      // Create outfit data
+      const outfitData = {
+        id: `outfit-${Date.now()}`,
+        name: outfitName.trim(),
+        description: outfitDescription.trim(),
+        items: outfitLayout,
+        selectedItems: selectedItems,
+        imageUri: outfitImageUri,
+        createdAt: new Date(),
+      };
+
+      console.log('Outfit data prepared:', outfitData);
+
+      // Validate addOutfit function exists
+      if (!addOutfit) {
+        throw new Error('addOutfit function not available from wardrobe context');
+      }
+
+      // Save to wardrobe context
+      console.log('Saving outfit to Firestore...');
+      await addOutfit(outfitData);
+      
+      console.log('Outfit saved successfully to Firestore!');
+      
+      // Show success message
+      alert('Outfit saved successfully! 🎉\nYou can view it in the Saved Outfits tab.');
+      
+      // Navigate back to wardrobe with a slight delay to ensure the alert is shown
+      setTimeout(() => {
+        router.push('/wardrobe');
+      }, 500);
+      
+    } catch (error) {
+      console.error('Error saving outfit:', error);
+      console.error('Error details:', error.message);
+      alert(`Failed to save outfit: ${error.message}\nPlease try again.`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   // Draggable item component for the selected items row
   const DraggableItem = ({ item }) => {
@@ -268,7 +372,7 @@ export default function AddOutfitScreen() {
             </View>
           </GestureDetector>
           
-          {isSelected && (
+          {isSelected && !isCapturing && (
             <>
               <TouchableOpacity
                 style={styles.deleteButton}
@@ -295,8 +399,41 @@ export default function AddOutfitScreen() {
 
     return (
       <GestureHandlerRootView style={styles.container}>
-        <View style={styles.arrangementContent}>
+        <ScrollView 
+          style={styles.arrangementScrollView}
+          contentContainerStyle={styles.arrangementContent}
+          showsVerticalScrollIndicator={false}
+        >
           <Text style={styles.header}>Arrange Your Outfit</Text>
+          
+          {/* Outfit Name Input */}
+          <View style={styles.nameInputContainer}>
+            <Text style={styles.inputLabel}>Outfit Name</Text>
+            <TextInput
+              style={styles.nameInput}
+              placeholder="Enter outfit name"
+              placeholderTextColor="#828282"
+              value={outfitName}
+              onChangeText={setOutfitName}
+              maxLength={50}
+            />
+          </View>
+          
+          {/* Outfit Description Input */}
+          <View style={styles.nameInputContainer}>
+            <Text style={styles.inputLabel}>Description</Text>
+            <TextInput
+              style={[styles.nameInput, styles.descriptionInput]}
+              placeholder="Enter outfit description (optional)"
+              placeholderTextColor="#828282"
+              value={outfitDescription}
+              onChangeText={setOutfitDescription}
+              maxLength={200}
+              multiline
+              numberOfLines={3}
+              textAlignVertical="top"
+            />
+          </View>
           
           {/* Selected items row */}
           <View style={styles.selectedItemsContainer}>
@@ -315,21 +452,27 @@ export default function AddOutfitScreen() {
           {/* Drop zone */}
           <View style={styles.dropZoneContainer}>
             <Text style={styles.sectionTitle}>Drag items here to arrange</Text>
-            <View style={styles.dropZone}>
-              {outfitLayout.length === 0 ? (
-                <Text style={styles.dropZoneText}>
-                  Drag and drop items here to create your outfit
-                </Text>
-              ) : (
-                <View style={styles.outfitCanvas}>
-                  {outfitLayout.map((item) => (
-                    <DroppedItem key={item.id} item={item} />
-                  ))}
-                </View>
-              )}
+            <View style={styles.dropZoneBorder}>
+              <View 
+                ref={dropZoneRef}
+                style={styles.dropZoneCapture}
+                collapsable={false}
+              >
+                {outfitLayout.length === 0 ? (
+                  <Text style={styles.dropZoneText}>
+                    Drag and drop items here to create your outfit
+                  </Text>
+                ) : (
+                  <View style={styles.outfitCanvas}>
+                    {outfitLayout.map((item) => (
+                      <DroppedItem key={item.id} item={item} />
+                    ))}
+                  </View>
+                )}
+              </View>
             </View>
           </View>
-        </View>
+        </ScrollView>
 
         {/* Bottom buttons */}
         <View style={styles.bottomButtons}>
@@ -341,14 +484,17 @@ export default function AddOutfitScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.button, styles.saveButton]}
-            onPress={() => {
-              // TODO: Save the outfit
-              console.log('Saving outfit with layout:', outfitLayout);
-              router.push('/wardrobe');
-            }}
+            style={[
+              styles.button, 
+              styles.saveButton,
+              (!outfitName.trim() || isSaving) && styles.disabledButton
+            ]}
+            onPress={saveOutfit}
+            disabled={!outfitName.trim() || isSaving}
           >
-            <Text style={styles.saveButtonText}>Save Outfit</Text>
+            <Text style={styles.saveButtonText}>
+              {isSaving ? 'Saving...' : 'Save Outfit'}
+            </Text>
           </TouchableOpacity>
         </View>
       </GestureHandlerRootView>
@@ -553,9 +699,12 @@ const styles = StyleSheet.create({
     bottom: -8,
     left: -8,
   },
-  arrangementContent: {
+  arrangementScrollView: {
     flex: 1,
+  },
+  arrangementContent: {
     padding: 20,
+    paddingBottom: 20,
   },
   selectedItemsContainer: {
     marginBottom: 20,
@@ -572,17 +721,22 @@ const styles = StyleSheet.create({
   dropZoneContainer: {
     marginBottom: 20,
   },
-  dropZone: {
-    width: WINDOW_WIDTH - 40,
-    height: WINDOW_WIDTH - 40,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    borderWidth: 2,
-    borderStyle: 'dashed',
+  dropZoneBorder: {
+    width: DROP_ZONE_SIZE,
+    height: DROP_ZONE_SIZE,
+    borderWidth: 3,
     borderColor: '#4A6D51',
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    position: 'relative',
+  },
+  dropZoneCapture: {
+    width: DROP_ZONE_SIZE - 6,
+    height: DROP_ZONE_SIZE - 6,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   dropZoneText: {
     color: '#828282',
@@ -593,5 +747,31 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     position: 'relative',
+  },
+  nameInputContainer: {
+    marginBottom: 20,
+  },
+  inputLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#4A6D51',
+    marginBottom: 8,
+  },
+  nameInput: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    borderRadius: 12,
+    padding: 12,
+    fontSize: 16,
+    color: '#333333',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  descriptionInput: {
+    height: 80,
   },
 }); 
