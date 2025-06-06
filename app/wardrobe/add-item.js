@@ -62,7 +62,7 @@ const getCategoryIcon = (category, size = 22) => {
 
 export default function AddItemScreen() {
   const router = useRouter();
-  const { addItem } = useWardrobe(); 
+  const { addItem } = useWardrobe();
   const [imageUri, setImageUri] = useState(null);
   const [name, setName] = useState('');
   const [category, setCategory] = useState('tops'); // default
@@ -72,6 +72,7 @@ export default function AddItemScreen() {
   const [imageLoading, setImageLoading] = useState(false);
   const [isProcessingBackground, setIsProcessingBackground] = useState(false);
   const [showImageOptions, setShowImageOptions] = useState(false);
+  const [showBackgroundOptions, setShowBackgroundOptions] = useState(false);
 
   // configure custom back button in header
   useLayoutEffect(() => {
@@ -92,11 +93,19 @@ export default function AddItemScreen() {
   const removeBackground = async (uri) => {
     setIsProcessingBackground(true);
     try {
+      // Check if API key is available
+      if (!REMOVE_BG_API_KEY) {
+        throw new Error('Remove.bg API key not configured');
+      }
+
+      console.log('Starting background removal for:', uri);
+      
       // First convert the image to base64 for iOS compatibility
       const base64Image = await FileSystem.readAsStringAsync(uri, {
         encoding: FileSystem.EncodingType.Base64,
       });
 
+      console.log('Image converted to base64, length:', base64Image.length);
       console.log('Sending image to Remove.bg API...');
       
       const response = await fetch('https://api.remove.bg/v1.0/removebg', {
@@ -111,11 +120,31 @@ export default function AddItemScreen() {
         }),
       });
 
+      console.log('API Response status:', response.status);
+
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('API Error:', response.status, errorText);
-        throw new Error(`API request failed: ${response.status}`);
+        console.error('API Error Details:', {
+          status: response.status,
+          statusText: response.statusText,
+          errorText: errorText
+        });
+        
+        let errorMessage = 'Failed to remove background';
+        if (response.status === 402) {
+          errorMessage = 'Remove.bg API limit exceeded. Please try again later.';
+        } else if (response.status === 403) {
+          errorMessage = 'Remove.bg API key is invalid or expired.';
+        } else if (response.status === 400) {
+          errorMessage = 'Invalid image format. Please try a different image.';
+        } else {
+          errorMessage = `API error (${response.status}): ${errorText}`;
+        }
+        
+        throw new Error(errorMessage);
       }
+
+      console.log('API request successful, processing response...');
 
       // Get the response as an array buffer (works better in React Native)
       const arrayBuffer = await response.arrayBuffer();
@@ -136,7 +165,7 @@ export default function AddItemScreen() {
         encoding: FileSystem.EncodingType.Base64,
       });
 
-      console.log('Background removed successfully!');
+      console.log('Background removed successfully! Saved to:', fileUri);
       setImageUri(fileUri);
       // Reset image loading state after successful processing
       setImageLoading(false);
@@ -144,8 +173,8 @@ export default function AddItemScreen() {
     } catch (error) {
       console.error('Background removal error:', error);
       Alert.alert(
-        'Error',
-        'Failed to remove background. Please try again with a different image.'
+        'Background Removal Failed',
+        error.message || 'Failed to remove background. Please try again with a different image.'
       );
     } finally {
       setIsProcessingBackground(false);
@@ -284,14 +313,29 @@ export default function AddItemScreen() {
             </View>
 
             {/* image selection button */}
-            <TouchableOpacity 
-              style={[styles.imageButton, (imageLoading || isProcessingBackground) && styles.disabledButton]} 
-              onPress={() => setShowImageOptions(true)}
-              disabled={imageLoading || isProcessingBackground}
-            >
-              <Feather name="image" size={18} color="#4A6D51" style={styles.buttonIcon} />
-              <Text style={styles.buttonText}>Choose from Gallery</Text>
-            </TouchableOpacity>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity 
+                style={[styles.imageButton, (imageLoading || isProcessingBackground) && styles.disabledButton]} 
+                onPress={() => setShowImageOptions(true)}
+                disabled={imageLoading || isProcessingBackground}
+              >
+                <Feather name="image" size={18} color="#4A6D51" style={styles.buttonIcon} />
+                <Text style={styles.buttonText}>
+                  {imageUri ? 'Choose Different Image' : 'Choose from Gallery'}
+                </Text>
+              </TouchableOpacity>
+
+              {imageUri && (
+                <TouchableOpacity 
+                  style={[styles.removeBackgroundButton, (isProcessingBackground) && styles.disabledButton]}
+                  onPress={() => removeBackground(imageUri)}
+                  disabled={isProcessingBackground}
+                >
+                  <Feather name="scissors" size={18} color="#4A6D51" style={styles.buttonIcon} />
+                  <Text style={styles.buttonText}>Remove Background</Text>
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
 
           {/* item details card */}
@@ -452,6 +496,10 @@ const styles = StyleSheet.create({
     color: '#828282',
     fontSize: 14,
   },
+  buttonContainer: {
+    flexDirection: 'column',
+    gap: 10,
+  },
   imageButton: {
     flexDirection: 'row',
     backgroundColor: '#CADBC1',
@@ -595,5 +643,15 @@ const styles = StyleSheet.create({
     color: '#4A6D51',
     fontSize: 14,
     fontWeight: '500',
+  },
+  removeBackgroundButton: {
+    flexDirection: 'row',
+    backgroundColor: '#E3D3C6',
+    borderColor: '#8B6E57',
+    borderWidth: 1,
+    padding: 12,
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

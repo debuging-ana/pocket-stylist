@@ -48,6 +48,7 @@ export default {
       firebaseMessagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
       firebaseAppId: process.env.FIREBASE_APP_ID,
       firebaseMeasurementId: process.env.FIREBASE_MEASUREMENT_ID,
+      removeBgApiKey: process.env.REMOVE_BG_API_KEY,
       openAiSecretKey: process.env.OPENAI_SECRET_KEY,
       ollamaBaseUrl: process.env.OLLAMA_BASE_URL || "http://YOUR_LOCAL_IP:11434" // REPLACE WITH UR IP
     },
