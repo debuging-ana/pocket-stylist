@@ -200,12 +200,12 @@ export default function UserProfileScreen() {
       const getContainerStyle = () => {
         const baseStyle = styles.outfitContainer;
         switch (columnIndex) {
-          case 0: // First column (left) - move more left
-            return [baseStyle, { marginLeft: -0, marginRight: 20 }];
-          case 1: // Middle column - perfectly centered
-            return [baseStyle, { marginLeft: 0, marginRight: 0 }];
-          case 2: // Right column
-            return [baseStyle, { marginLeft: 20, marginRight: -0 }];
+          case 0: // First column (left) - fixed left position
+            return [baseStyle, { marginLeft: 0, marginRight: -1 }];
+          case 1: // Middle column - perfectly centered with fixed margins
+            return [baseStyle, { marginLeft: 12, marginRight: 12 }];
+          case 2: // Right column - fixed right position
+            return [baseStyle, { marginLeft: -1, marginRight: 0 }];
           default:
             return baseStyle;
         }
@@ -780,10 +780,12 @@ const styles = StyleSheet.create({
   outfitContainer: {
     flex: 1,
     maxWidth: (WINDOW_WIDTH - 60) / 3,
+    width: (WINDOW_WIDTH - 60) / 3,
     padding: 4,
     alignItems: 'center',
     height: 128,
     position: 'relative',
+    marginBottom: 6,
   },
   outfitImage: {
     width: 120,
