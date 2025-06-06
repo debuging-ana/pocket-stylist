@@ -192,34 +192,54 @@ export default function UserProfileScreen() {
       look.outfitName?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    const renderLookItem = ({ item: look }) => (
-      <TouchableOpacity 
-        style={styles.outfitContainer}
-        onPress={() => router.push({ pathname: '/outfit/[id]', params: { id: look.outfitId } })}
-        activeOpacity={0.8}
-      >
-        {look.outfitImageUri ? (
-          <Image 
-            source={{ uri: look.outfitImageUri }} 
-            style={styles.outfitImage}
-            resizeMode="cover"
-          />
-        ) : (
-          <View style={styles.placeholderImage}>
-            <MaterialCommunityIcons name="tshirt-crew" size={40} color="#CCCCCC" />
-          </View>
-        )}
-        
-        {deleteMode && (
-          <TouchableOpacity
-            style={styles.deleteLookButton}
-            onPress={() => deleteLook(look.id)}
-          >
-            <Feather name="minus" size={16} color="#FFFFFF" />
-          </TouchableOpacity>
-        )}
-      </TouchableOpacity>
-    );
+    const renderLookItem = ({ item: look, index }) => {
+      // Calculate column position (0 = left, 1 = middle, 2 = right)
+      const columnIndex = index % 3;
+      
+      // Apply different margins based on column position
+      const getContainerStyle = () => {
+        const baseStyle = styles.outfitContainer;
+        switch (columnIndex) {
+          case 0: // First column (left) - move more left
+            return [baseStyle, { marginLeft: -0, marginRight: 20 }];
+          case 1: // Middle column - perfectly centered
+            return [baseStyle, { marginLeft: 0, marginRight: 0 }];
+          case 2: // Right column
+            return [baseStyle, { marginLeft: 20, marginRight: -0 }];
+          default:
+            return baseStyle;
+        }
+      };
+
+      return (
+        <TouchableOpacity 
+          style={getContainerStyle()}
+          onPress={() => router.push({ pathname: '/outfit/[id]', params: { id: look.outfitId } })}
+          activeOpacity={0.8}
+        >
+          {look.outfitImageUri ? (
+            <Image 
+              source={{ uri: look.outfitImageUri }} 
+              style={styles.outfitImage}
+              resizeMode="cover"
+            />
+          ) : (
+            <View style={styles.placeholderImage}>
+              <MaterialCommunityIcons name="tshirt-crew" size={40} color="#CCCCCC" />
+            </View>
+          )}
+          
+          {deleteMode && (
+            <TouchableOpacity
+              style={styles.deleteLookButton}
+              onPress={() => deleteLook(look.id)}
+            >
+              <Feather name="minus" size={16} color="#FFFFFF" />
+            </TouchableOpacity>
+          )}
+        </TouchableOpacity>
+      );
+    };
 
     return (
       <>
@@ -759,7 +779,6 @@ const styles = StyleSheet.create({
   },
   outfitContainer: {
     flex: 1,
-    margin: 5,
     maxWidth: (WINDOW_WIDTH - 60) / 3,
     padding: 4,
     alignItems: 'center',

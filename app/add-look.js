@@ -121,44 +121,64 @@ export default function AddLookScreen() {
     }
   };
 
-  const renderOutfitCard = ({ item: outfit }) => (
-    <TouchableOpacity
-      style={styles.outfitContainer}
-      onPress={() => router.push({ pathname: '/outfit/[id]', params: { id: outfit.id } })}
-      activeOpacity={0.8}
-    >
-      {outfit.imageUri ? (
-        <Image 
-          source={{ uri: outfit.imageUri }} 
-          style={styles.outfitImage}
-          resizeMode="cover"
-        />
-      ) : (
-        <View style={styles.placeholderImage}>
-          <MaterialCommunityIcons name="tshirt-crew" size={40} color="#CCCCCC" />
-        </View>
-      )}
-      
+  const renderOutfitCard = ({ item: outfit, index }) => {
+    // Calculate column position (0 = left, 1 = middle, 2 = right)
+    const columnIndex = index % 3;
+    
+    // Apply different margins based on column position
+    const getContainerStyle = () => {
+      const baseStyle = styles.outfitContainer;
+      switch (columnIndex) {
+        case 0: // First column (left) - move more left
+          return [baseStyle, { marginLeft: -15, marginRight: 10 }];
+        case 1: // Middle column
+          return [baseStyle, { marginLeft: 7.5, marginRight: 7.5 }];
+        case 2: // Right column
+          return [baseStyle, { marginLeft: 10, marginRight: -15 }];
+        default:
+          return baseStyle;
+      }
+    };
+
+    return (
       <TouchableOpacity
-        style={[
-          styles.addButton,
-          loadingOutfits.has(outfit.id) && styles.addButtonDisabled
-        ]}
-        onPress={() => handleButtonPress(outfit)}
-        disabled={loadingOutfits.has(outfit.id)}
+        style={getContainerStyle()}
+        onPress={() => router.push({ pathname: '/outfit/[id]', params: { id: outfit.id } })}
+        activeOpacity={0.8}
       >
-        {loadingOutfits.has(outfit.id) ? (
-          <ActivityIndicator size="small" color="#4A6D51" />
-        ) : (
-          <Feather 
-            name={isOutfitInProfile(outfit.id) ? "minus" : "plus"} 
-            size={20} 
-            color="#4A6D51" 
+        {outfit.imageUri ? (
+          <Image 
+            source={{ uri: outfit.imageUri }} 
+            style={styles.outfitImage}
+            resizeMode="cover"
           />
+        ) : (
+          <View style={styles.placeholderImage}>
+            <MaterialCommunityIcons name="tshirt-crew" size={40} color="#CCCCCC" />
+          </View>
         )}
+        
+        <TouchableOpacity
+          style={[
+            styles.addButton,
+            loadingOutfits.has(outfit.id) && styles.addButtonDisabled
+          ]}
+          onPress={() => handleButtonPress(outfit)}
+          disabled={loadingOutfits.has(outfit.id)}
+        >
+          {loadingOutfits.has(outfit.id) ? (
+            <ActivityIndicator size="small" color="#4A6D51" />
+          ) : (
+            <Feather 
+              name={isOutfitInProfile(outfit.id) ? "minus" : "plus"} 
+              size={20} 
+              color="#4A6D51" 
+            />
+          )}
+        </TouchableOpacity>
       </TouchableOpacity>
-    </TouchableOpacity>
-  );
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -228,8 +248,7 @@ const styles = StyleSheet.create({
   },
   outfitContainer: {
     flex: 1,
-    margin: 5,
-    maxWidth: (WINDOW_WIDTH - 60) / 3,
+    maxWidth: (WINDOW_WIDTH - 80) / 3,
     padding: 4,
     alignItems: 'center',
     height: 128,
