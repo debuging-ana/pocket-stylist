@@ -1,8 +1,10 @@
 // the add item screen - where users can add new clothing items to their digital wardrobe
 import { useNavigation } from 'expo-router';
-import { useLayoutEffect } from 'react';
+import { useLayoutEffect, useEffect } from 'react';
 import WardrobeBackButton from './components/WardrobeBackButton';
 import { useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
 import { 
   View, 
   Text, 
@@ -21,6 +23,7 @@ import { useRouter } from 'expo-router';
 import { useWardrobe } from '../../context/wardrobeContext';
 import { MaterialCommunityIcons, Feather } from '@expo/vector-icons';
 import * as FileSystem from 'expo-file-system';
+import { REMOVE_BG_API_KEY } from '@env';
 
 // utility function to render category icons based on item category (matches wardrobe.js)
 const getCategoryIcon = (category, size = 22) => {
@@ -89,67 +92,54 @@ export default function AddItemScreen() {
   const removeBackground = async (uri) => {
     setIsProcessingBackground(true);
     try {
-      const formData = new FormData();
-      formData.append('image_file', {
-        uri: uri,
-        type: 'image/jpeg',
-        name: 'image.jpg'
+      // First convert the image to base64 for iOS compatibility
+      const base64Image = await FileSystem.readAsStringAsync(uri, {
+        encoding: FileSystem.EncodingType.Base64,
       });
 
-      console.log('Sending request to Remove.bg...');
+      console.log('Sending image to Remove.bg API...');
+      
       const response = await fetch('https://api.remove.bg/v1.0/removebg', {
         method: 'POST',
         headers: {
-          'X-Api-Key': '7Dgo1Q5WVJr2WJE39YKZmMSN',
-          'Accept': 'application/json'
+          'X-Api-Key': REMOVE_BG_API_KEY,
+          'Content-Type': 'application/json',
         },
-        body: formData
+        body: JSON.stringify({
+          image_file_b64: base64Image,
+          size: 'regular',
+        }),
       });
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('API Error:', errorText);
-        throw new Error('Failed to remove background');
+        console.error('API Error:', response.status, errorText);
+        throw new Error(`API request failed: ${response.status}`);
       }
 
-      const data = await response.json();
-      console.log('Received response:', data);
-
-      if (!data.data || !data.data.result_url) {
-        console.error('Invalid response format:', data);
-        throw new Error('Invalid response from server');
-      }
-
-      // Download the image from the result URL
-      console.log('Downloading image from:', data.data.result_url);
-      const imageResponse = await fetch(data.data.result_url);
+      // Get the response as an array buffer (works better in React Native)
+      const arrayBuffer = await response.arrayBuffer();
       
-      if (!imageResponse.ok) {
-        throw new Error('Failed to download processed image');
+      // Convert array buffer to base64
+      const bytes = new Uint8Array(arrayBuffer);
+      let binary = '';
+      for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
       }
+      const base64Data = btoa(binary);
 
-      // Save to local file
-      const base64Data = await imageResponse.blob().then(blob => {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => {
-            const base64 = reader.result.split(',')[1];
-            resolve(base64);
-          };
-          reader.onerror = reject;
-          reader.readAsDataURL(blob);
-        });
-      });
-
+      // Save the processed image
       const fileName = `processed_${Date.now()}.png`;
       const fileUri = `${FileSystem.cacheDirectory}${fileName}`;
       
       await FileSystem.writeAsStringAsync(fileUri, base64Data, {
-        encoding: FileSystem.EncodingType.Base64
+        encoding: FileSystem.EncodingType.Base64,
       });
 
-      console.log('Saved processed image to:', fileUri);
+      console.log('Background removed successfully!');
       setImageUri(fileUri);
+      // Reset image loading state after successful processing
+      setImageLoading(false);
 
     } catch (error) {
       console.error('Background removal error:', error);
@@ -220,8 +210,15 @@ export default function AddItemScreen() {
       // handles Firebase storage upload & Firestore document creation
       await addItem(newItem);
       
-      Alert.alert('Success!', 'Your item has been added to the wardrobe');
+      Alert.alert('Success!', 'Your item has been added to the wardrobe', [
+        {
+          text: 'OK',
+          onPress: () => {
+            resetForm(); // Reset form after successful save
       router.push('/wardrobe'); 
+          }
+        }
+      ]);
     } catch (error) {
       console.error('Save error:', error);
       Alert.alert('Error', 'Failed to save item. Please try again.');
@@ -229,6 +226,22 @@ export default function AddItemScreen() {
       setIsLoading(false);
     }
   };
+
+  const resetForm = useCallback(() => {
+    setImageUri(null);
+    setName('');
+    setCategory('tops');
+    setDescription('');
+    setImageLoading(false);
+    setIsProcessingBackground(false);
+  }, []);
+
+  // Reset form only when coming from a successful save (not on every focus)
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     resetForm();
+  //   }, [resetForm])
+  // );
 
   return (
     <>
@@ -245,8 +258,14 @@ export default function AddItemScreen() {
                 <Image 
                   source={{ uri: imageUri }} 
                   style={styles.image}
-                  onLoadStart={() => setImageLoading(true)}
+                  onLoadStart={() => {
+                    // Only set loading if not already processing background
+                    if (!isProcessingBackground) {
+                      setImageLoading(true);
+                    }
+                  }}
                   onLoadEnd={() => setImageLoading(false)}
+                  onError={() => setImageLoading(false)}
                 />
               ) : (
                 <View style={styles.imagePlaceholder}>
