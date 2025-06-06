@@ -201,11 +201,11 @@ export default function UserProfileScreen() {
         const baseStyle = styles.outfitContainer;
         switch (columnIndex) {
           case 0: // First column (left) - fixed left position
-            return [baseStyle, { marginLeft: 0, marginRight: -1 }];
+            return [baseStyle, { marginLeft: 0, marginRight: 0 }];
           case 1: // Middle column - perfectly centered with fixed margins
-            return [baseStyle, { marginLeft: 12, marginRight: 12 }];
+            return [baseStyle, { marginLeft: 10, marginRight: 10 }];
           case 2: // Right column - fixed right position
-            return [baseStyle, { marginLeft: -1, marginRight: 0 }];
+            return [baseStyle, { marginLeft: 0, marginRight: 0 }];
           default:
             return baseStyle;
         }
@@ -234,7 +234,7 @@ export default function UserProfileScreen() {
               style={styles.deleteLookButton}
               onPress={() => deleteLook(look.id)}
             >
-              <Feather name="minus" size={16} color="#FFFFFF" />
+              <Feather name="minus" size={16} color="#995454" />
             </TouchableOpacity>
           )}
         </TouchableOpacity>
@@ -785,7 +785,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: 128,
     position: 'relative',
-    marginBottom: 6,
+    marginBottom: 15,
   },
   outfitImage: {
     width: 120,
@@ -839,7 +839,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 5,
     right: 5,
-    backgroundColor: 'rgba(255, 0, 0, 0.8)',
+    backgroundColor: '#FFE5E5',
+    borderColor: '#995454',
+    borderWidth: 1,
     borderRadius: 12,
     width: 24,
     height: 24,

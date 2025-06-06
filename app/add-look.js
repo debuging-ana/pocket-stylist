@@ -161,6 +161,7 @@ export default function AddLookScreen() {
         <TouchableOpacity
           style={[
             styles.addButton,
+            isOutfitInProfile(outfit.id) && styles.minusButton,
             loadingOutfits.has(outfit.id) && styles.addButtonDisabled
           ]}
           onPress={() => handleButtonPress(outfit)}
@@ -172,7 +173,7 @@ export default function AddLookScreen() {
             <Feather 
               name={isOutfitInProfile(outfit.id) ? "minus" : "plus"} 
               size={20} 
-              color="#4A6D51" 
+              color={isOutfitInProfile(outfit.id) ? "#995454" : "#4A6D51"} 
             />
           )}
         </TouchableOpacity>
@@ -249,10 +250,12 @@ const styles = StyleSheet.create({
   outfitContainer: {
     flex: 1,
     maxWidth: (WINDOW_WIDTH - 80) / 3,
+    width: (WINDOW_WIDTH - 80) / 3,
     padding: 4,
     alignItems: 'center',
     height: 128,
     position: 'relative',
+    marginBottom: 15,
   },
   outfitImage: {
     width: 120,
@@ -299,6 +302,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 3,
     elevation: 4,
+  },
+  minusButton: {
+    backgroundColor: '#FFE5E5',
+    borderColor: '#995454',
   },
   addButtonDisabled: {
     opacity: 0.6,
