@@ -48,7 +48,7 @@ export default function SavedOutfits() {
           <MaterialCommunityIcons name="tshirt-crew" size={40} color="#CCCCCC" />
         </View>
       )}
-      </TouchableOpacity>
+    </TouchableOpacity>
   );
 
   if (loading) {
@@ -56,8 +56,8 @@ export default function SavedOutfits() {
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#4A6D51" />
         <Text style={styles.loadingText}>Loading outfits...</Text>
-    </View>
-  );
+      </View>
+    );
   }
 
   return (

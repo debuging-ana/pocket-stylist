@@ -215,7 +215,7 @@ export default function AddItemScreen() {
           text: 'OK',
           onPress: () => {
             resetForm(); // Reset form after successful save
-      router.push('/wardrobe'); 
+            router.push('/wardrobe');
           }
         }
       ]);
