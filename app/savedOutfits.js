@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#4A6D51',
     margin: 20,
-    marginBottom: 10,
+    marginBottom: 0,
   },
   searchInputContainer: {
     flexDirection: 'row',
@@ -135,7 +135,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 15,
     padding: 12,
-    marginHorizontal: 20,
+    marginTop: 20,
+    marginLeft: 20,
+    marginRight: 20,
     marginBottom: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
@@ -151,7 +153,6 @@ const styles = StyleSheet.create({
     height: 24,
     padding: 0,
     color: '#4A6D51',
-    fontSize: 16,
   },
   emptyContainer: {
     flex: 1,
@@ -174,6 +175,7 @@ const styles = StyleSheet.create({
   },
   list: {
     padding: 20,
+    paddingTop: 0,
   },
   outfitContainer: {
     flex: 1,
@@ -189,7 +191,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: '#F5F5F5',
     borderWidth: 1,
-    borderColor: '#4A6D51',
+    borderColor: '#E0E0E0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   placeholderImage: {
     width: 120,
@@ -199,6 +206,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#4A6D51',
+    borderColor: '#E0E0E0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
 });

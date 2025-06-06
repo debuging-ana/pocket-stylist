@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Alert, ScrollView, ActivityIndicator, TextInput } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useWardrobe } from '../../context/wardrobeContext';
@@ -11,7 +11,6 @@ export default function OutfitDetailScreen() {
   const { savedOutfits, deleteOutfit, updateOutfit } = useWardrobe();
   const navigation = useNavigation();
   const router = useRouter();
-  const [isDeleting, setIsDeleting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedDescription, setEditedDescription] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -38,14 +37,12 @@ export default function OutfitDetailScreen() {
           text: "Delete",
           style: "destructive",
           onPress: async () => {
-            setIsDeleting(true);
             try {
+              // Navigate immediately then delete in background
+              router.push('/savedOutfits');
               await deleteOutfit(outfit.id);
-              router.back();
             } catch (error) {
               Alert.alert("Error", "Failed to delete outfit");
-            } finally {
-              setIsDeleting(false);
             }
           }
         }
@@ -85,18 +82,10 @@ export default function OutfitDetailScreen() {
     });
   };
 
+  // If no outfit found, redirect immediately
   if (!outfit) {
-    return (
-      <View style={styles.container}>
-        <View style={styles.errorContainer}>
-          <MaterialCommunityIcons name="alert-circle-outline" size={60} color="#CCCCCC" />
-          <Text style={styles.errorText}>Outfit not found.</Text>
-          <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-            <Text style={styles.backButtonText}>Go Back</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
+    router.push('/savedOutfits');
+    return null;
   }
 
   return (
@@ -195,7 +184,11 @@ export default function OutfitDetailScreen() {
           {outfit.items && outfit.items.length > 0 && (
             <View style={styles.itemsContainer}>
               <Text style={styles.sectionTitle}>Items in this Outfit</Text>
-              <View style={styles.itemsGrid}>
+              <ScrollView 
+                horizontal 
+                showsHorizontalScrollIndicator={false}
+                style={styles.itemsScrollView}
+              >
                 {outfit.items.map((item, index) => (
                   <View key={`${item.id}-${index}`} style={styles.itemCard}>
                     <Image 
@@ -203,28 +196,19 @@ export default function OutfitDetailScreen() {
                       style={styles.itemImage}
                       resizeMode="cover"
                     />
-                    <Text style={styles.itemName} numberOfLines={1}>{item.name}</Text>
-                    <Text style={styles.itemCategory}>{item.category}</Text>
                   </View>
                 ))}
-              </View>
+              </ScrollView>
             </View>
           )}
 
           {/* Delete Button */}
           <TouchableOpacity 
-            style={[styles.deleteButton, isDeleting && styles.disabledButton]} 
+            style={styles.deleteButton} 
             onPress={handleDelete}
-            disabled={isDeleting}
           >
-            {isDeleting ? (
-              <ActivityIndicator size="small" color="#995454" />
-            ) : (
-              <Feather name="trash-2" size={20} color="#995454" />
-            )}
-            <Text style={styles.deleteButtonText}>
-              {isDeleting ? 'Deleting...' : 'Delete Outfit'}
-            </Text>
+            <Feather name="trash-2" size={20} color="#995454" />
+            <Text style={styles.deleteButtonText}>Delete Outfit</Text>
           </TouchableOpacity>
 
           {/* Back Button */}
@@ -360,7 +344,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   description: {
-    fontSize: 16,
     color: '#333333',
     lineHeight: 24,
   },
@@ -386,35 +369,19 @@ const styles = StyleSheet.create({
   itemsContainer: {
     marginBottom: 24,
   },
-  itemsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
+  itemsScrollView: {
+    padding: 10,
   },
   itemCard: {
-    width: '48%',
-    backgroundColor: '#F9F9F4',
-    borderRadius: 12,
-    padding: 12,
-    alignItems: 'center',
+    width: 70,
+    height: 70,
+    borderRadius: 8,
+    overflow: 'hidden',
+    marginRight: 8,
   },
   itemImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 8,
-    marginBottom: 8,
-  },
-  itemName: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333333',
-    textAlign: 'center',
-    marginBottom: 4,
-  },
-  itemCategory: {
-    fontSize: 12,
-    color: '#828282',
-    textAlign: 'center',
+    width: '100%',
+    height: '100%',
   },
   deleteButton: {
     flexDirection: 'row',
@@ -427,10 +394,6 @@ const styles = StyleSheet.create({
     borderColor: '#995454',
     gap: 8,
     marginBottom: 10,
-  },
-  disabledButton: {
-    backgroundColor: '#F0F0F0',
-    borderColor: '#CCCCCC',
   },
   deleteButtonText: {
     color: '#995454',

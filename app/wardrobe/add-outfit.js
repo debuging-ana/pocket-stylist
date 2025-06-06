@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   StatusBar,
   Dimensions,
   TextInput,
+  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useWardrobe } from '../../context/wardrobeContext';
@@ -44,9 +45,18 @@ export default function AddOutfitScreen() {
   const [outfitName, setOutfitName] = useState('');
   const [outfitDescription, setOutfitDescription] = useState('');
   const [isCapturing, setIsCapturing] = useState(false);
+  const isMountedRef = useRef(true);
   
   // Ref for capturing the drop zone
   const dropZoneRef = useRef();
+
+  // Track component mount status
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   // Group items by category
   const itemsByCategory = wardrobeItems.reduce((acc, item) => {
@@ -145,6 +155,22 @@ export default function AddOutfitScreen() {
     }
   };
 
+  // Function to reset the form to initial state
+  const resetForm = () => {
+    setSelectedItems({
+      tops: [],
+      bottoms: [],
+      jackets: [],
+      shoes: [],
+      accessories: [],
+    });
+    setStep('selection');
+    setOutfitLayout([]);
+    setSelectedItemId(null);
+    setOutfitName('');
+    setOutfitDescription('');
+  };
+
   // Function to save the complete outfit
   const saveOutfit = async () => {
     if (outfitLayout.length === 0) {
@@ -157,6 +183,8 @@ export default function AddOutfitScreen() {
       return;
     }
 
+    if (!isMountedRef.current) return;
+    
     setIsSaving(true);
     try {
       console.log('Starting outfit save process...');
@@ -191,20 +219,38 @@ export default function AddOutfitScreen() {
       
       console.log('Outfit saved successfully to Firestore!');
       
-      // Show success message
-      alert('Outfit saved successfully! 🎉\nYou can view it in the Saved Outfits tab.');
+      // Only proceed if component is still mounted
+      if (!isMountedRef.current) return;
       
-      // Navigate back to wardrobe with a slight delay to ensure the alert is shown
-      setTimeout(() => {
-        router.push('/wardrobe');
-      }, 500);
+      // Show success message and navigate immediately
+      Alert.alert('Outfit Saved', 'You can now view your saved outfit in the "See Outfits" page.', [
+        {
+          text: 'OK',
+          onPress: () => {
+            // Only reset and navigate if component is still mounted
+            if (isMountedRef.current) {
+              // Reset form to initial state
+              resetForm();
+              // Navigate to saved outfits to see the newly created outfit
+              router.replace('/savedOutfits');
+            }
+          }
+        }
+      ]);
       
     } catch (error) {
       console.error('Error saving outfit:', error);
       console.error('Error details:', error.message);
-      alert(`Failed to save outfit: ${error.message}\nPlease try again.`);
+      
+      // Only show alert if component is still mounted
+      if (isMountedRef.current) {
+        alert(`Failed to save outfit: ${error.message}\nPlease try again.`);
+      }
     } finally {
-      setIsSaving(false);
+      // Only update state if component is still mounted
+      if (isMountedRef.current) {
+        setIsSaving(false);
+      }
     }
   };
 
@@ -285,7 +331,7 @@ export default function AddOutfitScreen() {
                     <Feather name="check-circle" size={24} color="#4A6D51" />
                   </View>
                 )}
-                <Text style={styles.itemName} numberOfLines={1}>
+                <Text style={styles.itemName} numberOfLines={2}>
                   {item.name}
                 </Text>
               </TouchableOpacity>
@@ -311,8 +357,8 @@ export default function AddOutfitScreen() {
         translateY.value = event.translationY;
       })
       .onEnd(() => {
-        const newX = Math.max(0, Math.min(item.x + translateX.value, DROP_ZONE_SIZE - (ITEM_SIZE * scale.value)));
-        const newY = Math.max(0, Math.min(item.y + translateY.value, DROP_ZONE_SIZE - (ITEM_SIZE * scale.value)));
+        const newX = Math.max(0, Math.min(item.x + translateX.value, DROP_ZONE_SIZE - (60 * scale.value)));
+        const newY = Math.max(0, Math.min(item.y + translateY.value, DROP_ZONE_SIZE - (60 * scale.value)));
         
         runOnJS(updateItemInLayout)(item.id, { x: newX, y: newY });
         
@@ -334,7 +380,7 @@ export default function AddOutfitScreen() {
         })
         .onUpdate((event) => {
           const scaleChange = (event.translationX + event.translationY) * 0.005;
-          const newScale = Math.max(0.5, Math.min(2.5, savedScale.value + scaleChange));
+          const newScale = Math.max(0.5, Math.min(4.0, savedScale.value + scaleChange));
           scale.value = newScale;
         })
         .onEnd(() => {
@@ -495,10 +541,10 @@ export default function AddOutfitScreen() {
             style={[
               styles.button, 
               styles.saveButton,
-              (!outfitName.trim() || isSaving) && styles.disabledButton
+              (!outfitName.trim() || outfitLayout.length === 0 || isSaving) && styles.disabledButton
             ]}
             onPress={saveOutfit}
-            disabled={!outfitName.trim() || isSaving}
+            disabled={!outfitName.trim() || outfitLayout.length === 0 || isSaving}
           >
             <Text style={styles.saveButtonText}>
               {isSaving ? 'Saving...' : 'Save Outfit'}
@@ -578,24 +624,24 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   categorySection: {
-    marginBottom: 20,
+    marginBottom: 16,
   },
   categoryTitle: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '600',
     color: '#4A6D51',
-    marginBottom: 12,
+    marginBottom: 10,
   },
   itemsRow: {
     flexDirection: 'row',
-    paddingVertical: 8,
+    paddingVertical: 6,
   },
   itemCard: {
-    width: 120,
-    height: 150,
-    marginRight: 12,
+    width: 122.7,
+    height: 137,
+    marginRight: 10,
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    borderRadius: 10,
     padding: 8,
     borderWidth: 1,
     borderColor: '#E0E0E0',
@@ -603,11 +649,11 @@ const styles = StyleSheet.create({
   },
   selectedItemCard: {
     borderColor: '#4A6D51',
-    borderWidth: 2,
+    borderWidth: 1,
   },
   itemImage: {
-    width: 104,
-    height: 104,
+    width: 88,
+    height: 88,
     borderRadius: 8,
     resizeMode: 'cover',
   },
@@ -616,15 +662,16 @@ const styles = StyleSheet.create({
     top: 8,
     right: 8,
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 4,
+    borderRadius: 10,
+    padding: 3,
   },
   itemName: {
-    fontSize: 14,
+    fontSize: 11,
     color: '#333',
-    marginTop: 8,
+    marginTop: 6,
     textAlign: 'center',
-    paddingHorizontal: 4,
+    paddingHorizontal: 3,
+    numberOfLines: 2,
   },
   bottomButtons: {
     flexDirection: 'row',
@@ -732,7 +779,7 @@ const styles = StyleSheet.create({
   dropZoneBorder: {
     width: DROP_ZONE_SIZE,
     height: DROP_ZONE_SIZE,
-    borderWidth: 3,
+    borderWidth: 1,
     borderColor: '#4A6D51',
     borderRadius: 20,
     justifyContent: 'center',
@@ -771,7 +818,6 @@ const styles = StyleSheet.create({
     borderColor: '#E0E0E0',
     borderRadius: 12,
     padding: 12,
-    fontSize: 16,
     color: '#333333',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },

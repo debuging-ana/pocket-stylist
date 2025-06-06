@@ -200,7 +200,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   category: {
-    fontSize: 16,
     color: '#666',
     marginBottom: 9,
     textTransform: 'capitalize',
@@ -220,7 +219,6 @@ const styles = StyleSheet.create({
     color: '#4A6D51',
   },
   description: {
-    fontSize: 16,
     color: '#666',
     lineHeight: 24,
   },
@@ -229,7 +227,6 @@ const styles = StyleSheet.create({
     borderColor: '#E0E0E0',
     borderRadius: 12,
     padding: 15,
-    fontSize: 16,
     color: '#333',
     backgroundColor: '#FFFFFF',
     height: 50,
