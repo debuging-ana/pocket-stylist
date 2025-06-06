@@ -96,7 +96,11 @@ function TabsLayout() {
         <Tabs.Screen name="wardrobe/jackets" options={{ title: 'My Jackets', tabBarButton: () => null, headerShown: true }} />
         <Tabs.Screen name="wardrobe/accessories" options={{ title: 'My Accessories', tabBarButton: () => null, headerShown: true }} />
         <Tabs.Screen name="wardrobe/shoes" options={{ title: 'My Shoes', tabBarButton: () => null, headerShown: true }} />
-        <Tabs.Screen name="wardrobe/edit-item" options={{ title: 'Edit Item', tabBarButton: () => null, headerShown: true }} />
+        <Tabs.Screen name="wardrobe/edit-item" options={{ tabBarButton: () => null, headerShown: true }} />
+        <Tabs.Screen name="wardrobe/add-outfit" options={{ tabBarButton: () => null, headerShown: true }} />
+        <Tabs.Screen name="wardrobe/[id]" options={{ tabBarButton: () => null, headerShown: true }} />
+        <Tabs.Screen name="outfit/[id]" options={{ tabBarButton: () => null, headerShown: true }} />
+        <Tabs.Screen name="savedOutfits" options={{ tabBarButton: () => null, headerShown: true }} />
       </Tabs>
     </WardrobeProvider>
   );

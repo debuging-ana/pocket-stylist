@@ -119,17 +119,25 @@ export default function AddOutfitScreen() {
       // Wait a brief moment for the state change to take effect
       await new Promise(resolve => setTimeout(resolve, 100));
 
-      // Capture the drop zone as an image
+      // Capture the drop zone as an image with permanent storage
       const uri = await captureRef(dropZoneRef, {
         format: 'png',
         quality: 1.0,
-        result: 'tmpfile',
+        result: 'base64',
+      });
+
+      // Convert base64 to a file URI in the document directory for persistence
+      const filename = `outfit_${Date.now()}.png`;
+      const fileUri = `${FileSystem.documentDirectory}${filename}`;
+      
+      await FileSystem.writeAsStringAsync(fileUri, uri, {
+        encoding: FileSystem.EncodingType.Base64,
       });
 
       // Show buttons again
       setIsCapturing(false);
 
-      return uri;
+      return fileUri;
     } catch (error) {
       console.error('Error capturing outfit image:', error);
       setIsCapturing(false); // Make sure to reset state on error

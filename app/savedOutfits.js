@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet, Alert, ActivityIndicator, Dimensions, TextInput } from 'react-native';
 import { useWardrobe } from '../context/wardrobeContext';
 import { MaterialCommunityIcons, Feather } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 
 const WINDOW_WIDTH = Dimensions.get('window').width;
 const ITEM_WIDTH = (WINDOW_WIDTH - 60) / 3; // 3 columns with padding
@@ -9,6 +10,7 @@ const ITEM_WIDTH = (WINDOW_WIDTH - 60) / 3; // 3 columns with padding
 export default function SavedOutfits() {
   const { savedOutfits, loading, deleteOutfit } = useWardrobe();
   const [searchQuery, setSearchQuery] = useState('');
+  const router = useRouter();
 
   // Filter outfits based on search query (keep newest first)
   const filteredOutfits = useMemo(
@@ -23,50 +25,29 @@ export default function SavedOutfits() {
     [savedOutfits, searchQuery]
   );
 
-  const handleDeleteOutfit = async (outfitId) => {
-    Alert.alert(
-      'Delete Outfit',
-      'Are you sure you want to delete this outfit?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Delete', 
-          style: 'destructive',
-          onPress: () => deleteOutfit(outfitId)
-        }
-      ]
-    );
+  const handleOutfitPress = (outfitId) => {
+    router.push(`/outfit/${outfitId}`);
   };
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity style={styles.gridItem}>
-      <View style={styles.outfitCard}>
-        {item.imageUri ? (
-          <Image 
-            source={{ uri: item.imageUri }} 
-            style={styles.outfitImage} 
-            resizeMode="cover" 
-          />
-        ) : (
-          <View style={styles.placeholderImage}>
-            <MaterialCommunityIcons name="tshirt-crew" size={40} color="#CCCCCC" />
-          </View>
-        )}
-        
-        <View style={styles.outfitInfo}>
-          <Text style={styles.outfitName} numberOfLines={2}>{item.name}</Text>
-          <Text style={styles.itemCount}>
-            {item.items ? `${item.items.length} items` : '0 items'}
-          </Text>
+    <TouchableOpacity 
+      style={styles.outfitContainer}
+      onPress={() => handleOutfitPress(item.id)}
+      activeOpacity={0.8}
+    >
+      {item.imageUri ? (
+        <Image 
+          source={{ uri: item.imageUri }} 
+          style={styles.outfitImage} 
+          resizeMode="cover"
+          onLoad={() => console.log('Image loaded successfully for outfit:', item.name)}
+          onError={(error) => console.log('Image failed to load for outfit:', item.name, error.nativeEvent.error)}
+        />
+      ) : (
+        <View style={styles.placeholderImage}>
+          <MaterialCommunityIcons name="tshirt-crew" size={40} color="#CCCCCC" />
         </View>
-        
-        <TouchableOpacity 
-          style={styles.deleteButton} 
-          onPress={() => handleDeleteOutfit(item.id)}
-        >
-          <MaterialCommunityIcons name="delete" size={16} color="#FFFFFF" />
-        </TouchableOpacity>
-      </View>
+      )}
     </TouchableOpacity>
   );
 
@@ -194,58 +175,30 @@ const styles = StyleSheet.create({
   list: {
     padding: 20,
   },
-  gridItem: {
+  outfitContainer: {
     flex: 1,
     margin: 5,
     maxWidth: (WINDOW_WIDTH - 60) / 3,
-  },
-  outfitCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-    overflow: 'hidden',
-    position: 'relative',
+    padding: 4,
+    alignItems: 'center',
+    height: 128,
   },
   outfitImage: {
-    width: '100%',
-    aspectRatio: 1, // Square aspect ratio
+    width: 120,
+    height: 120,
+    borderRadius: 8,
     backgroundColor: '#F5F5F5',
+    borderWidth: 1,
+    borderColor: '#4A6D51',
   },
   placeholderImage: {
-    width: '100%',
-    aspectRatio: 1,
+    width: 120,
+    height: 120,
     backgroundColor: '#F5F5F5',
+    borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  outfitInfo: {
-    padding: 12,
-    minHeight: 60, // Consistent height for all cards
-  },
-  outfitName: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333333',
-    marginBottom: 8,
-    lineHeight: 18,
-  },
-  itemCount: {
-    fontSize: 11,
-    color: '#828282',
-    fontWeight: '500',
-  },
-  deleteButton: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    backgroundColor: '#FF4444',
-    borderRadius: 16,
-    padding: 6,
-    borderWidth: 2,
-    borderColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#4A6D51',
   },
 });

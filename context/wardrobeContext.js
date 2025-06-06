@@ -210,6 +210,30 @@ export const WardrobeProvider = ({ children }) => {
     }
   };
 
+  const updateOutfit = async (outfitData) => {
+    if (!user) {
+      console.log("User not logged in");
+      throw new Error("User not logged in");
+    }
+
+    try {
+      console.log('Updating outfit:', outfitData.id);
+      
+      const updatedOutfit = {
+        ...outfitData,
+        ownerId: user.uid,
+        updatedAt: serverTimestamp()
+      };
+
+      await setDoc(doc(db, "users", user.uid, "outfits", outfitData.id), updatedOutfit, { merge: true });
+      console.log('Outfit updated successfully');
+      
+    } catch (error) {
+      console.error("Error updating outfit:", error);
+      throw error;
+    }
+  };
+
   return (
     <WardrobeContext.Provider 
       value={{ 
@@ -220,7 +244,8 @@ export const WardrobeProvider = ({ children }) => {
         updateItem, 
         deleteItem,
         addOutfit,
-        deleteOutfit
+        deleteOutfit,
+        updateOutfit
       }}
     >
       {children}
