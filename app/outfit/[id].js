@@ -24,6 +24,27 @@ export default function OutfitDetailScreen() {
     }
   }, [outfit]);
 
+  // Handle redirect when outfit is deleted (moved from render phase to useEffect)
+  useEffect(() => {
+    if (!outfit && savedOutfits.length > 0) {
+      // Only redirect if we have loaded outfits but this specific one isn't found
+      // This prevents redirecting during initial load when savedOutfits is still empty
+      router.push('/savedOutfits');
+    }
+  }, [outfit, savedOutfits.length, router]);
+
+  // Show loading screen if outfit doesn't exist yet
+  if (!outfit) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.errorContainer}>
+          <ActivityIndicator size="large" color="#4A6D51" />
+          <Text style={styles.errorText}>Loading outfit...</Text>
+        </View>
+      </View>
+    );
+  }
+
   const handleDelete = () => {
     Alert.alert(
       "Delete Outfit",
@@ -81,12 +102,6 @@ export default function OutfitDetailScreen() {
       day: 'numeric'
     });
   };
-
-  // If no outfit found, redirect immediately
-  if (!outfit) {
-    router.push('/savedOutfits');
-    return null;
-  }
 
   return (
     <ScrollView style={styles.container}>
