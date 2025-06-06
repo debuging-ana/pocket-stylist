@@ -785,7 +785,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: 128,
     position: 'relative',
-    marginBottom: 15,
+    marginBottom: 5,
   },
   outfitImage: {
     width: 120,
