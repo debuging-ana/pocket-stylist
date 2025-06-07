@@ -56,7 +56,7 @@ export default function NotificationsScreen() {
         </View>
 
         {/* Notification Types Section */}
-        <View style={styles.settingsSection}>
+        <View style={[styles.settingsSection, styles.firstSettingsSection]}>
           <View style={styles.sectionTitleContainer}>
             <Text style={styles.sectionTitle}>Notification Types</Text>
           </View>
@@ -208,6 +208,9 @@ const styles = StyleSheet.create({
   },
   settingsSection: {
     padding: scaleSpacing(20),
+  },
+  firstSettingsSection: {
+    paddingTop: scaleSpacing(23),
   },
   sectionTitleContainer: {
     flexDirection: 'row',
