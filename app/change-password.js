@@ -12,6 +12,7 @@ import { router } from 'expo-router';
 import { updatePassword } from '../services/auth';
 import Feather from '@expo/vector-icons/Feather';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { scaleSize, scaleWidth, scaleHeight, scaleFontSize, scaleSpacing, deviceWidth } from '../utils/responsive';
 
 export default function ChangePassword() {
   const [oldPassword, setOldPassword] = useState('');
@@ -170,84 +171,84 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     backgroundColor: '#F9F9F4',
     justifyContent: 'center',
-    paddingVertical: 40,
-    paddingBottom: 40, // Added extra padding at the bottom
+    paddingVertical: scaleSpacing(40),
+    paddingBottom: scaleSpacing(40), // Added extra padding at the bottom
   },
   headerContainer: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingHorizontal: scaleSpacing(20),
+    paddingTop: scaleSpacing(20),
   },
   headerCard: {
     backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 20,
+    borderRadius: scaleSize(20),
+    padding: scaleSpacing(20),
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    marginBottom: 30, // Added margin at the bottom of the card
+    marginBottom: scaleSpacing(30), // Added margin at the bottom of the card
   },
   iconContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: scaleSize(80),
+    height: scaleSize(80),
+    borderRadius: scaleSize(40),
     backgroundColor: '#DBE9D1',
     alignSelf: 'center',
-    marginBottom: 20,
+    marginBottom: scaleSpacing(20),
   },
   title: {
-    fontSize: 26,
+    fontSize: scaleFontSize(26),
     fontWeight: 'bold',
     color: '#4A6D51',
     textAlign: 'center',
-    marginBottom: 10,
+    marginBottom: scaleSpacing(10),
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: scaleFontSize(16),
     color: '#828282',
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: scaleSpacing(20),
   },
   errorContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFEBEE',
-    borderRadius: 10,
-    padding: 10,
-    marginBottom: 20,
+    borderRadius: scaleSize(10),
+    padding: scaleSpacing(10),
+    marginBottom: scaleSpacing(20),
   },
   errorText: {
     color: '#D32F2F',
-    marginLeft: 10,
-    fontSize: 14,
+    marginLeft: scaleSpacing(10),
+    fontSize: scaleFontSize(14),
   },
   inputContainer: {
-    marginBottom: 15,
+    marginBottom: scaleSpacing(15),
   },
   inputLabel: {
-    fontSize: 14,
+    fontSize: scaleFontSize(14),
     color: '#4A6D51',
-    marginBottom: 8,
+    marginBottom: scaleSpacing(8),
     fontWeight: '500',
   },
   input: {
     backgroundColor: '#F9F9F4',
-    borderRadius: 15,
-    padding: 15,
-    fontSize: 16,
+    borderRadius: scaleSize(15),
+    padding: scaleSpacing(15),
+    fontSize: scaleFontSize(16),
     borderWidth: 1,
     borderColor: '#E0E0E0',
   },
   changeButton: {
     backgroundColor: '#4A6D51',
-    borderRadius: 15,
-    padding: 15,
+    borderRadius: scaleSize(15),
+    padding: scaleSpacing(15),
     alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 15,
+    marginTop: scaleSpacing(10),
+    marginBottom: scaleSpacing(15),
     elevation: 3,
     shadowColor: '#4A6D51',
     shadowOffset: { width: 0, height: 2 },
@@ -255,20 +256,20 @@ const styles = StyleSheet.create({
   },
   changeButtonText: {
     color: 'white',
-    fontSize: 16,
+    fontSize: scaleFontSize(16),
     fontWeight: '600',
   },
   cancelButton: {
-    borderRadius: 15,
-    padding: 15,
+    borderRadius: scaleSize(15),
+    padding: scaleSpacing(15),
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#4A6D51',
-    marginBottom: 10, // Added bottom margin
+    marginBottom: scaleSpacing(10), // Added bottom margin
   },
   cancelButtonText: {
     color: '#4A6D51',
-    fontSize: 16,
+    fontSize: scaleFontSize(16),
     fontWeight: '600',
   },
 });

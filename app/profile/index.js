@@ -22,6 +22,7 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import { router } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons'; // Import MaterialCommunityIcons
+import { scaleSize, scaleWidth, scaleHeight, scaleFontSize, scaleSpacing, deviceWidth } from '../../utils/responsive';
 
 // this screen lets our users view & update their profile info, including personal details and photo.
 const ProfileScreen = () => {  
@@ -552,26 +553,26 @@ const styles = StyleSheet.create({
     backgroundColor: '#F9F9F4',
   },
   headerContainer: {
-    height: 220, // Reduced from 250
+    height: scaleHeight(220), // Reduced from 250
     backgroundColor: '#F9F9F4',
     alignItems: 'center',
     justifyContent: 'center',
   },
   photoContainer: {
-    marginTop: -20,
-    marginBottom: -30, // Reduced space under profile picture
+    marginTop: scaleSpacing(-20),
+    marginBottom: scaleSpacing(-30), // Reduced space under profile picture
   },
   profileImage: {
-    width: 180,
-    height: 180,
-    borderRadius: 90,
+    width: scaleSize(180),
+    height: scaleSize(180),
+    borderRadius: scaleSize(90),
     borderWidth: 3,
     borderColor: 'white',
   },
   photoPlaceholder: {
-    width: 180,
-    height: 180,
-    borderRadius: 90,
+    width: scaleSize(180),
+    height: scaleSize(180),
+    borderRadius: scaleSize(90),
     backgroundColor: '#f5f5f5',
     justifyContent: 'center',
     alignItems: 'center',
@@ -585,85 +586,85 @@ const styles = StyleSheet.create({
   },
   placeholderText: {
     color: '#4A6D51',
-    fontSize: 14,
+    fontSize: scaleFontSize(14),
     textAlign: 'center',
-    marginTop: 10,
+    marginTop: scaleSpacing(10),
     fontWeight: 'bold',
   },
   contentContainer: {
     flex: 1,
     backgroundColor: '#F9F9F4',
-    paddingTop: 10,
-    paddingBottom: 20, // Reduced padding at bottom
+    paddingTop: scaleSpacing(10),
+    paddingBottom: scaleSpacing(20), // Reduced padding at bottom
   },
   formContainer: {
-    paddingHorizontal: 25,
+    paddingHorizontal: scaleSpacing(25),
   },
   nameRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 10,
+    marginBottom: scaleSpacing(10),
   },
   firstNameField: {
     width: '48%', 
-    marginTop: 5, 
-    marginRight: 10, 
+    marginTop: scaleSpacing(5), 
+    marginRight: scaleSpacing(10), 
   },
   lastNameField: {
     width: '48%', 
-    marginTop: 5, 
+    marginTop: scaleSpacing(5), 
   },
   bioFieldWrapper: {
     width: '100%',  
-    marginTop: 10,  
-    marginBottom: 10,  
+    marginTop: scaleSpacing(10),  
+    marginBottom: scaleSpacing(10),  
   },
   inputField: {
-    height: 45,
+    height: scaleHeight(45),
     backgroundColor: '#F9F9F4',
     borderColor: '#E0E0E0',
     borderWidth: 1,
-    borderRadius: 15,
-    paddingHorizontal: 15,
-    fontSize: 16,
+    borderRadius: scaleSize(15),
+    paddingHorizontal: scaleSpacing(15),
+    fontSize: scaleFontSize(16),
     color: '#666666',
     fontWeight: 'normal',
-    marginBottom: 10,
+    marginBottom: scaleSpacing(10),
   },
   inputLabel: {
-    fontSize: 14,
+    fontSize: scaleFontSize(14),
     color: '#4A6D51',
     fontWeight: '500',
-    marginBottom: 8,
+    marginBottom: scaleSpacing(8),
   },  
   bioField: {
-    height: 100,
+    height: scaleHeight(100),
     textAlignVertical: 'top',
-    paddingTop: 15,
+    paddingTop: scaleSpacing(15),
   },
   sectionTitle: {
-    fontSize: 22,
+    fontSize: scaleFontSize(22),
     fontWeight: '600',
     color: '#4A6D51',
-    marginTop: 5,
-    marginVertical: 15,
+    marginTop: scaleSpacing(5),
+    marginVertical: scaleSpacing(15),
   },
   dropdownWrapper: {
-    marginBottom: 15,
+    marginBottom: scaleSpacing(15),
     zIndex: 1,
   },
   dropdownLabel: {
-    fontSize: 14,
+    fontSize: scaleFontSize(14),
     color: '#4A6D51',
-    marginBottom: 8,
+    marginBottom: scaleSpacing(8),
     fontWeight: '500',
   },
   dropdown: {
     borderColor: '#E0E0E0',
     backgroundColor: '#F9F9F4',
-    minHeight: 45,
-    borderRadius: 15,
-    paddingHorizontal: 15,
+    minHeight: scaleHeight(45),
+    borderRadius: scaleSize(15),
+    paddingHorizontal: scaleSpacing(15),
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
@@ -675,19 +676,19 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   dropdownText: {
-    fontSize: 16,
+    fontSize: scaleFontSize(16),
     color: '#4A6D51',
     fontWeight: '500',
   },
   dropdownItemText: {
     color: '#4A6D51',
     fontWeight: '400', 
-    fontSize: 16,
+    fontSize: scaleFontSize(16),
   },
   dropdownContainer: {
     borderColor: '#E0E0E0',
     backgroundColor: 'white',
-    borderRadius: 15,
+    borderRadius: scaleSize(15),
     elevation: 5,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 3 },
@@ -695,49 +696,49 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
   },
   dropdownItemContainer: {
-  borderBottomWidth: 1,
-  borderBottomColor: '#F2F2F2',
-  paddingVertical: 10,
-},
-dropdownModalContainer: {
-  backgroundColor: 'white', 
-  paddingHorizontal: 20,
-  paddingTop: 10,
-  paddingBottom: 20,
-},
-dropdownModalTitle: {
-  fontSize: 18,
-  fontWeight: 'bold', 
-  color: '#4A6D51',
-  marginLeft:130,
-},
-dropdownOpenContainer: {
-  backgroundColor: 'white', 
-},
-modalHeaderContainer: {
-  backgroundColor: '#AFC6A3',
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  paddingHorizontal: 15,
-  paddingVertical: 10,
-  borderBottomWidth: 1,
-  borderBottomColor: '#E0E0E0',
-},
-modalTitleContainer: {
-  flex: 1,
-  alignItems: 'center', 
-  position: 'absolute', 
-  left: 0,
-  right: 0,
-},
+    borderBottomWidth: 1,
+    borderBottomColor: '#F2F2F2',
+    paddingVertical: scaleSpacing(10),
+  },
+  dropdownModalContainer: {
+    backgroundColor: 'white', 
+    paddingHorizontal: scaleSpacing(20),
+    paddingTop: scaleSpacing(10),
+    paddingBottom: scaleSpacing(20),
+  },
+  dropdownModalTitle: {
+    fontSize: scaleFontSize(18),
+    fontWeight: 'bold', 
+    color: '#4A6D51',
+    marginLeft: scaleSpacing(130),
+  },
+  dropdownOpenContainer: {
+    backgroundColor: 'white', 
+  },
+  modalHeaderContainer: {
+    backgroundColor: '#AFC6A3',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: scaleSpacing(15),
+    paddingVertical: scaleSpacing(10),
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
+  },
+  modalTitleContainer: {
+    flex: 1,
+    alignItems: 'center', 
+    position: 'absolute', 
+    left: 0,
+    right: 0,
+  },
   saveButton: {
     backgroundColor: '#4A6D51',
-    borderRadius: 15,
-    padding: 15,
+    borderRadius: scaleSize(15),
+    padding: scaleSpacing(15),
     alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 10, // Reduced from 15
+    marginTop: scaleSpacing(10),
+    marginBottom: scaleSpacing(10), // Reduced from 15
     elevation: 3,
     shadowColor: '#4A6D51',
     shadowOffset: { width: 0, height: 2 },
@@ -745,10 +746,10 @@ modalTitleContainer: {
   },
   editButton: {
     backgroundColor: '#4A6D51',
-    borderRadius: 15,
-    padding: 15,
+    borderRadius: scaleSize(15),
+    padding: scaleSpacing(15),
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: scaleSpacing(10),
     marginBottom: 0,
     elevation: 3,
     shadowColor: '#4A6D51',
@@ -761,8 +762,8 @@ modalTitleContainer: {
     justifyContent: 'center',
   },
   cancelButton: {
-    borderRadius: 15,
-    padding: 15,
+    borderRadius: scaleSize(15),
+    padding: scaleSpacing(15),
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#4A6D51',
@@ -770,20 +771,20 @@ modalTitleContainer: {
   },
   buttonText: {
     color: 'white',
-    fontSize: 16,
+    fontSize: scaleFontSize(16),
     fontWeight: '600',
-    marginLeft: 8, // Add space between icon and text
+    marginLeft: scaleSpacing(8), // Add space between icon and text
   },
   cancelButtonText: {
     color: '#4A6D51',
-    fontSize: 16,
+    fontSize: scaleFontSize(16),
     fontWeight: '600',
   },
   detailsContainer: {
     backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 20, // Reduced from 25
+    borderRadius: scaleSize(20),
+    padding: scaleSpacing(20),
+    marginBottom: scaleSpacing(20), // Reduced from 25
     shadowColor: '#000',
     shadowOffset: {
       width: 0,

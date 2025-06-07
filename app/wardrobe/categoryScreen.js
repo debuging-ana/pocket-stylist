@@ -14,6 +14,7 @@ import {
 import { useWardrobe } from '../../context/wardrobeContext';
 import { useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
+import { scaleSize, scaleWidth, scaleHeight, scaleFontSize, scaleSpacing, deviceWidth, getTwoColumnWidth } from '../../utils/responsive';
 
 export default function CategoryScreen({ category }) {
 const router = useRouter();
@@ -103,53 +104,53 @@ return (
 const styles = StyleSheet.create({
 container: {
   flex: 1,
-  padding: 10,
+  padding: scaleSpacing(10),
   backgroundColor: '#F9F9F4',
 },
 title: {
-  fontSize: 24,
+  fontSize: scaleFontSize(24),
   fontWeight: 'bold',
   color: '#4A6D51',
-  marginVertical: 10,
+  marginVertical: scaleSpacing(10),
   textAlign: 'center',
 },
 emptyContainer: {
   flex: 1,
   justifyContent: 'center',
   alignItems: 'center',
-  padding: 20,
+  padding: scaleSpacing(20),
 },
 emptyText: {
-  fontSize: 18,
+  fontSize: scaleFontSize(18),
   color: '#7D7D7D',
-  marginBottom: 5,
+  marginBottom: scaleSpacing(5),
 },
 emptySubText: {
-  fontSize: 14,
+  fontSize: scaleFontSize(14),
   color: '#AAAAAA',
 },
 listContent: {
-  paddingBottom: 20,
+  paddingBottom: scaleSpacing(20),
 },
 itemContainer: {
-  margin: 5,
+  margin: scaleSpacing(5),
   backgroundColor: 'white',
-  borderRadius: 10,
-  padding: 10,
+  borderRadius: scaleSize(10),
+  padding: scaleSpacing(10),
   alignItems: 'center',
-  width: '48%',
-  height: 250,
+  width: getTwoColumnWidth(20, 10),
+  height: scaleHeight(250),
 },
 itemImage: {
   width: '100%',
-  height: 180,
-  borderRadius: 5,
+  height: scaleHeight(180),
+  borderRadius: scaleSize(5),
   resizeMode: 'cover',
-  marginBottom: 5,
+  marginBottom: scaleSpacing(5),
 },
 buttonsContainer: {
   flexDirection: 'row',
-  gap: 10,
+  gap: scaleSpacing(10),
   marginTop: 'auto',
   justifyContent: 'center',
   width: '100%',
@@ -159,9 +160,9 @@ editButton: {
   alignItems: 'center',
   justifyContent: 'center',
   backgroundColor: '#CADBC1',
-  width: 115,
-  height: 40,
-  borderRadius: 8,
+  width: scaleWidth(115),
+  height: scaleHeight(40),
+  borderRadius: scaleSize(8),
   borderWidth: 1,
   borderColor: '#4A6D51',
 },
@@ -169,21 +170,21 @@ deleteButton: {
   alignItems: 'center',
   justifyContent: 'center',
   backgroundColor: '#FFE5E5',
-  width: 40,
-  height: 40,
-  borderRadius: 8,
+  width: scaleSize(40),
+  height: scaleSize(40),
+  borderRadius: scaleSize(8),
   borderWidth: 1,
   borderColor: '#995454',
 },
 editButtonText: {
   color: '#4A6D51',
-  fontSize: 14,
+  fontSize: scaleFontSize(14),
   fontWeight: '600',
-  marginLeft: 4,
+  marginLeft: scaleSpacing(4),
 },
 deleteButtonText: {
   color: '#995454',
-  fontSize: 12,
+  fontSize: scaleFontSize(12),
   fontWeight: '600',
 },
 row: {

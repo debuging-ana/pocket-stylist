@@ -11,6 +11,7 @@ import {
 import { useRouter } from 'expo-router';
 import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { scaleSize, scaleWidth, scaleHeight, scaleFontSize, scaleSpacing, deviceWidth } from '../utils/responsive';
 
 export default function NotificationsScreen() {
   const router = useRouter();
@@ -172,15 +173,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#F9F9F4',
   },
   headerContainer: {
-    paddingHorizontal: 20,
-    paddingTop: 20, // Increased top padding to account for status bar
+    paddingHorizontal: scaleSpacing(20),
+    paddingTop: scaleSpacing(20), // Increased top padding to account for status bar
     paddingBottom: 0,
     backgroundColor: '#F9F9F4',
   },
   headerCard: {
     backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 20,
+    borderRadius: scaleSize(20),
+    padding: scaleSpacing(20),
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -195,27 +196,27 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   greeting: {
-    fontSize: 16,
+    fontSize: scaleFontSize(16),
     color: '#828282',
     fontWeight: '500',
   },
   username: {
-    fontSize: 26,
+    fontSize: scaleFontSize(26),
     fontWeight: 'bold',
     color: '#4A6D51',
-    marginBottom: 3,
+    marginBottom: scaleSpacing(3),
   },
   settingsSection: {
-    padding: 20,
+    padding: scaleSpacing(20),
   },
   sectionTitleContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: scaleSpacing(15),
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: scaleFontSize(18),
     fontWeight: '600',
     color: '#4A6D51',
   },
@@ -223,9 +224,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
-    borderRadius: 15,
-    padding: 15,
-    marginBottom: 12,
+    borderRadius: scaleSize(15),
+    padding: scaleSpacing(15),
+    marginBottom: scaleSpacing(12),
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
@@ -233,33 +234,33 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   settingIconContainer: {
-    height: 45,
-    width: 45,
-    borderRadius: 12,
+    height: scaleSize(45),
+    width: scaleSize(45),
+    borderRadius: scaleSize(12),
     justifyContent: 'center',
     alignItems: 'center',
   },
   settingInfo: {
     flex: 1,
-    marginLeft: 15,
+    marginLeft: scaleSpacing(15),
   },
   settingName: {
-    fontSize: 16,
+    fontSize: scaleFontSize(16),
     fontWeight: '600',
     color: '#4A6D51',
-    marginBottom: 4,
+    marginBottom: scaleSpacing(4),
   },
   settingDescription: {
-    fontSize: 13,
+    fontSize: scaleFontSize(13),
     color: '#828282',
   },
   saveButton: {
     backgroundColor: '#4A6D51',
-    marginHorizontal: 20,
-    marginTop: 5,
-    marginBottom: 15.9,
-    padding: 15,
-    borderRadius: 15,
+    marginHorizontal: scaleSpacing(20),
+    marginTop: scaleSpacing(5),
+    marginBottom: scaleSpacing(15.9),
+    padding: scaleSpacing(15),
+    borderRadius: scaleSize(15),
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
@@ -271,13 +272,13 @@ const styles = StyleSheet.create({
   saveButtonText: {
     color: '#FFFFFF',
     fontWeight: '600',
-    fontSize: 16,
+    fontSize: scaleFontSize(16),
   },
   cancelButton: {
-    marginHorizontal: 20,
-    marginBottom: 30,
-    padding: 15,
-    borderRadius: 15,
+    marginHorizontal: scaleSpacing(20),
+    marginBottom: scaleSpacing(30),
+    padding: scaleSpacing(15),
+    borderRadius: scaleSize(15),
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
@@ -286,6 +287,6 @@ const styles = StyleSheet.create({
   cancelButtonText: {
     color: '#4A6D51',
     fontWeight: '600',
-    fontSize: 16,
+    fontSize: scaleFontSize(16),
   },
 });
