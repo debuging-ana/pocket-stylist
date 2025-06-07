@@ -1,9 +1,0 @@
-{
-    "expo": {
-      "name": "Pocket Stylist",
-      "slug": "pocket-stylist",
-      "scheme": "pocketstylist",
-      "plugins": ["expo-router"],
-      "newArchEnabled": true
-    }
-  }

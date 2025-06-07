@@ -1,4 +1,0 @@
-/*
-reusable ~
-confirmation dialogues
-*/
