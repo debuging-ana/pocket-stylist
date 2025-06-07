@@ -621,9 +621,14 @@ export default function EventsScreen() {
                     )}
                     
                     {/* outfit description */}
+                    <ScrollView style={styles.outfitDescriptionContainer}
+                    nestedScrollEnabled={true}
+                    >
                     <Text style={styles.outfitDescription}>
                       {outfit.description}
                     </Text>
+                    </ScrollView>
+
                     
                     {/* select outfit button */}
                     <View style={{ marginTop: 10 }}> 
@@ -632,7 +637,7 @@ export default function EventsScreen() {
                         onPress={() => confirmOutfit(outfit)} 
                         disabled={loadingOutfitId === outfit.name}>
                           <Text style={styles.selectButtonText}>
-                            {loadingOutfitId === outfit.name ? 'Saving...' : 'Select This Outfit'}
+                            {loadingOutfitId === outfit.name ? 'Saving...' : 'Select This Outfit Suggestion'}
                           </Text>
                       </Pressable>
                     </View>
@@ -736,6 +741,7 @@ const styles = StyleSheet.create({
   modalScrollContainer: {
     flexGrow: 1,
     paddingBottom: 40,
+    minHeight: '100%',
   },
   modalContainer: {
     flex: 1,
@@ -837,10 +843,18 @@ const styles = StyleSheet.create({
     color: '#4A6D51',
     marginBottom: 8,
   },
+  outfitDescriptionContainer: {
+  maxHeight: 200, //fixed height for consistent sizing
+  marginBottom: 8,
+  borderWidth: 1,
+  borderColor: '#E8E8E8',
+  borderRadius: 8,
+  padding: 10,
+  },
   outfitDescription: {
-    color: '#4A6D51',
-    fontStyle: 'italic',
-    marginBottom: 8,
+  color: '#4A6D51',
+  fontStyle: 'italic',
+  flexShrink: 1, //allows text to wrap properly
   },
   selectButton: {
     backgroundColor: '#4A6D51',
@@ -879,12 +893,5 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     color: '#4A6D51',
     fontWeight: '600',
-  },
-  outfitDescription: {
-    color: '#4A6D51',
-    fontStyle: 'italic',
-    marginBottom: 8,
-    maxHeight: 200, 
-    overflow: 'scroll', 
   },
 });
