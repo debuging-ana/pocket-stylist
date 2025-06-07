@@ -10,6 +10,18 @@ import NotificationBadge from '../components/NotificationBadge';
 import { doc, getDoc, collection, query, orderBy, limit, getDocs } from 'firebase/firestore'; // Add imports for Firestore
 import { db } from '../firebaseConfig'; // Import your Firebase configuration
 import { useWardrobe } from '../context/wardrobeContext';
+import { scaleSize, scaleWidth, scaleHeight, scaleFontSize, scaleSpacing, deviceWidth } from '../utils/responsive';
+
+const getCategoryIcon = (category, size = 22) => {
+  const icons = {
+    tops: 'tshirt-crew',
+    bottoms: 'human',
+    jackets: 'coat-rack',
+    accessories: 'bag-personal',
+    shoes: 'shoe-formal',
+  };
+  return icons[category] || 'hanger';
+};
 
 export default function HomePage() {
   const router = useRouter();
@@ -65,7 +77,7 @@ export default function HomePage() {
   return (
     <>
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <View style={styles.container}>
         {/* Header Section */}
         <View style={styles.headerContainer}>
           <View style={styles.headerCard}>
@@ -299,7 +311,7 @@ export default function HomePage() {
             ))
           )}
         </View>
-      </ScrollView>
+      </View>
     </>
   );
 }
@@ -310,15 +322,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#F9F9F4',
   },
   headerContainer: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 10,
+    paddingHorizontal: scaleSpacing(20),
+    paddingTop: scaleSpacing(20),
+    paddingBottom: scaleSpacing(10),
     backgroundColor: '#F9F9F4',
   },
   headerCard: {
     backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 20,
+    borderRadius: scaleSize(20),
+    padding: scaleSpacing(20),
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -334,20 +346,20 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   greeting: {
-    fontSize: 16,
+    fontSize: scaleFontSize(16),
     color: '#828282',
     fontWeight: '500',
   },
   username: {
-    fontSize: 26,
+    fontSize: scaleFontSize(26),
     fontWeight: 'bold',
     color: '#4A6D51',
-    marginTop: 3,
+    marginTop: scaleSpacing(3),
   },
   profileButton: {
-    height: 45,
-    width: 45,
-    borderRadius: 22.5,
+    height: scaleSize(45),
+    width: scaleSize(45),
+    borderRadius: scaleSize(22.5),
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
@@ -358,43 +370,43 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   profileImageContainer: {
-    height: 40,
-    width: 40,
-    borderRadius: 50,
+    height: scaleSize(40),
+    width: scaleSize(40),
+    borderRadius: scaleSize(50),
     backgroundColor: '#AFC6A3',
     justifyContent: 'center',
     alignItems: 'center',
   },
   profileImage: {
-    height: 48,
-    width: 48,
-    borderRadius: 50,
+    height: scaleSize(48),
+    width: scaleSize(48),
+    borderRadius: scaleSize(50),
     borderWidth: 3,
     borderColor: '#FFFFFF',
   },
   profileInitial: {
-    fontSize: 18,
+    fontSize: scaleFontSize(18),
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
   contentSection: {
-    paddingHorizontal: 20,
-    paddingTop: 15,
-    paddingBottom: 5,
+    paddingHorizontal: scaleSpacing(20),
+    paddingTop: scaleSpacing(15),
+    paddingBottom: scaleSpacing(5),
   },
   sectionTitleContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: scaleSpacing(20),
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: scaleFontSize(18),
     fontWeight: '600',
     color: '#4A6D51',
   },
   seeAllText: {
-    fontSize: 14,
+    fontSize: scaleFontSize(14),
     color: '#828282',
     fontWeight: '500',
   },
@@ -402,19 +414,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     flexWrap: 'wrap',
-    marginBottom: 5,
+    marginBottom: scaleSpacing(5),
   },
   actionButton: {
     alignItems: 'center',
     width: '22%',
   },
   actionIconContainer: {
-    height: 60,
-    width: 60,
-    borderRadius: 20,
+    height: scaleSize(60),
+    width: scaleSize(60),
+    borderRadius: scaleSize(20),
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: scaleSpacing(8),
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
@@ -422,19 +434,19 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   actionText: {
-    fontSize: 12,
+    fontSize: scaleFontSize(12),
     color: '#4A6D51',
     textAlign: 'center',
     fontWeight: '500',
   },
   suggestionsScrollContent: {
-    paddingRight: 20,
+    paddingRight: scaleSpacing(20),
   },
   suggestionCard: {
-    width: 260,
-    height: 180,
-    borderRadius: 20,
-    marginRight: 15,
+    width: scaleWidth(260),
+    height: scaleHeight(180),
+    borderRadius: scaleSize(20),
+    marginRight: scaleSpacing(15),
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
@@ -445,42 +457,42 @@ const styles = StyleSheet.create({
   },
   cardContent: {
     flex: 1,
-    padding: 20,
+    padding: scaleSpacing(20),
     justifyContent: 'flex-end',
   },
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: scaleSpacing(8),
   },
   cardTag: {
-    fontSize: 12,
+    fontSize: scaleFontSize(12),
     color: '#FFFFFF',
-    marginLeft: 5,
+    marginLeft: scaleSpacing(5),
     fontWeight: '500',
   },
   cardTitle: {
-    fontSize: 20,
+    fontSize: scaleFontSize(20),
     fontWeight: 'bold',
     color: '#FFFFFF',
-    marginBottom: 8,
+    marginBottom: scaleSpacing(8),
     textShadowColor: 'rgba(0, 0, 0, 0.3)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 3,
   },
   cardDescription: {
-    fontSize: 13,
+    fontSize: scaleFontSize(13),
     color: '#FFFFFF',
-    marginBottom: 12,
+    marginBottom: scaleSpacing(12),
     textShadowColor: 'rgba(0, 0, 0, 0.3)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
   },
   cardButton: {
     backgroundColor: '#FFFFFF',
-    paddingVertical: 8,
-    paddingHorizontal: 15,
-    borderRadius: 15,
+    paddingVertical: scaleSpacing(8),
+    paddingHorizontal: scaleSpacing(15),
+    borderRadius: scaleSize(15),
     alignSelf: 'flex-start',
     flexDirection: 'row',
     alignItems: 'center',
@@ -493,16 +505,16 @@ const styles = StyleSheet.create({
   cardButtonText: {
     color: '#4A6D51',
     fontWeight: '600',
-    fontSize: 13,
-    marginRight: 5,
+    fontSize: scaleFontSize(13),
+    marginRight: scaleSpacing(5),
   },
   recentItemCard: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
-    borderRadius: 15,
-    padding: 12,
-    marginBottom: 12,
+    borderRadius: scaleSize(15),
+    padding: scaleSpacing(12),
+    marginBottom: scaleSpacing(12),
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
@@ -510,9 +522,9 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   recentItemImageContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: 10,
+    width: scaleSize(60),
+    height: scaleSize(60),
+    borderRadius: scaleSize(10),
     overflow: 'hidden',
     backgroundColor: '#F8F8F8',
     justifyContent: 'center',
@@ -524,17 +536,17 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   recentItemImagePlaceholder: {
-    width: 60,
-    height: 60,
+    width: scaleSize(60),
+    height: scaleSize(60),
     backgroundColor: '#F8F8F8',
-    borderRadius: 10,
+    borderRadius: scaleSize(10),
     justifyContent: 'center',
     alignItems: 'center',
   },
   addItemIconContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: 10,
+    width: scaleSize(60),
+    height: scaleSize(60),
+    borderRadius: scaleSize(10),
     backgroundColor: '#F8F8F8',
     justifyContent: 'center',
     alignItems: 'center',
@@ -544,16 +556,16 @@ const styles = StyleSheet.create({
   },
   recentItemInfo: {
     flex: 1,
-    marginLeft: 15,
+    marginLeft: scaleSpacing(15),
   },
   recentItemName: {
-    fontSize: 16,
+    fontSize: scaleFontSize(16),
     fontWeight: '600',
     color: '#4A6D51',
-    marginBottom: 4,
+    marginBottom: scaleSpacing(4),
   },
   recentItemSubtext: {
-    fontSize: 13,
+    fontSize: scaleFontSize(13),
     color: '#828282',
   },
   recentItemDetails: {
@@ -561,7 +573,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   recentItemCategory: {
-    fontSize: 13,
+    fontSize: scaleFontSize(13),
     color: '#828282',
     textTransform: 'capitalize',
   },
