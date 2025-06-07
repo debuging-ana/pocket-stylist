@@ -325,7 +325,7 @@ export default function EventsScreen() {
              (response.includes('°C') || response.includes('weather'));
     };
 
-    //construct prompt for ollama AI, why is prompting so hard
+    //construct prompt for ollama AI
     const prompt = `Suggest a complete outfit for a ${userProfile.gender} attending a ${event.type} event in ${weatherData.condition} weather (${weatherData.temperature}°C). 
     Featured item: ${itemDescription}.
     Respond in one paragraph with:
