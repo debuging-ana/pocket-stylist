@@ -5,6 +5,8 @@ import Feather from '@expo/vector-icons/Feather';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAuth } from '../context/AuthContext';
+import { useNotifications } from '../context/NotificationContext';
+import NotificationBadge from '../components/NotificationBadge';
 import { doc, getDoc, collection, query, orderBy, limit, getDocs } from 'firebase/firestore'; // Add imports for Firestore
 import { db } from '../firebaseConfig'; // Import your Firebase configuration
 import { useWardrobe } from '../context/wardrobeContext';
@@ -12,10 +14,13 @@ import { useWardrobe } from '../context/wardrobeContext';
 export default function HomePage() {
   const router = useRouter();
   const { user } = useAuth();
+  const { totalHasUnread } = useNotifications();
   const { wardrobeItems } = useWardrobe(); // Get wardrobe items from context
   const [profilePhotoUri, setProfilePhotoUri] = useState(null);
   const [userFirstName, setUserFirstName] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+
+  console.log('🏠 Homepage: totalHasUnread =', totalHasUnread);
 
   // Derive recent items from wardrobeItems
   const recentItems = wardrobeItems
@@ -122,6 +127,7 @@ export default function HomePage() {
                 borderWidth: 1
               }]}>
                 <Ionicons name="chatbubble-ellipses" size={22} color="#8B6E57" />
+                <NotificationBadge hasUnread={totalHasUnread} />
               </View>
               <Text style={styles.actionText}>Messages</Text>
             </TouchableOpacity>
