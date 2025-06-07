@@ -42,7 +42,7 @@ export default function SavedOutfits() {
         case 0: // First column (left) - fixed left position
           return [baseStyle, { marginLeft: 0, marginRight: 0 }];
         case 1: // Middle column - perfectly centered with fixed margins
-          return [baseStyle, { marginLeft: 5, marginRight: 5 }];
+          return [baseStyle, { marginLeft: 20, marginRight: 20 }];
         case 2: // Right column - fixed right position
           return [baseStyle, { marginLeft: 0, marginRight: 0 }];
         default:
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
     padding: scaleSpacing(4),
     alignItems: 'center',
     height: scaleHeight(128),
-    marginBottom: scaleSpacing(1),
+    marginBottom: scaleSpacing(10),
   },
   outfitImage: {
     width: scaleSize(120),

@@ -204,7 +204,7 @@ export default function UserProfileScreen() {
           case 0: // First column (left) - fixed left position
             return [baseStyle, { marginLeft: 0, marginRight: 0 }];
           case 1: // Middle column - perfectly centered with fixed margins
-            return [baseStyle, { marginLeft: 10, marginRight: 10 }];
+            return [baseStyle, { marginLeft: 20, marginRight: 20 }];
           case 2: // Right column - fixed right position
             return [baseStyle, { marginLeft: 0, marginRight: 0 }];
           default:
@@ -654,7 +654,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: scaleSpacing(15),
-    gap: scaleSpacing(10),
+    gap: scaleSpacing(1),
   },
   searchInputContainer: {
     flex: 1,
@@ -816,7 +816,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: scaleHeight(128),
     position: 'relative',
-    marginBottom: scaleSpacing(5),
+    marginBottom: scaleSpacing(10),
   },
   outfitImage: {
     width: scaleSize(120),
