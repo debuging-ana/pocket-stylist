@@ -328,7 +328,7 @@ const ExplorePage = () => {
           case 0: // First column (left)
             return [baseStyle, { marginLeft: 0, marginRight: 0 }];
           case 1: // Middle column
-            return [baseStyle, { marginLeft: 10, marginRight: 10 }];
+            return [baseStyle, { marginLeft: 20, marginRight: 20 }];
           case 2: // Right column
             return [baseStyle, { marginLeft: 0, marginRight: 0 }];
           default:
