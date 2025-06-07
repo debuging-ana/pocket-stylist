@@ -9,7 +9,7 @@ import {
   StatusBar,
   Dimensions,
   TextInput,
-  Alert,
+  Alert
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useWardrobe } from '../../context/wardrobeContext';
@@ -187,13 +187,8 @@ export default function AddOutfitScreen() {
     
     setIsSaving(true);
     try {
-      console.log('Starting outfit save process...');
-      console.log('Current outfit layout:', outfitLayout);
-      
       // Capture the outfit arrangement as an image
-      console.log('Capturing outfit image...');
       const outfitImageUri = await captureOutfitImage();
-      console.log('Outfit image captured:', outfitImageUri);
       
       // Create outfit data
       const outfitData = {
@@ -206,18 +201,13 @@ export default function AddOutfitScreen() {
         createdAt: new Date(),
       };
 
-      console.log('Outfit data prepared:', outfitData);
-
       // Validate addOutfit function exists
       if (!addOutfit) {
         throw new Error('addOutfit function not available from wardrobe context');
       }
 
       // Save to wardrobe context
-      console.log('Saving outfit to Firestore...');
       await addOutfit(outfitData);
-      
-      console.log('Outfit saved successfully to Firestore!');
       
       // Only proceed if component is still mounted
       if (!isMountedRef.current) return;

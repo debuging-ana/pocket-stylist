@@ -79,7 +79,21 @@ export default function Chat() {
     }, { merge: true }).then(() => {
       // Mark chat as read after ensuring document exists
       console.log('🏠 Chat document ensured, marking as read');
-      markChatAsRead(friendName);
+      try {
+        markChatAsRead(friendName);
+      } catch (readError) {
+        console.log('Error marking chat as read:', readError);
+      }
+    }).catch((error) => {
+      console.log('Error setting up chat document:', error);
+      // Handle specific errors
+      if (error.code === 'permission-denied') {
+        console.log('Permission denied for chat creation');
+      } else if (error.code === 'unauthenticated') {
+        console.log('User not authenticated for chat creation');
+      } else {
+        console.log('Unknown error setting up chat:', error.message);
+      }
     });
 
     // Listen for messages
@@ -88,23 +102,48 @@ export default function Chat() {
       orderBy('timestamp', 'asc')
     );
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const newMessages = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      setMessages(newMessages);
-      
-      // Mark chat as read whenever new messages arrive (while viewing)
-      if (newMessages.length > 0) {
-        markChatAsRead(friendName);
+    const unsubscribe = onSnapshot(q, 
+      (snapshot) => {
+        const newMessages = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setMessages(newMessages);
+        
+        // Mark chat as read whenever new messages arrive (while viewing)
+        if (newMessages.length > 0) {
+          try {
+            markChatAsRead(friendName);
+          } catch (readError) {
+            console.log('Error marking chat as read on new messages:', readError);
+          }
+        }
+        
+        // Scroll to bottom when new messages arrive
+        setTimeout(() => {
+          flatListRef.current?.scrollToEnd({ animated: true });
+        }, 100);
+      },
+      (error) => {
+        console.log('Chat snapshot listener error:', error);
+        
+        // Handle specific Firebase errors
+        if (error.code === 'permission-denied') {
+          console.log('Permission denied for chat access');
+          // You might want to show a user-friendly message here
+        } else if (error.code === 'unavailable') {
+          console.log('Firebase service temporarily unavailable');
+        } else if (error.code === 'unauthenticated') {
+          console.log('User not authenticated for chat');
+          // Redirect to login or handle authentication
+        } else {
+          console.log('Unknown chat error:', error.message);
+        }
+        
+        // Set empty messages array on error to prevent crashes
+        setMessages([]);
       }
-      
-      // Scroll to bottom when new messages arrive
-      setTimeout(() => {
-        flatListRef.current?.scrollToEnd({ animated: true });
-      }, 100);
-    });
+    );
 
     return () => unsubscribe();
   }, [currentUser, friendName, chatId]);
@@ -247,7 +286,22 @@ export default function Chat() {
             ref={flatListRef}
             data={messages}
             renderItem={renderMessage}
-            keyExtractor={(item) => item.id || item.timestamp?.toString() || Math.random().toString()}
+            keyExtractor={(item, index) => {
+              // Create a unique key using multiple fallback strategies
+              if (item.id) {
+                return item.id;
+              }
+              if (item.timestamp) {
+                // Use timestamp + sender + index for uniqueness
+                const timestampStr = item.timestamp.seconds ? 
+                  item.timestamp.seconds.toString() : 
+                  item.timestamp.toString();
+                return `${timestampStr}_${item.sender}_${index}`;
+              }
+              // Final fallback using sender, text hash, and index
+              const textHash = item.text ? item.text.length : 0;
+              return `${item.sender || 'unknown'}_${textHash}_${index}_${Date.now()}`;
+            }}
             style={styles.messagesList}
             contentContainerStyle={styles.messagesContainer}
             showsVerticalScrollIndicator={false}

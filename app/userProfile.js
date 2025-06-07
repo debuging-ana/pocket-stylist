@@ -358,11 +358,11 @@ export default function UserProfileScreen() {
                 {/* profile stats */}
                 <View style={styles.statsContainer}>
                   <View style={styles.stat}>
-                    <Text style={styles.statNumber}>{userData?.followers || 0}</Text>
+                    <Text style={styles.statNumber}>{userData?.followersCount || (userData?.followers?.length || 0)}</Text>
                     <Text style={styles.statLabel}>Followers</Text>
                   </View>
                   <View style={styles.stat}>
-                    <Text style={styles.statNumber}>{userData?.following || 0}</Text>
+                    <Text style={styles.statNumber}>{userData?.followingCount || (userData?.following?.length || 0)}</Text>
                     <Text style={styles.statLabel}>Following</Text>
                   </View>
                   <View style={styles.stat}>
