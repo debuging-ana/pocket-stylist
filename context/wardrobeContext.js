@@ -13,15 +13,24 @@ export const WardrobeProvider = ({ children }) => {
 
   // Set up real-time listener for wardrobe items
   useEffect(() => {
-    if (user) {
-      // Create a query to order items by creation time
-      const q = query(
-        collection(db, "users", user.uid, "wardrobe"),
-        orderBy("createdAt", "desc")
-      );
+    if (user?.uid) {
+      // Try with orderBy first, fall back to simple query if index doesn't exist
+      let q;
+      try {
+        q = query(
+          collection(db, "users", user.uid, "wardrobe"),
+          orderBy("createdAt", "desc")
+        );
+      } catch (error) {
+        console.log("Using simple query due to missing index");
+        q = collection(db, "users", user.uid, "wardrobe");
+      }
 
       // Set up real-time listener
       const unsubscribe = onSnapshot(q, (snapshot) => {
+        // Check if user is still authenticated before processing
+        if (!user?.uid) return;
+        
         const items = [];
         snapshot.forEach((doc) => {
           const data = doc.data();
@@ -31,11 +40,52 @@ export const WardrobeProvider = ({ children }) => {
             createdAt: data.createdAt?.toDate() || new Date()
           });
         });
+        
+        // Sort in JavaScript if we couldn't use orderBy
+        items.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+        
         setWardrobeItems(items);
         setLoading(false);
       }, (error) => {
+        // Check if user is still authenticated before handling error
+        if (!user?.uid) return;
+        
         console.error("Error listening to wardrobe updates:", error);
-        setLoading(false);
+        console.error("Error code:", error.code);
+        console.error("Error message:", error.message);
+        
+        // Handle specific error cases
+        if (error.code === 'failed-precondition' || error.code === 'unimplemented') {
+          console.log("Firestore index not found, switching to simple query");
+          // Retry with a simple collection query
+          const simpleQuery = collection(db, "users", user.uid, "wardrobe");
+          const simpleUnsubscribe = onSnapshot(simpleQuery, (snapshot) => {
+            if (!user?.uid) return;
+            const items = [];
+            snapshot.forEach((doc) => {
+              const data = doc.data();
+              items.push({
+                id: doc.id,
+                ...data,
+                createdAt: data.createdAt?.toDate() || new Date()
+              });
+            });
+            // Sort manually since we can't use orderBy
+            items.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+            setWardrobeItems(items);
+            setLoading(false);
+          }, (retryError) => {
+            if (!user?.uid) return;
+            console.error("Error on retry:", retryError);
+            setWardrobeItems([]);
+            setLoading(false);
+          });
+          return () => simpleUnsubscribe();
+        } else if (error.code !== 'permission-denied') {
+          // For other errors (but ignore permission-denied during logout), just set empty state
+          setWardrobeItems([]);
+          setLoading(false);
+        }
       });
 
       // Cleanup listener on unmount
@@ -48,15 +98,25 @@ export const WardrobeProvider = ({ children }) => {
 
   // Set up real-time listener for saved outfits
   useEffect(() => {
-    if (user) {
+    if (user?.uid) {
       console.log('Setting up outfit listener for user:', user.uid);
       
-      const q = query(
-        collection(db, "users", user.uid, "outfits"),
-        orderBy("createdAt", "desc")
-      );
+      // Try with orderBy first, fall back to simple query if index doesn't exist
+      let q;
+      try {
+        q = query(
+          collection(db, "users", user.uid, "outfits"),
+          orderBy("createdAt", "desc")
+        );
+      } catch (error) {
+        console.log("Using simple query for outfits due to missing index");
+        q = collection(db, "users", user.uid, "outfits");
+      }
 
       const unsubscribe = onSnapshot(q, (snapshot) => {
+        // Check if user is still authenticated before processing
+        if (!user?.uid) return;
+        
         console.log('Outfit listener triggered, snapshot size:', snapshot.size);
         
         const outfits = [];
@@ -70,12 +130,48 @@ export const WardrobeProvider = ({ children }) => {
           });
         });
         
+        // Sort in JavaScript if we couldn't use orderBy
+        outfits.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+        
         console.log('Setting saved outfits, count:', outfits.length);
         setSavedOutfits(outfits);
       }, (error) => {
+        // Check if user is still authenticated before handling error
+        if (!user?.uid) return;
+        
         console.error("Error listening to outfit updates:", error);
         console.error("Error code:", error.code);
         console.error("Error message:", error.message);
+        
+        // Handle specific error cases
+        if (error.code === 'failed-precondition' || error.code === 'unimplemented') {
+          console.log("Firestore index not found for outfits, switching to simple query");
+          // Retry with a simple collection query
+          const simpleQuery = collection(db, "users", user.uid, "outfits");
+          const simpleUnsubscribe = onSnapshot(simpleQuery, (snapshot) => {
+            if (!user?.uid) return;
+            const outfits = [];
+            snapshot.forEach((doc) => {
+              const data = doc.data();
+              outfits.push({
+                id: doc.id,
+                ...data,
+                createdAt: data.createdAt?.toDate() || new Date()
+              });
+            });
+            // Sort manually since we can't use orderBy
+            outfits.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+            setSavedOutfits(outfits);
+          }, (retryError) => {
+            if (!user?.uid) return;
+            console.error("Error on outfits retry:", retryError);
+            setSavedOutfits([]);
+          });
+          return () => simpleUnsubscribe();
+        } else if (error.code !== 'permission-denied') {
+          // For other errors (but ignore permission-denied during logout), just set empty state
+          setSavedOutfits([]);
+        }
       });
 
       return () => {
@@ -100,7 +196,8 @@ export const WardrobeProvider = ({ children }) => {
     }
 
     try {
-      const newId = Date.now() + '-' + Math.floor(Math.random() * 1000);
+      // Generate more unique ID with higher randomness
+      const newId = Date.now() + '-' + Math.floor(Math.random() * 100000) + '-' + Math.floor(Math.random() * 1000);
       const completeItem = { 
         ...newItem, 
         id: newId, 

@@ -1,9 +1,9 @@
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, FlatList, TouchableOpacity } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
-import { useEffect, useState } from 'react';
 import { Feather } from '@expo/vector-icons';
 
 export default function BoardDetail() {

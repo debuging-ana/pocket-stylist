@@ -92,7 +92,7 @@ export default function AddOutfitScreen() {
       ...current, 
       { 
         ...item, 
-        id: `${item.id}-${Date.now()}`, // Unique ID for multiple instances
+        id: `${item.id}-${Date.now()}-${Math.floor(Math.random() * 10000)}`, // More unique ID for multiple instances
         x: relativeX,
         y: relativeY,
         scale: 1.0
@@ -193,7 +193,7 @@ export default function AddOutfitScreen() {
       
       // Create outfit data
       const outfitData = {
-        id: `outfit-${Date.now()}`,
+        id: `outfit-${Date.now()}-${Math.floor(Math.random() * 100000)}`,
         name: outfitName.trim(),
         description: outfitDescription.trim(),
         items: outfitLayout,

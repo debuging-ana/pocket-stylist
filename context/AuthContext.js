@@ -1,4 +1,4 @@
-import { createContext, useState, useContext, useEffect } from 'react';
+import { createContext, useState, useContext, useEffect, useRef } from 'react';
 import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc, onSnapshot } from 'firebase/firestore';
 import { app, db } from "../firebaseConfig";
@@ -9,18 +9,26 @@ export const AuthProvider = ({ children }) => {
   const [authUser, setAuthUser] = useState(null);
   const [userData, setUserData] = useState(null);
   const auth = getAuth(app);
+  const isLoggingOutRef = useRef(false);
+  const unsubscribeUserRef = useRef(null);
 
   useEffect(() => {
-    let unsubscribeUser = () => {};
-
     const unsubscribeAuth = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
+      if (firebaseUser && !isLoggingOutRef.current) {
         const userDocRef = doc(db, "users", firebaseUser.uid);
 
-        // setup snapshot listener FIRST
-        unsubscribeUser = onSnapshot(
+        // Clean up any existing listener first
+        if (unsubscribeUserRef.current) {
+          unsubscribeUserRef.current();
+        }
+
+        // setup snapshot listener
+        unsubscribeUserRef.current = onSnapshot(
           userDocRef,
           (userDoc) => {
+            // Skip state updates if user is logging out
+            if (isLoggingOutRef.current) return;
+            
             if (userDoc.exists()) {
               const data = userDoc.data();
               setUserData({
@@ -33,29 +41,65 @@ export const AuthProvider = ({ children }) => {
             }
           },
           (error) => {
+            // Skip error handling if user is logging out
+            if (isLoggingOutRef.current) return;
             console.error("Snapshot error:", error);
             setUserData(null);
           }
         );
       } else {
-        setUserData(null);
-        setAuthUser(null);
+        // Clean up user listener when user logs out
+        if (unsubscribeUserRef.current) {
+          unsubscribeUserRef.current();
+          unsubscribeUserRef.current = null;
+        }
+        
+        if (!isLoggingOutRef.current) {
+          setUserData(null);
+          setAuthUser(null);
+        }
       }
-      setAuthUser(firebaseUser);
+      
+      if (!isLoggingOutRef.current) {
+        setAuthUser(firebaseUser);
+      }
     });
 
     return () => {
       unsubscribeAuth();
-      unsubscribeUser();
+      if (unsubscribeUserRef.current) {
+        unsubscribeUserRef.current();
+      }
     };
   }, []);
 
   const logout = async () => {
     try {
-      await signOut(auth);
-      setAuthUser(null);
+      // Set logout flag first to prevent any new listeners or state updates
+      isLoggingOutRef.current = true;
+      
+      // Clean up the user data listener immediately
+      if (unsubscribeUserRef.current) {
+        unsubscribeUserRef.current();
+        unsubscribeUserRef.current = null;
+      }
+      
+      // Clear state immediately
       setUserData(null);
+      setAuthUser(null);
+      
+      // Wait a brief moment for other contexts to clean up
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Now sign out from Firebase
+      await signOut(auth);
+      
+      // Reset the flag after logout completes
+      setTimeout(() => {
+        isLoggingOutRef.current = false;
+      }, 1000);
     } catch (error) {
+      isLoggingOutRef.current = false;
       console.error("Error logging out: ", error);
     }
   };

@@ -24,18 +24,19 @@ export default function ContactsScreen() {
   // Fetch user profile picture
   useEffect(() => {
     const fetchUserProfile = async () => {
-      if (user?.uid) {
-        try {
-          const docRef = doc(db, "users", user.uid);
-          const docSnap = await getDoc(docRef);
-          
-          if (docSnap.exists()) {
-            const userData = docSnap.data();
-            setProfilePhotoUri(userData.profilePhotoUri || null);
-          }
-        } catch (error) {
-          console.error('Error fetching user profile:', error);
+      if (!user?.uid) return;
+      
+      try {
+        const docRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(docRef);
+        
+        if (docSnap.exists()) {
+          const userData = docSnap.data();
+          setProfilePhotoUri(userData.profilePhotoUri || null);
         }
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+        // Don't show this error to user as it's not critical
       }
     };
 
@@ -43,8 +44,14 @@ export default function ContactsScreen() {
   }, [user]);
 
   useEffect(() => {
-    const currentUser = user?.email || getAuth().currentUser?.email;
-    if (!currentUser) return;
+    // Check if user is authenticated first
+    if (!user?.uid || !user?.email) {
+      console.log('User not properly authenticated, skipping contacts fetch');
+      setContacts([]);
+      return;
+    }
+
+    const currentUser = user.email;
 
     // Get chats where user is a participant - removed orderBy to avoid index requirement
     const q = query(
@@ -54,63 +61,81 @@ export default function ContactsScreen() {
     );
 
     const unsubscribe = onSnapshot(q, async (snapshot) => {
-      const chats = snapshot.docs.map(doc => {
-        const data = doc.data();
-        // Find the other participant (not current user)
-        const otherParticipant = data.participants?.find(p => p !== currentUser);
-        
-        return {
-          id: doc.id,
-          email: otherParticipant || 'Unknown',
-          lastMessage: data.lastMessage || 'No messages yet',
-          lastUpdated: data.lastUpdated,
-          lastMessageSender: data.lastMessageSender
-        };
-      });
-      
-      // Get user names for each email
-      const chatsWithNames = await Promise.all(
-        chats.map(async (chat) => {
-          if (chat.email === 'Unknown') return { ...chat, name: 'Unknown' };
+      // Double-check authentication before processing
+      if (!user?.uid || !user?.email) {
+        console.log('User authentication lost during contacts fetch');
+        return;
+      }
+
+      try {
+        const chats = snapshot.docs.map(doc => {
+          const data = doc.data();
+          // Find the other participant (not current user)
+          const otherParticipant = data.participants?.find(p => p !== currentUser);
           
-          try {
-            // Query users collection to find user by email
-            const usersRef = collection(db, 'users');
-            const userQuery = query(usersRef, where('email', '==', chat.email));
-            const userSnapshot = await getDocs(userQuery);
-            
-            if (!userSnapshot.empty) {
-              const userData = userSnapshot.docs[0].data();
-              const fullName = `${userData.firstName || ''} ${userData.lastName || ''}`.trim();
-              return { ...chat, name: fullName || chat.email.split('@')[0] };
-            } else {
-              // Fallback to email username if user not found
-              return { ...chat, name: chat.email.split('@')[0] };
-            }
-          } catch (error) {
-            console.error('Error fetching user name:', error);
-            return { ...chat, name: chat.email.split('@')[0] };
-          }
-        })
-      );
-      
-      // Filter out any contacts without valid names and sort by lastUpdated in JavaScript
-      const validContacts = chatsWithNames
-        .filter(chat => chat.name && chat.name !== 'Unknown')
-        .sort((a, b) => {
-          if (!a.lastUpdated && !b.lastUpdated) return 0;
-          if (!a.lastUpdated) return 1;
-          if (!b.lastUpdated) return -1;
-          
-          const aTime = a.lastUpdated.toDate ? a.lastUpdated.toDate() : new Date(a.lastUpdated);
-          const bTime = b.lastUpdated.toDate ? b.lastUpdated.toDate() : new Date(b.lastUpdated);
-          
-          return bTime.getTime() - aTime.getTime(); // Sort newest first
+          return {
+            id: doc.id,
+            email: otherParticipant || 'Unknown',
+            lastMessage: data.lastMessage || 'No messages yet',
+            lastUpdated: data.lastUpdated,
+            lastMessageSender: data.lastMessageSender
+          };
         });
         
-      setContacts(validContacts);
+        // Get user names for each email with better error handling
+        const chatsWithNames = await Promise.all(
+          chats.map(async (chat) => {
+            if (chat.email === 'Unknown') return { ...chat, name: 'Unknown' };
+            
+            try {
+              // Query users collection to find user by email
+              const usersRef = collection(db, 'users');
+              const userQuery = query(usersRef, where('email', '==', chat.email));
+              const userSnapshot = await getDocs(userQuery);
+              
+              if (!userSnapshot.empty) {
+                const userData = userSnapshot.docs[0].data();
+                const fullName = `${userData.firstName || ''} ${userData.lastName || ''}`.trim();
+                return { ...chat, name: fullName || chat.email.split('@')[0] };
+              } else {
+                // Fallback to email username if user not found
+                return { ...chat, name: chat.email.split('@')[0] };
+              }
+            } catch (error) {
+              console.log('Error fetching user name for:', chat.email, error.code || error.message);
+              // Don't log full error to avoid console spam
+              return { ...chat, name: chat.email.split('@')[0] };
+            }
+          })
+        );
+        
+        // Filter out any contacts without valid names and sort by lastUpdated in JavaScript
+        const validContacts = chatsWithNames
+          .filter(chat => chat.name && chat.name !== 'Unknown')
+          .sort((a, b) => {
+            if (!a.lastUpdated && !b.lastUpdated) return 0;
+            if (!a.lastUpdated) return 1;
+            if (!b.lastUpdated) return -1;
+            
+            const aTime = a.lastUpdated.toDate ? a.lastUpdated.toDate() : new Date(a.lastUpdated);
+            const bTime = b.lastUpdated.toDate ? b.lastUpdated.toDate() : new Date(b.lastUpdated);
+            
+            return bTime.getTime() - aTime.getTime(); // Sort newest first
+          });
+          
+        setContacts(validContacts);
+      } catch (error) {
+        console.log('Error processing contacts data:', error.code || error.message);
+        // Set empty contacts on error but don't spam console
+        setContacts([]);
+      }
     }, (error) => {
-      console.error('Error fetching contacts:', error);
+      console.log('Error fetching contacts:', error.code || error.message);
+      // Handle permission errors gracefully
+      if (error.code === 'permission-denied') {
+        console.log('Permission denied for contacts - user may need to re-authenticate');
+      }
+      setContacts([]);
     });
 
     return () => unsubscribe();
@@ -118,7 +143,7 @@ export default function ContactsScreen() {
 
   // Function to search for users in Firestore
   const searchUsers = async (term) => {
-    if (term.trim() === '') {
+    if (term.trim() === '' || !user?.uid) {
       setSearchResults([]);
       return;
     }
@@ -146,7 +171,7 @@ export default function ContactsScreen() {
         getDocs(emailQuery)
       ]);
 
-      const currentUserEmail = getAuth().currentUser?.email;
+      const currentUserEmail = user.email;
       const userMap = new Map();
 
       // Combine results from both queries
@@ -164,7 +189,12 @@ export default function ContactsScreen() {
 
       setSearchResults(Array.from(userMap.values()));
     } catch (error) {
-      console.error("Error fetching users: ", error);
+      console.log("Error searching users:", error.code || error.message);
+      // Handle permission errors gracefully
+      if (error.code === 'permission-denied') {
+        console.log('Permission denied for user search - check authentication');
+      }
+      setSearchResults([]);
     } finally {
       setSearchLoading(false);
     }

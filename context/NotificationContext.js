@@ -40,6 +40,9 @@ export const NotificationProvider = ({ children }) => {
     );
 
     const unsubscribe = onSnapshot(chatsQuery, (snapshot) => {
+      // Check if user is still authenticated before processing
+      if (!currentUser || !user?.email) return;
+      
       console.log('🔔 NotificationContext: Chat snapshot received', snapshot.docs.length, 'chats');
       const chatUnreadStatus = {};
       let hasAnyUnread = false;
@@ -89,6 +92,17 @@ export const NotificationProvider = ({ children }) => {
       
       setHasUnreadMessages(chatUnreadStatus);
       setTotalHasUnread(hasAnyUnread);
+    }, (error) => {
+      // Check if user is still authenticated before handling error
+      if (!currentUser || !user?.email) return;
+      
+      // Ignore permission-denied errors during logout
+      if (error.code === 'permission-denied') {
+        console.log('NotificationContext: Permission denied (likely during logout)');
+        return;
+      }
+      
+      console.error('NotificationContext snapshot error:', error);
     });
 
     return () => unsubscribe();

@@ -57,19 +57,18 @@ export default function AddLookScreen() {
       await setDoc(userRef, {}, { merge: true });
       
       // Create the look object to add to profile
-      const profileLook = {
-        id: `look-${outfit.id}-${Date.now()}`,
+      const lookData = {
+        id: `look-${outfit.id}-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
         outfitId: outfit.id,
         outfitName: outfit.name,
         outfitImageUri: outfit.imageUri,
-        outfitDescription: outfit.description || '',
-        addedAt: new Date().toISOString(),
-        itemCount: outfit.items?.length || 0
+        outfitItems: outfit.items || [],
+        createdAt: new Date(),
       };
 
       // Add to user's looks array
       await updateDoc(userRef, {
-        looks: arrayUnion(profileLook),
+        looks: arrayUnion(lookData),
         lastUpdated: new Date().toISOString()
       });
 

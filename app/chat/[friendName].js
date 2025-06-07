@@ -41,8 +41,8 @@ export default function Chat() {
   const navigation = useNavigation();
   const { user } = useAuth();
   const { markChatAsRead } = useNotifications();
-  const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
+  const [message, setMessage] = useState('');
   const flatListRef = useRef(null);
 
   const currentUser = user?.email || getAuth().currentUser?.email;
@@ -298,9 +298,9 @@ export default function Chat() {
                   item.timestamp.toString();
                 return `${timestampStr}_${item.sender}_${index}`;
               }
-              // Final fallback using sender, text hash, and index
+              // Final fallback using sender, text hash, and index (no Date.now())
               const textHash = item.text ? item.text.length : 0;
-              return `${item.sender || 'unknown'}_${textHash}_${index}_${Date.now()}`;
+              return `${item.sender || 'unknown'}_${textHash}_${index}`;
             }}
             style={styles.messagesList}
             contentContainerStyle={styles.messagesContainer}

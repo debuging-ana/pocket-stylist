@@ -99,15 +99,9 @@ export default function UserProfileScreen() {
       const userRef = doc(db, "users", user.uid);
       // create a new board object with all required properties
       const newBoard = {
-        id: `${Date.now()}-${Math.floor(Math.random() * 1000)}`, // Unique ID using timestamp + random
-        title: boardName,
-        pins: [], // start with empty pins array
-        updated: new Date().toISOString(), // last update timestamp
-        isSecret: false, // default visibility
-        isFavorite: false, // not favourited by default
-        ownerId: user.uid,  // critical for Firestore security rules
-        createdAt: new Date().toISOString(), // creation timestamp
-        lastUpdated: new Date().toISOString() // tracks modifications
+        id: `${Date.now()}-${Math.floor(Math.random() * 100000)}`, // More unique ID using timestamp + random
+        title: boardName.trim(),
+        pins: []
       };
 
       // to ensure the user document exists (doesnt overwrite existing fields)
