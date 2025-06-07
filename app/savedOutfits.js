@@ -3,9 +3,11 @@ import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet, Alert, Activ
 import { useWardrobe } from '../context/wardrobeContext';
 import { MaterialCommunityIcons, Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { scaleSize, scaleWidth, scaleHeight, scaleFontSize, scaleSpacing, deviceWidth, getGridItemWidth } from '../utils/responsive';
 
-const WINDOW_WIDTH = Dimensions.get('window').width;
-const ITEM_WIDTH = (WINDOW_WIDTH - 60) / 3; // 3 columns with padding
+const WINDOW_WIDTH = deviceWidth;
+const ITEM_WIDTH = getGridItemWidth(60, 20); // 3 columns with responsive padding
 
 export default function SavedOutfits() {
   const { savedOutfits, loading, deleteOutfit } = useWardrobe();
@@ -138,27 +140,27 @@ const styles = StyleSheet.create({
     backgroundColor: '#F9F9F4',
   },
   loadingText: {
-    marginTop: 12,
-    fontSize: 16,
+    marginTop: scaleSpacing(12),
+    fontSize: scaleFontSize(16),
     color: '#828282',
   },
   title: {
-    fontSize: 26,
+    fontSize: scaleFontSize(26),
     fontWeight: 'bold',
     color: '#4A6D51',
-    margin: 20,
+    margin: scaleSpacing(20),
     marginBottom: 0,
   },
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
-    borderRadius: 15,
-    padding: 12,
-    marginTop: 20,
-    marginLeft: 20,
-    marginRight: 20,
-    marginBottom: 20,
+    borderRadius: scaleSize(15),
+    padding: scaleSpacing(12),
+    marginTop: scaleSpacing(20),
+    marginLeft: scaleSpacing(20),
+    marginRight: scaleSpacing(20),
+    marginBottom: scaleSpacing(20),
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
@@ -166,50 +168,51 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   searchIcon: {
-    marginRight: 8,
+    marginRight: scaleSpacing(8),
   },
   searchInput: {
     flex: 1,
-    height: 24,
+    height: scaleHeight(24),
     padding: 0,
     color: '#4A6D51',
+    fontSize: scaleFontSize(16),
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 40,
+    paddingHorizontal: scaleSpacing(40),
   },
   emptyTitle: {
-    fontSize: 22,
+    fontSize: scaleFontSize(22),
     fontWeight: '600',
     color: '#4A6D51',
-    marginTop: 20,
-    marginBottom: 8,
+    marginTop: scaleSpacing(20),
+    marginBottom: scaleSpacing(8),
   },
   emptyText: {
-    fontSize: 16,
+    fontSize: scaleFontSize(16),
     color: '#828282',
     textAlign: 'center',
-    lineHeight: 24,
+    lineHeight: scaleHeight(24),
   },
   list: {
-    padding: 20,
+    padding: scaleSpacing(20),
     paddingTop: 0,
   },
   outfitContainer: {
     flex: 1,
-    maxWidth: (WINDOW_WIDTH - 60) / 3,
-    width: (WINDOW_WIDTH - 60) / 3,
-    padding: 4,
+    maxWidth: getGridItemWidth(60, 20),
+    width: getGridItemWidth(60, 20),
+    padding: scaleSpacing(4),
     alignItems: 'center',
-    height: 128,
-    marginBottom: 1,
+    height: scaleHeight(128),
+    marginBottom: scaleSpacing(1),
   },
   outfitImage: {
-    width: 120,
-    height: 120,
-    borderRadius: 8,
+    width: scaleSize(120),
+    height: scaleSize(120),
+    borderRadius: scaleSize(8),
     backgroundColor: '#F5F5F5',
     borderWidth: 1,
     borderColor: '#E0E0E0',
@@ -220,10 +223,10 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   placeholderImage: {
-    width: 120,
-    height: 120,
+    width: scaleSize(120),
+    height: scaleSize(120),
     backgroundColor: '#F5F5F5',
-    borderRadius: 8,
+    borderRadius: scaleSize(8),
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,

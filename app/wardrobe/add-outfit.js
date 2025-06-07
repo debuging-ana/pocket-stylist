@@ -23,10 +23,11 @@ import Animated, {
 import { GestureDetector, Gesture, GestureHandlerRootView } from 'react-native-gesture-handler';
 import { captureRef } from 'react-native-view-shot';
 import * as FileSystem from 'expo-file-system';
+import { scaleSize, scaleWidth, scaleHeight, scaleFontSize, scaleSpacing, deviceWidth } from '../../utils/responsive';
 
-const WINDOW_WIDTH = Dimensions.get('window').width;
-const DROP_ZONE_SIZE = WINDOW_WIDTH - 40;
-const ITEM_SIZE = 60;
+const WINDOW_WIDTH = deviceWidth;
+const DROP_ZONE_SIZE = WINDOW_WIDTH - scaleSpacing(40);
+const ITEM_SIZE = scaleSize(60);
 
 export default function AddOutfitScreen() {
   const router = useRouter();
