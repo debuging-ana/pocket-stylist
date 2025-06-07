@@ -1,44 +1,234 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar, TextInput, FlatList, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import Feather from '@expo/vector-icons/Feather';
 import { getAuth } from 'firebase/auth';
-import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, orderBy, limit, getDocs, doc, setDoc, getDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { useAuth } from '../context/AuthContext';
+import { useNotifications } from '../context/NotificationContext';
+import NotificationBadge from '../components/NotificationBadge';
 
 export default function ContactsScreen() {
   const router = useRouter();
   const { user } = useAuth();
-  const [friends, setFriends] = useState([]);
+  const { hasUnreadMessages } = useNotifications();
+  const [contacts, setContacts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const [profilePhotoUri, setProfilePhotoUri] = useState(null);
+
+  // Fetch user profile picture
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (user?.uid) {
+        try {
+          const docRef = doc(db, "users", user.uid);
+          const docSnap = await getDoc(docRef);
+          
+          if (docSnap.exists()) {
+            const userData = docSnap.data();
+            setProfilePhotoUri(userData.profilePhotoUri || null);
+          }
+        } catch (error) {
+          console.error('Error fetching user profile:', error);
+        }
+      }
+    };
+
+    fetchUserProfile();
+  }, [user]);
 
   useEffect(() => {
-    const currentUser = getAuth().currentUser?.displayName || getAuth().currentUser?.email;
+    const currentUser = user?.email || getAuth().currentUser?.email;
     if (!currentUser) return;
 
-    // Get messages where user is either sender or receiver
+    // Get chats where user is a participant - removed orderBy to avoid index requirement
     const q = query(
-      collection(db, 'messages'),
-      where('participants', 'array-contains', currentUser) // assuming you store participants array
+      collection(db, 'chats'),
+      where('participants', 'array-contains', currentUser),
+      limit(50)
     );
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const allMessages = snapshot.docs.map(doc => doc.data());
-      const contacts = allMessages.map(msg =>
-        msg.sender === currentUser ? msg.receiver : msg.sender
+    const unsubscribe = onSnapshot(q, async (snapshot) => {
+      const chats = snapshot.docs.map(doc => {
+        const data = doc.data();
+        // Find the other participant (not current user)
+        const otherParticipant = data.participants?.find(p => p !== currentUser);
+        
+        return {
+          id: doc.id,
+          email: otherParticipant || 'Unknown',
+          lastMessage: data.lastMessage || 'No messages yet',
+          lastUpdated: data.lastUpdated,
+          lastMessageSender: data.lastMessageSender
+        };
+      });
+      
+      // Get user names for each email
+      const chatsWithNames = await Promise.all(
+        chats.map(async (chat) => {
+          if (chat.email === 'Unknown') return { ...chat, name: 'Unknown' };
+          
+          try {
+            // Query users collection to find user by email
+            const usersRef = collection(db, 'users');
+            const userQuery = query(usersRef, where('email', '==', chat.email));
+            const userSnapshot = await getDocs(userQuery);
+            
+            if (!userSnapshot.empty) {
+              const userData = userSnapshot.docs[0].data();
+              const fullName = `${userData.firstName || ''} ${userData.lastName || ''}`.trim();
+              return { ...chat, name: fullName || chat.email.split('@')[0] };
+            } else {
+              // Fallback to email username if user not found
+              return { ...chat, name: chat.email.split('@')[0] };
+            }
+          } catch (error) {
+            console.error('Error fetching user name:', error);
+            return { ...chat, name: chat.email.split('@')[0] };
+          }
+        })
       );
-      const unique = [...new Set(contacts)];
-      const formatted = unique.map((name, index) => ({ id: index.toString(), name }));
-      setFriends(formatted);
+      
+      // Filter out any contacts without valid names and sort by lastUpdated in JavaScript
+      const validContacts = chatsWithNames
+        .filter(chat => chat.name && chat.name !== 'Unknown')
+        .sort((a, b) => {
+          if (!a.lastUpdated && !b.lastUpdated) return 0;
+          if (!a.lastUpdated) return 1;
+          if (!b.lastUpdated) return -1;
+          
+          const aTime = a.lastUpdated.toDate ? a.lastUpdated.toDate() : new Date(a.lastUpdated);
+          const bTime = b.lastUpdated.toDate ? b.lastUpdated.toDate() : new Date(b.lastUpdated);
+          
+          return bTime.getTime() - aTime.getTime(); // Sort newest first
+        });
+        
+      setContacts(validContacts);
+    }, (error) => {
+      console.error('Error fetching contacts:', error);
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [user]);
+
+  // Function to search for users in Firestore
+  const searchUsers = async (term) => {
+    if (term.trim() === '') {
+      setSearchResults([]);
+      return;
+    }
+
+    setSearchLoading(true);
+    try {
+      const usersRef = collection(db, 'users');
+      
+      // Search by firstName
+      const firstNameQuery = query(
+        usersRef,
+        where('firstName', '>=', term),
+        where('firstName', '<=', term + '\uf8ff')
+      );
+      
+      // Search by email
+      const emailQuery = query(
+        usersRef,
+        where('email', '>=', term),
+        where('email', '<=', term + '\uf8ff')
+      );
+
+      const [firstNameSnapshot, emailSnapshot] = await Promise.all([
+        getDocs(firstNameQuery),
+        getDocs(emailQuery)
+      ]);
+
+      const currentUserEmail = getAuth().currentUser?.email;
+      const userMap = new Map();
+
+      // Combine results from both queries
+      [...firstNameSnapshot.docs, ...emailSnapshot.docs].forEach((doc) => {
+        const userData = doc.data();
+        if (userData.email !== currentUserEmail) {
+          userMap.set(doc.id, {
+            id: doc.id,
+            firstName: userData.firstName || 'Unknown',
+            lastName: userData.lastName || '',
+            email: userData.email,
+          });
+        }
+      });
+
+      setSearchResults(Array.from(userMap.values()));
+    } catch (error) {
+      console.error("Error fetching users: ", error);
+    } finally {
+      setSearchLoading(false);
+    }
+  };
+
+  // Trigger search when the user types in the input field
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      searchUsers(searchTerm);
+    }, 300); // Debounce search
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm]);
+
+  const handleUserSelect = (user) => {
+    try {
+      // Navigate to the chat page when a user is selected
+      router.push({
+        pathname: '/chat/[friendName]',
+        params: { friendName: user.email }, // Use email as identifier
+      });
+      setShowSearch(false);
+      setSearchTerm('');
+      setSearchResults([]);
+    } catch (error) {
+      console.error('Error navigating to chat:', error);
+    }
+  };
+
+  const formatLastSeen = (timestamp) => {
+    if (!timestamp) return '';
+    
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    const now = new Date();
+    const diffInMinutes = Math.floor((now - date) / (1000 * 60));
+    
+    if (diffInMinutes < 1) return 'Just now';
+    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;
+    return date.toLocaleDateString();
+  };
+
+  const renderUserItem = ({ item }) => (
+    <TouchableOpacity 
+      style={styles.searchResultItem} 
+      onPress={() => handleUserSelect(item)}
+    >
+      <View style={styles.userIconContainer}>
+        <Text style={styles.userInitial}>
+          {(item.firstName.charAt(0) + (item.lastName.charAt(0) || '')).toUpperCase()}
+        </Text>
+      </View>
+      <View style={styles.userInfo}>
+        <Text style={styles.userName}>
+          {item.firstName} {item.lastName}
+        </Text>
+      </View>
+      <Feather name="plus-circle" size={20} color="#4A6D51" />
+    </TouchableOpacity>
+  );
 
   return (
     <>
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <View style={styles.container}>
         {/* Header Section */}
         <View style={styles.headerContainer}>
           <View style={styles.headerCard}>
@@ -52,45 +242,130 @@ export default function ContactsScreen() {
                 onPress={() => router.push('/profile')}
               >
                 <View style={styles.profileImageContainer}>
-                  <Text style={styles.profileInitial}>
-                    {(user?.email?.charAt(0) || 'S').toUpperCase()}
-                  </Text>
+                  {profilePhotoUri ? (
+                    <Image 
+                      source={{ uri: profilePhotoUri }} 
+                      style={styles.profileImage}
+                    />
+                  ) : (
+                    <Text style={styles.profileInitial}>
+                      {(user?.email?.charAt(0) || 'S').toUpperCase()}
+                    </Text>
+                  )}
                 </View>
               </TouchableOpacity>
             </View>
           </View>
         </View>
 
-        <View style={styles.settingsSection}>
-          <View style={styles.sectionTitleContainer}>
-            <Text style={styles.sectionTitle}>Contacts</Text>
-            <TouchableOpacity onPress={() => router.push('/add-contact')}>
-              <Feather name="plus" size={20} color="#4A6D51" />
-            </TouchableOpacity>
+        <View style={styles.contentSection}>
+          {/* Search Section */}
+          <View style={styles.searchInputContainer}>
+            <Feather name="search" size={20} color="#7D7D7D" style={styles.searchIcon} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search for friends..."
+              placeholderTextColor="#828282"
+              value={searchTerm}
+              onChangeText={(text) => {
+                setSearchTerm(text);
+                setShowSearch(text.length > 0);
+              }}
+              onFocus={() => setShowSearch(searchTerm.length > 0)}
+              autoCapitalize="none"
+            />
+            {searchTerm.length > 0 && (
+              <TouchableOpacity 
+                onPress={() => {
+                  setSearchTerm('');
+                  setShowSearch(false);
+                }}
+                style={styles.clearButton}
+              >
+                <Feather name="x" size={18} color="#828282" />
+              </TouchableOpacity>
+            )}
           </View>
 
-          {friends.map((friend) => (
-            <TouchableOpacity 
-              key={friend.id}
-              style={styles.settingCard}
-              onPress={() => router.push({
-                pathname: '/chat/[friendName]', 
-                params: { friendName: friend.name }
-              })}
-            >
-              <View style={[styles.settingIconContainer, { backgroundColor: '#E8F0E2' }]}>
-                <Text style={styles.contactInitial}>
-                  {friend.name.split(' ').map(n => n[0]).join('').toUpperCase()}
-                </Text>
+          {/* Search Results */}
+          {showSearch && (
+            <View style={styles.searchResultsContainer}>
+              {searchLoading ? (
+                <View style={styles.loadingContainer}>
+                  <Text style={styles.loadingText}>Searching...</Text>
+                </View>
+              ) : searchTerm.trim() === '' ? null : searchResults.length === 0 ? (
+                <View style={styles.noSearchResults}>
+                  <Text style={styles.noResultsText}>No users found</Text>
+                  <Text style={styles.noResultsSubtext}>Try searching with a different term</Text>
+                </View>
+              ) : (
+                <FlatList
+                  data={searchResults}
+                  keyExtractor={(item) => item.id}
+                  renderItem={renderUserItem}
+                  showsVerticalScrollIndicator={false}
+                  style={styles.searchResultsList}
+                  nestedScrollEnabled={true}
+                />
+              )}
+            </View>
+          )}
+
+          {/* Recent Conversations Section - Only show if not searching */}
+          {!showSearch && (
+            <>
+              <View style={styles.sectionTitleContainer}>
+                <Text style={styles.sectionTitle}>Recent Conversations</Text>
               </View>
-              <View style={styles.settingInfo}>
-                <Text style={styles.settingName}>{friend.name}</Text>
-              </View>
-              <Feather name="chevron-right" size={20} color="#CCCCCC" />
-            </TouchableOpacity>
-          ))}
+
+              {contacts.length > 0 ? (
+                <ScrollView showsVerticalScrollIndicator={false} style={styles.conversationsList}>
+                  {contacts.map((contact) => (
+                    <TouchableOpacity 
+                      key={contact.id}
+                      style={styles.settingCard}
+                      onPress={() => router.push({
+                        pathname: '/chat/[friendName]', 
+                        params: { friendName: contact.email }
+                      })}
+                    >
+                      <View style={[styles.settingIconContainer, { backgroundColor: '#E8F0E2' }]}>
+                        <Text style={styles.contactInitial}>
+                          {contact.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                        </Text>
+                        <NotificationBadge hasUnread={hasUnreadMessages[contact.email]} />
+                      </View>
+                      <View style={styles.settingInfo}>
+                        <Text style={styles.settingName}>{contact.name}</Text>
+                        <Text style={styles.lastMessage} numberOfLines={1}>
+                          {contact.lastMessageSender === (user?.email || getAuth().currentUser?.email) 
+                            ? `You: ${contact.lastMessage}` 
+                            : contact.lastMessage}
+                        </Text>
+                        <Text style={styles.lastSeen}>
+                          {formatLastSeen(contact.lastUpdated)}
+                        </Text>
+                      </View>
+                      <Feather name="chevron-right" size={20} color="#CCCCCC" />
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              ) : (
+                <View style={styles.emptyStateContainer}>
+                  <View style={styles.emptyState}>
+                    <Feather name="message-circle" size={64} color="#CCCCCC" />
+                    <Text style={styles.emptyStateText}>No conversations yet</Text>
+                    <Text style={styles.emptyStateSubtext}>
+                      Search for friends above to start chatting
+                    </Text>
+                  </View>
+                </View>
+              )}
+            </>
+          )}
         </View>
-      </ScrollView>
+      </View>
     </>
   );
 }
@@ -157,13 +432,71 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  profileImage: {
+    height: 40,
+    width: 40,
+    borderRadius: 20,
+  },
   profileInitial: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
-  settingsSection: {
+  contentSection: {
+    flex: 1,
     padding: 20,
+  },
+  searchInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 15,
+    padding: 12,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  searchIcon: {
+    marginRight: 8,
+  },
+  searchInput: {
+    flex: 1,
+    height: 24,
+    padding: 0,
+    color: '#4A6D51',
+  },
+  clearButton: {
+    padding: 5,
+    marginLeft: 5,
+  },
+  loadingContainer: {
+    padding: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#4A6D51',
+  },
+  noSearchResults: {
+    padding: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noResultsText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#828282',
+    marginBottom: 5,
+  },
+  noResultsSubtext: {
+    fontSize: 14,
+    color: '#828282',
+    textAlign: 'center',
   },
   sectionTitleContainer: {
     flexDirection: 'row',
@@ -211,8 +544,85 @@ const styles = StyleSheet.create({
     color: '#4A6D51',
     marginBottom: 4,
   },
-  settingDescription: {
+  lastMessage: {
     fontSize: 13,
     color: '#828282',
-  }
+    marginBottom: 2,
+  },
+  lastSeen: {
+    fontSize: 12,
+    color: '#828282',
+  },
+  conversationsList: {
+    flex: 1,
+  },
+  emptyStateContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 60,
+  },
+  emptyState: {
+    alignItems: 'center',
+  },
+  emptyStateText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#828282',
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  emptyStateSubtext: {
+    fontSize: 16,
+    color: '#828282',
+    textAlign: 'center',
+    lineHeight: 22,
+  },
+  searchResultItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 15,
+    marginBottom: 10,
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  userIconContainer: {
+    height: 45,
+    width: 45,
+    borderRadius: 22.5,
+    backgroundColor: '#E8F0E2',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 15,
+  },
+  userInitial: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#4A6D51',
+  },
+  userInfo: {
+    flex: 1,
+  },
+  userName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#4A6D51',
+    marginBottom: 4,
+  },
+  userEmail: {
+    fontSize: 14,
+    color: '#828282',
+  },
+  searchResultsList: {
+    flex: 1,
+  },
+  searchResultsContainer: {
+    flex: 1,
+    maxHeight: '100%',
+  },
 });
