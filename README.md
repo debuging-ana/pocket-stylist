@@ -15,6 +15,7 @@ Help students look their best with little to no effort and never be late to a cl
 
 ### Authentication & Database
 - Firebase Authentication
+- Firestore
 
 ## Features
 - Personalized outfit suggestions
