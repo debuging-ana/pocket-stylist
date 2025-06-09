@@ -83,6 +83,11 @@ export default function AddOutfitScreen() {
     }));
   };
 
+  // Function to navigate to AI Filter Page
+  const navigateToAIGenerate = () => {
+    router.push('/ai-filters');
+  };
+
   // Function to add item to outfit layout
   const addToOutfitLayout = useCallback((item, x, y) => {
     const relativeX = Math.max(0, Math.min(x - ITEM_SIZE/2, DROP_ZONE_SIZE - ITEM_SIZE));
@@ -553,7 +558,18 @@ export default function AddOutfitScreen() {
         {step === 'selection' ? (
           <>
             <ScrollView style={styles.scrollView}>
-              <Text style={styles.header}>Create New Outfit</Text>
+              {/* Header with AI Generate Button */}
+              <View style={styles.headerContainer}>
+                <Text style={styles.header}>Create New Outfit</Text>
+                <TouchableOpacity
+                  style={styles.aiGenerateButton}
+                  onPress={navigateToAIGenerate}
+                >
+                  <MaterialCommunityIcons name="magic-staff" size={16} color="#FFFFFF" />
+                  <Text style={styles.aiGenerateButtonText}>Create With AI</Text>
+                </TouchableOpacity>
+              </View>
+              
               <Text style={styles.subtitle}>
                 Select items to create your outfit
               </Text>
@@ -603,11 +619,37 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 10,
+  },
   header: {
     fontSize: 26,
     fontWeight: 'bold',
     color: '#4A6D51',
-    marginBottom: 10,
+    flex: 1,
+    marginRight: 15,
+  },
+  aiGenerateButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#4A6D51',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  aiGenerateButtonText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '600',
+    marginLeft: 6,
   },
   subtitle: {
     fontSize: 16,
@@ -819,4 +861,4 @@ const styles = StyleSheet.create({
   descriptionInput: {
     height: 80,
   },
-}); 
+});
