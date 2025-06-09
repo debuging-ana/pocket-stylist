@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router'; // <-- ✅ ADD THIS
 
 export default function AiFiltersScreen() {
   const [filters, setFilters] = useState({
@@ -9,11 +10,22 @@ export default function AiFiltersScreen() {
     lifestyle: false,
   });
 
+  const router = useRouter(); // <-- ✅ GET ROUTER INSTANCE
+
   const toggleFilter = (key) => {
     setFilters((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
   const capitalize = (text) => text.charAt(0).toUpperCase() + text.slice(1);
+
+  const onGeneratePress = () => {
+    const anyFilterSelected = Object.values(filters).some((value) => value);
+    if (anyFilterSelected) {
+      router.push('/outfits-with-filters');
+    } else {
+      router.push('/outfits-no-filters');
+    }
+  };
 
   return (
     <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.scrollContent}>
@@ -35,7 +47,7 @@ export default function AiFiltersScreen() {
           ))}
         </View>
 
-        <TouchableOpacity style={styles.generateButton}>
+        <TouchableOpacity style={styles.generateButton} onPress={onGeneratePress}>
           <Text style={styles.generateButtonText}>Generate</Text>
         </TouchableOpacity>
       </View>
