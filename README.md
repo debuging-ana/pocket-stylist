@@ -6,24 +6,23 @@ Help students look their best with little to no effort and never be late to a cl
 
 ## Features
 ### Core Styling Features
-AI-Powered Outfit Suggestions 
-Weather-Based Styling 
-Event-Based Recommendations 
-Quick Wardrobe Curation 
-Real Closet Integration
+- AI-Powered Outfit Suggestions
+- Weather-Based Styling
+- Event-Based Recommendations
+- Quick Wardrobe Curation
+- Real Closet Integration
 
 ### Social Features
-User Search & Discovery 
-Chat Integration 
-Outfit Sharing 
-Fashion Community 
+- User Search & Discovery
+- Chat Integration
+- Outfit Sharing
+- Fashion Community 
 
 ### User Experience
-Saved Outfits 
-Daily Outfit Suggestions 
-Camera Integration 
-Profile Management 
-Notification System 
+- Saved Outfits
+- Daily Outfit Suggestions
+- Camera Integration
+- Profile Management 
 
 ## Tech Stack
 
@@ -110,7 +109,6 @@ FIREBASE_MEASUREMENT_ID=your_measurement_id
 OPENAI_SECRET_KEY=your_openai_key
 OLLAMA_BASE_URL=http://YOUR_LOCAL_IP:11434
 REMOVE_BG_API_KEY=your_remove_bg_key
-
 ```
 
 - [development build](https://docs.expo.dev/develop/development-builds/introduction/)
