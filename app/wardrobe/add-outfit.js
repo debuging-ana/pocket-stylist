@@ -85,7 +85,7 @@ export default function AddOutfitScreen() {
 
   // Function to navigate to AI Filter Page
   const navigateToAIGenerate = () => {
-    router.push('/ai-filters');
+    router.push('wardrobe/ai-filters');
   };
 
   // Function to add item to outfit layout
