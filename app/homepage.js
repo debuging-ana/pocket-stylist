@@ -190,7 +190,7 @@ export default function HomePage() {
                 backgroundColor: '#CADBC1',
                 borderColor: '#4A6D51'
               }]} 
-              onPress={() => router.push('/events')}
+              onPress={() => router.push('/occasion-outfits')}
             >
               <View style={styles.cardContent}>
                 <View style={styles.cardHeader}>
@@ -210,7 +210,7 @@ export default function HomePage() {
                 backgroundColor: '#E3D3C6',
                 borderColor: '#8B6E57'
               }]} 
-              onPress={() => router.push('/events')}
+              onPress={() => router.push('/occasion-styles')}
             >
               <View style={styles.cardContent}>
                 <View style={styles.cardHeader}>

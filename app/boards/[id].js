@@ -18,25 +18,15 @@ export default function BoardDetail() {
    * it automatically updates when pins are added or removed from the board
    */
   useEffect(() => {
-  if (!user || !user.uid) {
-    setLoading(false);
-    return;
-  }
+    if (!user?.uid) return;
 
-  const userDocRef = doc(db, "users", user.uid);
-  const unsubscribe = onSnapshot(
-    userDocRef,
-    (docSnap) => {
-      // Add robust auth check
-      if (!user || !user.uid) {
-        console.log("User missing during snapshot");
-        return;
-      }
-
+    const userDocRef = doc(db, "users", user.uid);
+    const unsubscribe = onSnapshot(
+      userDocRef,
+      (docSnap) => {
         if (docSnap.exists()) {
           const userData = docSnap.data();
-          // More defensive access:
-          const boards = userData?.boards || [];
+          const boards = userData.boards || [];
           const foundBoard = boards.find(b => b.id === id);
 
           if (foundBoard) {
@@ -54,17 +44,14 @@ export default function BoardDetail() {
         setLoading(false);
       },
       (error) => {
-        // Handle permission errors specifically
-        if (error.code === 'permission-denied' && !user?.uid) {
-          console.log("Ignoring permission error (user signed out)");
-        } else {
-          console.error("Firestore error:", error);
-        }
+        console.error("Snapshot error:", error);
+        console.log("Error details:", error.code, error.message);
+        setBoard(null);
         setLoading(false);
       }
     );
-    
-    return unsubscribe;
+
+    return () => unsubscribe();
   }, [user, id]);
 
   if (loading) {

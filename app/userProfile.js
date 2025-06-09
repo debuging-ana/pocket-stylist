@@ -780,8 +780,7 @@ const styles = StyleSheet.create({
   emptyText: {
     textAlign: 'center',
     color: '#828282',
-    fontStyle: 'italic',
-    fontSize: scaleFontSize(14),
+    fontSize: scaleFontSize(16),
   },
   saveButton: {
     backgroundColor: '#CADBC1',

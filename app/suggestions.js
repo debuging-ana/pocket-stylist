@@ -38,7 +38,7 @@ export default function SuggestionsPage() {
       backgroundColor: "#CADBC1",
       borderColor: "#4A6D51",
       accentColor: "#4A6D51",
-      route: "/events",
+      route: "/occasion-outfits",
       buttonText: "Explore"
     },
     {

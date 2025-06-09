@@ -1,4 +1,4 @@
-/*
+
 import OpenAI from 'openai';
 import Constants from "expo-constants";
 
@@ -26,4 +26,4 @@ export async function generateImageFromPrompt(prompt) {
     throw error;
   }
 }
-  */
+  
