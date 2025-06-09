@@ -667,7 +667,7 @@ const styles = StyleSheet.create({
   bottomButtons: {
     flexDirection: 'row',
     padding: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#AFC6A3',
     borderTopWidth: 1,
     borderTopColor: '#E0E0E0',
     gap: 12,
@@ -679,7 +679,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cancelButton: {
-    backgroundColor: '#CADBC1',
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
     borderColor: '#4A6D51',
   },
