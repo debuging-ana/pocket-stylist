@@ -6,16 +6,21 @@ export default function DailyOutFit() {
     const [imageData, setImageData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [myRequirements, setMyRequirements] = useState('');
+    const [myOutfitDetails, setMyOutfitDetails] = useState('');
 
     const handleGenerateImage = async () => {
+        if(!myOutfitDetails){
+            setError("Please fill all inputs");
+            return;
+        }
+
         setLoading(true);
         setError(null);
         setImageData(null);
 
         try {
             const prompt = "A fashion full body model wearing an outfit based on the current weather in Auckland, high fashion photography, photorealistic, 4K detail, make sure there is no background in the image";
-            const base64Image = await generateImageFromPrompt(`${prompt} and using these requirements ${myRequirements}`);
+            const base64Image = await generateImageFromPrompt(`${prompt} and using these requirements ${myOutfitDetails}`);
             setImageData(base64Image);
         } catch (err) {
             setError('Failed to generate image. Try again.');
@@ -29,10 +34,15 @@ export default function DailyOutFit() {
             <Text style={styles.text}>Made for you!</Text>
 
             <Text style={styles.inputLabel}>Let your imagination run wild! Your style, your rules!</Text>
-            <TextInput style={styles.input} value={myRequirements} onChangeText={setMyRequirements} editable multiline numberOfLines={4} maxLength={80} />
+            <TextInput testID='my-outfit-details' style={styles.input} value={myOutfitDetails} onChangeText={setMyOutfitDetails} editable multiline numberOfLines={4} maxLength={80} />
 
-            <TouchableOpacity style={styles.loginButton} onPress={handleGenerateImage} disabled={loading}>
-                <Text style={styles.loginButtonText}>Generate Outfit</Text>
+            <TouchableOpacity testID='generate-outfit-button' 
+            style={[
+                styles.generateOutfitButton,
+                (loading || !myOutfitDetails.trim()) && styles.generateOutfitButtonDisabled
+            ]}
+            onPress={handleGenerateImage} disabled={loading || !myOutfitDetails.trim()}>
+                <Text style={styles.generateOutfitButtonText}>Generate Outfit</Text>
             </TouchableOpacity>
 
             {loading && <ActivityIndicator size="large" style={styles.loading} />}
@@ -87,7 +97,7 @@ const styles = StyleSheet.create({
         color: 'red',
         marginTop: 10
     },
-    loginButton: {
+    generateOutfitButton: {
         backgroundColor: '#4A6D51',
         borderRadius: 15,
         padding: 15,
@@ -99,10 +109,15 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.2,
     },
-    loginButtonText: {
+    generateOutfitButtonText: {
         color: 'white',
         fontSize: 16,
         fontWeight: '600',
+    },
+    generateOutfitButtonDisabled: {
+        backgroundColor: '#cccccc',
+        opacity: 0.6,
+        shadowColor: 'transparent',
     },
     saveButton: {
         backgroundColor: '#AFC6A3',
