@@ -458,15 +458,17 @@ const styles = StyleSheet.create({
   profileImageContainer: {
     height: scaleSize(40),
     width: scaleSize(40),
-    borderRadius: scaleSize(20),
+    borderRadius: scaleSize(50),
     backgroundColor: '#AFC6A3',
     justifyContent: 'center',
     alignItems: 'center',
   },
   profileImage: {
-    height: scaleSize(40),
-    width: scaleSize(40),
-    borderRadius: scaleSize(20),
+    height: scaleSize(48),
+    width: scaleSize(48),
+    borderRadius: scaleSize(50),
+    borderWidth: 3,
+    borderColor: '#FFFFFF',
   },
   profileInitial: {
     fontSize: scaleFontSize(18),
