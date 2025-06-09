@@ -1,6 +1,8 @@
 /*
 INSTRUCTIONS TO SET IT UP ON UR DEVICE - julz:
 
+download ollama first!!
+
 1. find ur local IP address:
    - Windows: 
       • type cmd

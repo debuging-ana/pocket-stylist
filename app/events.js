@@ -446,7 +446,7 @@ export default function EventsScreen() {
         <Pressable 
           style={styles.addButton}
           onPress={() => setShowModal(true)}>
-          <Ionicons name="add" size={24} color="white" />
+          <Ionicons name="add" size={24} color="#4A6D51" />
         </Pressable>
       </View>
 
@@ -683,7 +683,9 @@ const styles = StyleSheet.create({
     color: '#4A6D51',
   },
   addButton: {
-    backgroundColor: '#4A6D51',
+    backgroundColor: '#CADBC1',
+    borderColor: '#4A6D51', 
+    borderWidth: 1,  
     borderRadius: 20,
     padding: 8,
   },
@@ -723,14 +725,16 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   suggestButton: {
-    backgroundColor: '#4A6D51',
+    backgroundColor: '#CADBC1',
+    borderColor: '#4A6D51', 
+    borderWidth: 1,  
     padding: 10,
     borderRadius: 10,
     marginTop: 8,
     alignItems: 'center',
   },
   buttonText: {
-    color: 'white',
+    color: '#4A6D51',
     fontWeight: '600',
   },
   outfitText: {
@@ -812,16 +816,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   selectedTypeButton: {
-    backgroundColor: '#4A6D51',
+    backgroundColor: '#CADBC1',
+    borderColor: '#4A6D51', 
+    borderWidth: 1,  
   },
   typeText: {
     color: '#4A6D51',
   },
   selectedTypeText: {
-    color: 'white',
+    color: '#4A6D51',
   },
   submitButton: {
-    backgroundColor: '#4A6D51',
+    backgroundColor: '#CADBC1',
+    borderColor: '#4A6D51', 
+    borderWidth: 1,  
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
@@ -857,13 +865,15 @@ const styles = StyleSheet.create({
   flexShrink: 1, //allows text to wrap properly
   },
   selectButton: {
-    backgroundColor: '#4A6D51',
+    backgroundColor: '#CADBC1',
+    borderColor: '#4A6D51', 
+    borderWidth: 1,  
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
   },
   selectButtonText: {
-    color: 'white',
+    color: '#4A6D51',
     fontWeight: '600',
   },
   disabledButton: {
@@ -875,7 +885,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   regenerateButton: {
-    backgroundColor: '#4A6D51',
+    backgroundColor: '#CADBC1',
+    borderColor: '#4A6D51', 
+    borderWidth: 1,  
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
