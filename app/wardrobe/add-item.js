@@ -595,7 +595,7 @@ const styles = StyleSheet.create({
   },
   descriptionInput: {
     height: 50,
-    fontSize: 16,
+    fontSize: 14,
   },
   modalOverlay: {
     flex: 1,
