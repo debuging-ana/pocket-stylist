@@ -24,7 +24,7 @@ Help students look their best with little to no effort and never be late to a cl
 - Ollama - Local AI model integration
 
 ## Project Structure
-   ```
+      ```
       pocket-stylist-1/
       ├── app/                   
       │   ├── wardrobe/          
@@ -47,7 +47,7 @@ Help students look their best with little to no effort and never be late to a cl
       ├── assets/                
       ├── __tests__/             
       └── firebaseConfig.js 
-   ```
+      ```
 
 ## Features
 - Personalized outfit suggestions
@@ -84,7 +84,7 @@ Help students look their best with little to no effort and never be late to a cl
 
 ## Environmental Setup
 ### Create an .env file in the root directory:
-   ```
+      ```
       FIREBASE_API_KEY=your_firebase_api_key
       FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
       FIREBASE_PROJECT_ID=your_project_id
@@ -95,7 +95,7 @@ Help students look their best with little to no effort and never be late to a cl
       OPENAI_SECRET_KEY=your_openai_key
       OLLAMA_BASE_URL=http://YOUR_LOCAL_IP:11434
       REMOVE_BG_API_KEY=your_remove_bg_key
-   ```
+      ```
 
 - [development build](https://docs.expo.dev/develop/development-builds/introduction/)
 - [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
