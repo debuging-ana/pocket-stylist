@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router'; // <-- ✅ ADD THIS
+import { useRouter } from 'expo-router'; 
 
 export default function AiFiltersScreen() {
   const [filters, setFilters] = useState({
@@ -10,7 +10,7 @@ export default function AiFiltersScreen() {
     lifestyle: false,
   });
 
-  const router = useRouter(); // <-- ✅ GET ROUTER INSTANCE
+  const router = useRouter(); 
 
   const toggleFilter = (key) => {
     setFilters((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -21,9 +21,9 @@ export default function AiFiltersScreen() {
   const onGeneratePress = () => {
     const anyFilterSelected = Object.values(filters).some((value) => value);
     if (anyFilterSelected) {
-      router.push('/outfits-with-filters');
+      router.push('wardrobe/outfits-with-filters');
     } else {
-      router.push('/outfits-no-filters');
+      router.push('wardrobe/outfits-no-filters');
     }
   };
 
