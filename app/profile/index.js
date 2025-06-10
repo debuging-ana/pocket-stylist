@@ -4,7 +4,7 @@ Profile Screen - Displays & allows editing of user info
 import { auth, db } from '../../firebaseConfig';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -19,10 +19,9 @@ import {
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import DropDownPicker from 'react-native-dropdown-picker';
-import { router } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
-import { MaterialCommunityIcons } from '@expo/vector-icons'; // Import MaterialCommunityIcons
-import { scaleSize, scaleWidth, scaleHeight, scaleFontSize, scaleSpacing, deviceWidth } from '../../utils/responsive';
+import { MaterialCommunityIcons } from '@expo/vector-icons'; 
+import { scaleSize, scaleHeight, scaleFontSize, scaleSpacing } from '../../utils/responsive';
 
 // this screen lets our users view & update their profile info, including personal details and photo.
 const ProfileScreen = () => {  

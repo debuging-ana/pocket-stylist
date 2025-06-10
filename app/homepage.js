@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar, Image, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import Feather from '@expo/vector-icons/Feather';
@@ -262,6 +262,26 @@ export default function HomePage() {
                 <Text style={styles.cardDescription}>Custom style recommendations based on your preferences.</Text>
                 <View style={styles.cardButton}>
                   <Text style={styles.cardButtonText}>Generate now!</Text>
+                  <Feather name="arrow-right" size={14} color="#4A6D51" />
+                </View>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.suggestionCard, { 
+                backgroundColor: '#CADBC1',
+                borderColor: '#4A6D51'
+              }]} 
+              onPress={() => router.push('/events')}
+            >
+              <View style={styles.cardContent}>
+                <View style={styles.cardHeader}>
+                  <Ionicons name="calendar-outline" size={18} color="#FFFFFF" />
+                  <Text style={styles.cardTag}>Special Event</Text>
+                </View>
+                <Text style={styles.cardTitle}>Event Ready</Text>
+                <Text style={styles.cardDescription}>Outfit ideas perfect for your upcoming events and occasions</Text>
+                <View style={styles.cardButton}>
+                  <Text style={styles.cardButtonText}>Explore</Text>
                   <Feather name="arrow-right" size={14} color="#4A6D51" />
                 </View>
               </View>
