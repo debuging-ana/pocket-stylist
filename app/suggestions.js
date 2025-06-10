@@ -33,19 +33,6 @@ export default function SuggestionsPage() {
       buttonText: "Make your list!"
     },
     {
-      id: 2,
-      title: "Event Ready",
-      tag: "Special Event",
-      icon: "calendar-outline",
-      iconColor: "#FFFFFF",
-      description: "Outfit ideas perfect for your upcoming events and occasions",
-      backgroundColor: "#CADBC1",
-      borderColor: "#4A6D51",
-      accentColor: "#4A6D51",
-      route: "/occasion-outfits",
-      buttonText: "Explore"
-    },
-    {
       id: 3,
       title: "Styling by Occasion",
       tag: "Occasion-Based",

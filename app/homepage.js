@@ -206,26 +206,6 @@ export default function HomePage() {
                 </View>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.suggestionCard, { 
-                backgroundColor: '#CADBC1',
-                borderColor: '#4A6D51'
-              }]} 
-              onPress={() => router.push('/occasion-outfits')}
-            >
-              <View style={styles.cardContent}>
-                <View style={styles.cardHeader}>
-                  <Ionicons name="calendar-outline" size={18} color="#FFFFFF" />
-                  <Text style={styles.cardTag}>Special Event</Text>
-                </View>
-                <Text style={styles.cardTitle}>Event Ready</Text>
-                <Text style={styles.cardDescription}>Outfit ideas perfect for your upcoming events and occasions</Text>
-                <View style={styles.cardButton}>
-                  <Text style={styles.cardButtonText}>Explore</Text>
-                  <Feather name="arrow-right" size={14} color="#4A6D51" />
-                </View>
-              </View>
-            </TouchableOpacity>
             <TouchableOpacity 
               style={[styles.suggestionCard, { 
                 backgroundColor: '#E3D3C6',
