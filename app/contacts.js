@@ -36,7 +36,6 @@ export default function ContactsScreen() {
         }
       } catch (error) {
         console.error('Error fetching user profile:', error);
-        // Don't show this error to user as it's not critical
       }
     };
 
@@ -53,7 +52,7 @@ export default function ContactsScreen() {
 
     const currentUser = user.email;
 
-    // Get chats where user is a participant - removed orderBy to avoid index requirement
+    // Get chats where user is a participant
     const q = query(
       collection(db, 'chats'),
       where('participants', 'array-contains', currentUser),
@@ -126,12 +125,10 @@ export default function ContactsScreen() {
         setContacts(validContacts);
       } catch (error) {
         console.log('Error processing contacts data:', error.code || error.message);
-        // Set empty contacts on error but don't spam console
         setContacts([]);
       }
     }, (error) => {
       console.log('Error fetching contacts:', error.code || error.message);
-      // Handle permission errors gracefully
       if (error.code === 'permission-denied') {
         console.log('Permission denied for contacts - user may need to re-authenticate');
       }
