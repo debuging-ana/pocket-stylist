@@ -41,6 +41,32 @@ export default function SuggestionsPage() {
       buttonText: "Make your list!"
     },
     {
+      id: 2,
+      title: "Event Ready",
+      tag: "Special Event",
+      icon: "calendar-outline",
+      iconColor: "#FFFFFF",
+      description: "Outfit ideas perfect for your upcoming events and occasions",
+      backgroundColor: "#CADBC1",
+      borderColor: "#4A6D51",
+      accentColor: "#4A6D51",
+      route: "/occasion-outfits",
+      buttonText: "Explore"
+    },
+    {
+      id: 3,
+      title: "Styling by Occasion",
+      tag: "Occasion-Based",
+      icon: "briefcase-outline",
+      iconColor: "#FFFFFF",
+      description: "Find the perfect look for any occasion, from office meetings to weekend brunches",
+      backgroundColor: "#E3D3C6",
+      borderColor: "#8B6E57",
+      accentColor: "#4A6D51",
+      route: "/occasion-styles",
+      buttonText: "Browse Occasions"
+    },
+    {
       id: 4,
       title: "Personalised Outfits",
       tag: "Personalized",
