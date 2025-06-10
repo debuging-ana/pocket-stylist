@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet, TextInput, StatusBar, Modal, Alert, FlatList, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import Feather from '@expo/vector-icons/Feather';
