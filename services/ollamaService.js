@@ -1,8 +1,6 @@
 /*
 INSTRUCTIONS TO SET IT UP ON UR DEVICE - julz:
 
-download ollama first!!
-
 1. find ur local IP address:
    - Windows: 
       • type cmd
@@ -30,7 +28,7 @@ check if ur phone can connect thru -> http://[your-ip]:11434
 
 import { useState, useEffect } from 'react';
 
-const OLLAMA_BASE_URL = "http://172.29.81.13:11434" // REPLACE WITH UR IP
+const OLLAMA_BASE_URL = "http://172.29.50.236:11434" // REPLACE WITH UR IP
 
 // connection test with timeout
 const testConnection = async () => {
