@@ -70,7 +70,6 @@ export default function EventsScreen() {
   const [userProfile, setUserProfile] = useState({ gender: 'person' });
   const [weatherCache, setWeatherCache] = useState({});
 
-  // Add this helper function near the top of your component
   const isWeatherDataStale = (timestamp) => {
     const ONE_HOUR = 60 * 60 * 1000; // 1 hour in milliseconds
       return !timestamp || (Date.now() - timestamp) > ONE_HOUR;
