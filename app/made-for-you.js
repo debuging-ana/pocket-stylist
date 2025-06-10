@@ -53,6 +53,15 @@ export default function DailyOutFit() {
                     <Image source={{ uri: imageData }} style={styles.image} resizeMode="contain" />
                 </>
             )}
+             {imageData && (
+                        <TouchableOpacity style={styles.saveButton} onPress={() => {
+                        setImageData(null);
+                        setMyOutfitDetails('');
+                        setError(null);
+                     }}>
+                    <Text style={styles.saveButtonText}>Refresh page</Text>
+                </TouchableOpacity>
+            )}
         </View>
     );
 }
