@@ -167,8 +167,8 @@ export default function HomePage() {
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestionsScrollContent}>
              <TouchableOpacity
               style={[styles.suggestionCard, { 
-                backgroundColor: '#CADBC1',
-                borderColor: '#4A6D51'
+                backgroundColor: '#CDD7E4',
+                borderColor: '#536C8C'
               }]} 
               onPress={() => router.push('/get-away-trip')}
             >
@@ -188,8 +188,8 @@ export default function HomePage() {
 
             <TouchableOpacity 
               style={[styles.suggestionCard, { 
-                backgroundColor: '#CDD7E4',
-                borderColor: '#536C8C' 
+                backgroundColor: '#CADBC1',
+                borderColor: '#4A6D51' 
               }]} 
               onPress={() => router.push('/daily-outfit')}
             >
@@ -248,8 +248,8 @@ export default function HomePage() {
             </TouchableOpacity>
             <TouchableOpacity 
               style={[styles.suggestionCard, { 
-                backgroundColor: '#CADBC1',
-                borderColor: '#4A6D51'
+                backgroundColor: '#CDD7E4',
+                borderColor: '#536C8C'
               }]} 
               onPress={() => router.push('/events')}
             >
