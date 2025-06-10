@@ -14,7 +14,10 @@ import Feather from '@expo/vector-icons/Feather';
 import { db } from '../firebaseConfig';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 
+// Main signup screen component for new user registration
+// Includes form validation, user creation, and navigation
 export default function SignupScreen() {
+  // State variables for form inputs and validation
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -25,11 +28,13 @@ export default function SignupScreen() {
 
   const router = useRouter();
   
+  // Main function to handle user signup process
+  // Includes validation, Firebase user creation, and navigation
   const handleSignup = async () => {
-    // Reset error state
+    // Reset error state before validation
     setError('');
     
-    // Validate inputs
+    // Input validation checks
     if (!firstName.trim()) {
       setError('First name is required');
       return;
@@ -55,28 +60,27 @@ export default function SignupScreen() {
       return;
     }
     
-    // Show loading state
+    // Show loading state during signup process
     setIsLoading(true);
     
-    //actual firebase integration
+    // Firebase user creation process
     try {
       const user = await signupUser(email, password);
 
-       //Save user info to Firestore
-      /*
-       await setDoc(doc(db, 'users', user.uid), {
+      // Save user info to Firestore for profile data
+      await setDoc(doc(db, 'users', user.uid), {
         uid: user.uid,
         email: user.email,
         firstName,
         lastName,
         createdAt: serverTimestamp()
       });
-      */
-      // Show success alert
+      
+      // Show success message and navigate to login
       alert('Account created successfully! Please log in.');
       router.push('/login');
       
-      //clears form fields
+      // Clear all form fields after successful signup
       setFirstName('');
       setLastName('');
       setEmail('');
@@ -84,6 +88,7 @@ export default function SignupScreen() {
       setConfirmPassword('');
 
     } catch (err) {
+      // Handle different types of Firebase authentication errors
       let errorMessage = 'Sign up failed. Please try again.';
       switch (err.code) {
         case 'auth/email-already-in-use':
@@ -109,11 +114,14 @@ export default function SignupScreen() {
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
+        {/* Main signup form container */}
         <View style={styles.headerContainer}>
           <View style={styles.headerCard}>
+            {/* Page title and description */}
             <Text style={styles.title}>Create Account</Text>
             <Text style={styles.subtitle}>Join us to manage your wardrobe</Text>
             
+            {/* Error message display */}
             {error ? (
               <View style={styles.errorContainer}>
                 <Feather name="alert-circle" size={16} color="#D32F2F" />
@@ -121,6 +129,7 @@ export default function SignupScreen() {
               </View>
             ) : null}
             
+            {/* Name input fields row */}
             <View style={styles.nameFieldsContainer}>
               <View style={styles.nameFieldWrapper}>
                 <Text style={styles.inputLabel}>First Name</Text>
@@ -147,6 +156,7 @@ export default function SignupScreen() {
               </View>
             </View>
             
+            {/* Email input field */}
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>Email</Text>
               <TextInput
@@ -160,6 +170,7 @@ export default function SignupScreen() {
               />
             </View>
             
+            {/* Password input field */}
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>Password</Text>
               <TextInput
@@ -172,6 +183,7 @@ export default function SignupScreen() {
               />
             </View>
             
+            {/* Password confirmation input field */}
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>Confirm Password</Text>
               <TextInput
@@ -184,6 +196,7 @@ export default function SignupScreen() {
               />
             </View>
             
+            {/* Main signup button */}
             <TouchableOpacity 
               style={styles.signupButton} 
               onPress={handleSignup}
@@ -196,6 +209,7 @@ export default function SignupScreen() {
           </View>
         </View>
         
+        {/* Login redirect section */}
         <View style={styles.loginLinkContainer}>
           <Text style={styles.loginText}>Already have an account? </Text>
           <Link href="/login" asChild>
@@ -209,6 +223,7 @@ export default function SignupScreen() {
   );
 }
 
+// Styles for the signup screen
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,

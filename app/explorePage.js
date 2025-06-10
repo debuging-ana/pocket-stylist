@@ -7,10 +7,9 @@ import { collection, query, where, getDocs, limit, doc, getDoc, updateDoc, array
 import { db } from '../firebaseConfig';
 import Entypo from '@expo/vector-icons/Entypo';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { scaleSize, scaleWidth, scaleHeight, scaleFontSize, scaleSpacing, deviceWidth, getGridItemWidth } from '../utils/responsive';
+import { scaleSize, scaleWidth, scaleHeight, scaleFontSize, scaleSpacing, getGridItemWidth } from '../utils/responsive';
 
-const WINDOW_WIDTH = deviceWidth;
-
+// Main explore page component for discovering outfit inspiration
 const ExplorePage = () => {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('All');

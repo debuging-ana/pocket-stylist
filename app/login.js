@@ -12,16 +12,23 @@ import { Link, useRouter } from 'expo-router';
 import { loginUser } from '../services/auth';
 import Feather from '@expo/vector-icons/Feather';
 
+// Main login screen component for user authentication
+// Handles user login with email/password and error handling
 export default function LoginScreen() {
+  // State variables for form inputs and authentication
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
 
+  // Main function to handle user login process
+  // Includes validation, Firebase authentication, and navigation
   const handleLogin = async () => {
+    // Reset error state before validation
     setError('');
 
+    // Input validation checks
     if (!email.trim()) {
       setError('Email is required');
       return;
@@ -32,14 +39,16 @@ export default function LoginScreen() {
       return;
     }
 
+    // Show loading state during login process
     setIsLoading(true);
 
     try {
+      // Authenticate user with Firebase
       await loginUser(email, password);
       // Navigate directly to home tab after successful login
       router.replace('/homepage');
     } catch (err) {
-      // Better error handling
+      // Handle different types of Firebase authentication errors
       let errorMessage = 'Login failed. Please try again.';
       switch (err.code) {
         case 'auth/invalid-email':
@@ -66,11 +75,14 @@ export default function LoginScreen() {
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
+        {/* Main login form container */}
         <View style={styles.headerContainer}>
           <View style={styles.headerCard}>
+            {/* Page title and welcome message */}
             <Text style={styles.title}>Welcome to Pocket Stylist</Text>
             <Text style={styles.subtitle}>Log in to your account</Text>
 
+            {/* Error message display */}
             {error ? (
               <View style={styles.errorContainer}>
                 <Feather name="alert-circle" size={16} color="#D32F2F" />
@@ -78,6 +90,7 @@ export default function LoginScreen() {
               </View>
             ) : null}
 
+            {/* Email input field */}
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>Email</Text>
               <TextInput
@@ -91,6 +104,7 @@ export default function LoginScreen() {
               />
             </View>
 
+            {/* Password input field */}
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>Password</Text>
               <TextInput
@@ -103,6 +117,7 @@ export default function LoginScreen() {
               />
             </View>
 
+            {/* Main login button */}
             <TouchableOpacity
               style={styles.loginButton}
               onPress={handleLogin}
@@ -113,6 +128,7 @@ export default function LoginScreen() {
               </Text>
             </TouchableOpacity>
 
+            {/* Forgot password link */}
             <Link href="/forgot-password" asChild>
               <TouchableOpacity style={styles.forgotPasswordContainer}>
                 <Text style={styles.forgotPasswordText}>Forgot password?</Text>
@@ -121,6 +137,7 @@ export default function LoginScreen() {
           </View>
         </View>
 
+        {/* Signup redirect section */}
         <View style={styles.signUpContainer}>
           <Text style={styles.signUpText}>Don't have an account? </Text>
           <Link href="/signup" asChild>
@@ -134,6 +151,7 @@ export default function LoginScreen() {
   );
 }
 
+// Styles for the login screen
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,

@@ -8,7 +8,7 @@ import { db } from '../firebaseConfig';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
 import NotificationBadge from '../components/NotificationBadge';
-import { scaleSize, scaleWidth, scaleHeight, scaleFontSize, scaleSpacing } from '../utils/responsive';
+import { scaleSize, scaleHeight, scaleFontSize, scaleSpacing } from '../utils/responsive';
 
 export default function ContactsScreen() {
   const router = useRouter();
@@ -70,7 +70,7 @@ export default function ContactsScreen() {
       try {
         const chats = snapshot.docs.map(doc => {
           const data = doc.data();
-          // Find the other participant (not current user)
+          // Find the other user (not current user)
           const otherParticipant = data.participants?.find(p => p !== currentUser);
           
           return {

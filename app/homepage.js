@@ -7,10 +7,10 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
 import NotificationBadge from '../components/NotificationBadge';
-import { doc, getDoc, collection, query, orderBy, limit, getDocs } from 'firebase/firestore'; // Add imports for Firestore
-import { db } from '../firebaseConfig'; // Import your Firebase configuration
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../firebaseConfig';
 import { useWardrobe } from '../context/wardrobeContext';
-import { scaleSize, scaleWidth, scaleHeight, scaleFontSize, scaleSpacing, deviceWidth } from '../utils/responsive';
+import { scaleSize, scaleWidth, scaleHeight, scaleFontSize, scaleSpacing } from '../utils/responsive';
 
 const getCategoryIcon = (category, size = 22) => {
   const icons = {
@@ -165,7 +165,7 @@ export default function HomePage() {
             </TouchableOpacity>
           </View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestionsScrollContent}>
-             <TouchableOpacity Add commentMore actions
+             <TouchableOpacity
               style={[styles.suggestionCard, { 
                 backgroundColor: '#CADBC1',
                 borderColor: '#4A6D51'
@@ -185,8 +185,6 @@ export default function HomePage() {
                 </View>
               </View>
             </TouchableOpacity>
-
-
 
             <TouchableOpacity 
               style={[styles.suggestionCard, { 
@@ -209,8 +207,6 @@ export default function HomePage() {
               </View>
             </TouchableOpacity>
 
-
-              
             <TouchableOpacity 
               style={[styles.suggestionCard, { 
                 backgroundColor: '#DFBDBD',
@@ -563,9 +559,4 @@ const styles = StyleSheet.create({
     color: '#828282',
     textTransform: 'capitalize',
   },
-  tipCard: null,
-  tipIconContainer: null,
-  tipContent: null,
-  tipTitle: null,
-  tipText: null,
 });
