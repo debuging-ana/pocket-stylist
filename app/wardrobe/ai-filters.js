@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Pressable, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router'; 
+import { useRouter, useLocalSearchParams } from 'expo-router'; 
 
 export default function AiFiltersScreen() {
   const [filters, setFilters] = useState({
@@ -10,7 +10,27 @@ export default function AiFiltersScreen() {
     lifestyle: false,
   });
 
+  const [selectedItems, setSelectedItems] = useState({
+    tops: [],
+    bottoms: [],
+    jackets: [],
+    shoes: [],
+    accessories: [],
+  });
+
   const router = useRouter(); 
+  const { selectedItems: selectedItemsParam } = useLocalSearchParams();
+
+  useEffect(() => {
+    if (selectedItemsParam) {
+      try {
+        const parsedItems = JSON.parse(decodeURIComponent(selectedItemsParam));
+        setSelectedItems(parsedItems);
+      } catch (error) {
+        console.error('Error parsing selected items:', error);
+      }
+    }
+  }, [selectedItemsParam]);
 
   const toggleFilter = (key) => {
     setFilters((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -20,11 +40,50 @@ export default function AiFiltersScreen() {
 
   const onGeneratePress = () => {
     const anyFilterSelected = Object.values(filters).some((value) => value);
+    
+    // Pass selected items to both routes
+    const selectedItemsQuery = encodeURIComponent(JSON.stringify(selectedItems));
+    
     if (anyFilterSelected) {
-      router.push('wardrobe/outfits-with-filters');
+      router.push(`wardrobe/outfits-with-filters?selectedItems=${selectedItemsQuery}`);
     } else {
-      router.push('wardrobe/outfits-no-filters');
+      router.push(`wardrobe/outfits-no-filters?selectedItems=${selectedItemsQuery}`); 
     }
+  };
+
+  // Function to render selected items by category
+  const renderSelectedItems = () => {
+    const allSelectedItems = Object.entries(selectedItems)
+      .filter(([category, items]) => items.length > 0)
+      .map(([category, items]) => ({ category, items }));
+
+    if (allSelectedItems.length === 0) return null;
+
+    return (
+      <View style={styles.selectedItemsContainer}>
+        <Text style={styles.selectedItemsTitle}>Selected Items</Text>
+        {allSelectedItems.map(({ category, items }) => (
+          <View key={category} style={styles.categoryContainer}>
+            <Text style={styles.categoryTitle}>{capitalize(category)}</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <View style={styles.itemsRow}>
+                {items.map((item) => (
+                  <View key={item.id} style={styles.selectedItemCard}>
+                    <Image
+                      source={{ uri: item.imageUri }}
+                      style={styles.selectedItemImage}
+                    />
+                    <Text style={styles.selectedItemName} numberOfLines={2}>
+                      {item.name}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </ScrollView>
+          </View>
+        ))}
+      </View>
+    );
   };
 
   return (
@@ -47,6 +106,9 @@ export default function AiFiltersScreen() {
           ))}
         </View>
 
+        {/* Render selected items */}
+        {renderSelectedItems()}
+
         <TouchableOpacity style={styles.generateButton} onPress={onGeneratePress}>
           <Text style={styles.generateButtonText}>Generate</Text>
         </TouchableOpacity>
@@ -54,6 +116,53 @@ export default function AiFiltersScreen() {
     </ScrollView>
   );
 }
+
+
+const newStyles = {
+  selectedItemsContainer: {
+    marginBottom: 30,
+    paddingTop: 20,
+    borderTopWidth: 1,
+    borderTopColor: '#E0E0E0',
+  },
+  selectedItemsTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#4A6D51',
+    marginBottom: 12,
+  },
+  categoryContainer: {
+    marginBottom: 16,
+  },
+  categoryTitle: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#7D7D7D',
+    marginBottom: 8,
+  },
+  itemsRow: {
+    flexDirection: 'row',
+    paddingVertical: 4,
+  },
+  selectedItemCard: {
+    width: 80,
+    marginRight: 12,
+    alignItems: 'center',
+  },
+  selectedItemImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 8,
+    resizeMode: 'cover',
+    marginBottom: 4,
+  },
+  selectedItemName: {
+    fontSize: 11,
+    color: '#333',
+    textAlign: 'center',
+    paddingHorizontal: 2,
+  },
+};
 
 const styles = StyleSheet.create({
   scrollContainer: {
@@ -123,4 +232,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  ...newStyles,
 });

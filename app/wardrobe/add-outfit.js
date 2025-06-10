@@ -83,9 +83,22 @@ export default function AddOutfitScreen() {
     }));
   };
 
-  // Function to navigate to AI Filter Page
+  
+// Helper function to check if user has selected at least one top and one bottom
+  const hasMinimumAISelection = () => {
+    return selectedItems.tops.length > 0 && selectedItems.bottoms.length > 0;
+  };
+
+  // Function to navigate to AI Filter Page with validation
   const navigateToAIGenerate = () => {
-    router.push('wardrobe/ai-filters');
+    if (!hasMinimumAISelection()) {
+      alert('Please select at least one top and one bottom item before using AI generation.');
+      return;
+    }
+    
+    // Pass selected items as query parameters
+    const selectedItemsJson = encodeURIComponent(JSON.stringify(selectedItems));
+    router.push(`wardrobe/ai-filters?selectedItems=${selectedItemsJson}`);
   };
 
   // Function to add item to outfit layout

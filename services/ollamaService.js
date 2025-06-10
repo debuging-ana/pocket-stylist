@@ -28,8 +28,9 @@ check if ur phone can connect thru -> http://[your-ip]:11434
 5. run the app normally
 */
 
+import { useState, useEffect } from 'react';
 
-const OLLAMA_BASE_URL = "http://YOUR_LOCAL_IP:11434" // REPLACE WITH UR IP
+const OLLAMA_BASE_URL = "http://172.29.81.13:11434" // REPLACE WITH UR IP
 
 // connection test with timeout
 const testConnection = async () => {
@@ -75,18 +76,19 @@ export const generateWithLlama = async (prompt, timeoutMs = 120000) => {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
-    /*
-     Note: The JSON parsing logic remains here as a placeholder for future API responses.
-     but for events.js, Ollama changed to returning in plain text, but if the API starts returning structured JSON again,
-     this will be ready to handle it without needing a rewrite
-    */
+    
+    // Note: The JSON parsing logic remains here as a placeholder for future API responses.
+    // but for events.js, Ollama changed to returning in plain text, but if the API starts returning structured JSON again,
+    // this will be ready to handle it without needing a rewrite
+    
 
     // sends the actual generation request to Ollama
     const response = await fetch(`${OLLAMA_BASE_URL}/api/generate`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      mode: 'cors',
       body: JSON.stringify({
-        model: "llama3", // switched from tinyllama, mistral to that after testing
+        model: "llama3.2", // switched from tinyllama, mistral to that after testing
         prompt: `You are a fashion assistant. ${prompt}`, // role context
         stream: false,
         options: { 
@@ -118,6 +120,12 @@ export const generateWithLlama = async (prompt, timeoutMs = 120000) => {
     return responseText;
   } catch (error) {
     console.error("Ollama API Error:", error);
+    
+    // Add specific handling for AbortError
+    if (error.name === 'AbortError') {
+      console.log('Request was aborted - this might be due to timeout');
+      throw new Error('Request timeout - please try again');
+    }
     
     // return a fallback suggestion if generation fails
     const fallbacks = {
