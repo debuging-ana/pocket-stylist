@@ -50,7 +50,7 @@ export default function DailyOutFit() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Today's Look</Text>
+      <Text style={styles.text}>Weather-based</Text>
 
       <TouchableOpacity style={styles.loginButton} onPress={handleGenerateImage}>
         <Text style={styles.loginButtonText}>Generate Outfit</Text>

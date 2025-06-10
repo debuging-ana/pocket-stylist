@@ -221,9 +221,9 @@ export default function HomePage() {
               <View style={styles.cardContent}>
                 <View style={styles.cardHeader}>
                   <Ionicons name="person-outline" size={18} color="#FFFFFF" />
-                  <Text style={styles.cardTag}>Personalized</Text>
+                  <Text style={styles.cardTag}>Personalised Outfits</Text>
                 </View>
-                <Text style={styles.cardTitle}>Made for You</Text>
+                <Text style={styles.cardTitle}>Personalised Outfits</Text>
                 <Text style={styles.cardDescription}>Custom style recommendations based on your preferences.</Text>
                 <View style={styles.cardButton}>
                   <Text style={styles.cardButtonText}>Generate now!</Text>

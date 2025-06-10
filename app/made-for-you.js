@@ -31,7 +31,7 @@ export default function DailyOutFit() {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.text}>Made for you!</Text>
+            <Text style={styles.text}>Personalised Outfits</Text>
 
             <Text style={styles.inputLabel}>Let your imagination run wild! Your style, your rules!</Text>
             <TextInput testID='my-outfit-details' style={styles.input} value={myOutfitDetails} onChangeText={setMyOutfitDetails} editable multiline numberOfLines={4} maxLength={80} />
