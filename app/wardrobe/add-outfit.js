@@ -83,6 +83,24 @@ export default function AddOutfitScreen() {
     }));
   };
 
+  
+// Helper function to check if user has selected at least one top and one bottom
+  const hasMinimumAISelection = () => {
+    return selectedItems.tops.length > 0 && selectedItems.bottoms.length > 0;
+  };
+
+  // Function to navigate to AI Filter Page with validation
+  const navigateToAIGenerate = () => {
+    if (!hasMinimumAISelection()) {
+      alert('Please select at least one top and one bottom item before using AI generation.');
+      return;
+    }
+    
+    // Pass selected items as query parameters
+    const selectedItemsJson = encodeURIComponent(JSON.stringify(selectedItems));
+    router.push(`wardrobe/ai-filters?selectedItems=${selectedItemsJson}`);
+  };
+
   // Function to add item to outfit layout
   const addToOutfitLayout = useCallback((item, x, y) => {
     const relativeX = Math.max(0, Math.min(x - ITEM_SIZE/2, DROP_ZONE_SIZE - ITEM_SIZE));
@@ -553,10 +571,44 @@ export default function AddOutfitScreen() {
         {step === 'selection' ? (
           <>
             <ScrollView style={styles.scrollView}>
-              <Text style={styles.header}>Create New Outfit</Text>
-              <Text style={styles.subtitle}>
-                Select items to create your outfit
-              </Text>
+              {/* Header Section with improved design */}
+              <View style={styles.headerSection}>
+                <View style={styles.headerContainer}>
+                  <View style={styles.headerTextContainer}>
+                    <Text style={styles.header}>Create New Outfit</Text>
+                    <Text style={styles.subtitle}>
+                      Select items to create your outfit
+                    </Text>
+                  </View>
+                  
+                  {/* Improved AI Generate Button */}
+                  <TouchableOpacity
+                    style={[
+                      styles.aiGenerateButton,
+                      !hasMinimumAISelection() && styles.aiGenerateButtonDisabled
+                    ]}
+                    onPress={navigateToAIGenerate}
+                    disabled={!hasMinimumAISelection()}
+                  >
+                    <View style={styles.aiButtonContent}>
+                      <MaterialCommunityIcons 
+                        name="magic-staff" 
+                        size={20} 
+                        color={hasMinimumAISelection() ? "#4A6D51" : "#CCCCCC"} 
+                      />
+                      <Text style={[
+                        styles.aiGenerateButtonText,
+                        !hasMinimumAISelection() && styles.aiGenerateButtonTextDisabled
+                      ]}>
+                        AI Generate
+                      </Text>
+                    </View>
+                    <Text style={styles.aiButtonSubtext}>
+                      {hasMinimumAISelection() ? "Create with AI" : "Select top & bottom"}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
               
               {renderCategorySection('tops', itemsByCategory.tops)}
               {renderCategorySection('bottoms', itemsByCategory.bottoms)}
@@ -603,6 +655,17 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
+  headerSection: {
+    marginBottom: 20,
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  headerTextContainer: {
+    flex: 1,
+  },
   header: {
     fontSize: 26,
     fontWeight: 'bold',
@@ -612,35 +675,83 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     color: '#828282',
-    marginBottom: 20,
+  },
+  aiGenerateButton: {
+    backgroundColor: '#FFFFFF',
+    borderColor: '#4A6D51',
+    borderWidth: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    minWidth: 120,
+    alignItems: 'center',
+  },
+  aiGenerateButtonDisabled: {
+    backgroundColor: '#F5F5F5',
+    borderColor: '#CCCCCC',
+  },
+  aiButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  aiGenerateButtonText: {
+    color: '#4A6D51',
+    fontSize: 14,
+    fontWeight: '600',
+    marginLeft: 8,
+  },
+  aiGenerateButtonTextDisabled: {
+    color: '#CCCCCC',
+  },
+  aiButtonSubtext: {
+    color: '#828282',
+    fontSize: 10,
+    fontWeight: '500',
+    textAlign: 'center',
   },
   categorySection: {
-    marginBottom: 16,
+    marginBottom: 24,
   },
   categoryTitle: {
-    fontSize: 17,
+    fontSize: 18,
     fontWeight: '600',
     color: '#4A6D51',
-    marginBottom: 10,
+    marginBottom: 12,
   },
   itemsRow: {
     flexDirection: 'row',
-    paddingVertical: 6,
+    paddingVertical: 8,
   },
   itemCard: {
-    width: 122.7,
-    height: 137,
-    marginRight: 10,
+    width: 120,
+    height: 140,
+    marginRight: 12,
     backgroundColor: '#FFFFFF',
-    borderRadius: 10,
-    padding: 8,
+    borderRadius: 12,
+    padding: 10,
     borderWidth: 1,
     borderColor: '#E0E0E0',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 1,
   },
   selectedItemCard: {
     borderColor: '#4A6D51',
-    borderWidth: 1,
+    borderWidth: 2,
+    shadowColor: '#4A6D51',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 3,
   },
   itemImage: {
     width: 88,
@@ -667,7 +778,7 @@ const styles = StyleSheet.create({
   bottomButtons: {
     flexDirection: 'row',
     padding: 20,
-    backgroundColor: '#AFC6A3',
+    backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
     borderTopColor: '#E0E0E0',
     gap: 12,
@@ -679,7 +790,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cancelButton: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#CADBC1',
     borderWidth: 1,
     borderColor: '#4A6D51',
   },
@@ -819,4 +930,4 @@ const styles = StyleSheet.create({
   descriptionInput: {
     height: 80,
   },
-}); 
+});
