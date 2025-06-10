@@ -2,7 +2,6 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar } from 
 import { useRouter } from 'expo-router';
 import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { ActivityIndicator } from 'react-native';
 
 export default function SuggestionsPage() {
   const router = useRouter();
