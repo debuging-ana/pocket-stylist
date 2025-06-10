@@ -1,17 +1,33 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Image, Alert, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
 import { generateImageFromPrompt } from '../services/openAI';
-import { Button } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 
-export default function DailyOutFit() {
+
+const countries = [
+  "Afghanistan", "Albania", "Algeria", "Andorra", "Angola",
+  "Argentina", "Australia", "Austria", "Bahamas", "Bangladesh",
+  "Belgium", "Brazil", "Bulgaria", "Canada", "Chile", "China",
+  "Colombia", "Croatia", "Czech Republic", "Denmark", "Egypt",
+  "Finland", "France", "Germany", "Greece", "Hungary", "India",
+  "Indonesia", "Ireland", "Israel", "Italy", "Japan", "Kenya",
+  "Luxembourg", "Mexico", "Netherlands", "New Zealand", "Nigeria",
+  "Norway", "Pakistan", "Peru", "Philippines", "Poland", "Portugal",
+  "Qatar", "Romania", "Russia", "Saudi Arabia", "Singapore", "Slovakia",
+  "South Africa", "South Korea", "Spain", "Sweden", "Switzerland",
+  "Thailand", "Turkey", "Ukraine", "United Arab Emirates", "United Kingdom",
+  "United States", "Vietnam", "Zimbabwe"
+];
+
+export default function TravelBased() {
     const [imageData, setImageData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [myOutfitDetails, setMyOutfitDetails] = useState('');
+    const [selectedCountry, setSelectedCountry] = useState("Afghanistan");
 
     const handleGenerateImage = async () => {
-        if(!myOutfitDetails){
-            setError("Please fill in destination and style preferences");
+        if(!selectedCountry){
+            setError("Please select a country first");
             return;
         }
 
@@ -20,9 +36,11 @@ export default function DailyOutFit() {
         setImageData(null);
 
         try {
-            const { destination, stylePreferences, weather } = myOutfitDetails;
-            const prompt = "Flat lay photo of clothing and accessories for a trip to ${destination}. The weather is ${weather.condition} with around ${weather.temperature}°C. The outfit should match a ${stylePreferences} style, and be suitable for this weather — include items like sunglasses, light layers, or jackets depending on the temperature. High quality, 4K, no background, photorealistic.";
-            const base64Image = await generateImageFromPrompt(`${prompt} and using these requirements ${myOutfitDetails}`);
+            const prompt = `I'm planning a trip and I want help choosing an outfit to pack. Please suggest a travel-appropriate 
+            look based on the destination country I'll visit, taking into account the local weather at the moment, culture, and typical
+             dress code. The goal is to avoid overpacking and only bring what's essential and versatile. here is the country and places 
+             that I'll be visiting ${selectedCountry}, what should I pack?`;
+            const base64Image = await generateImageFromPrompt(prompt);
             setImageData(base64Image);
         } catch (err) {
             setError('Failed to generate image. Try again.');
@@ -33,17 +51,28 @@ export default function DailyOutFit() {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.text}>Get away!</Text>
+            <Text style={styles.text}>Travel-Based</Text>
 
-            <Text style={styles.inputLabel}>Planning a getaway but don’t want to overpack? Just tell us where you’re headed — we’ll check the weather and give you a smart packing list. It’s that easy!</Text>
-            <TextInput testID='my-outfit-details' style={styles.input} value={myOutfitDetails} onChangeText={setMyOutfitDetails} editable multiline numberOfLines={4} maxLength={80} />
+            <Text style={styles.inputLabel}>
+                Planning a getaway but don't want to overpack? Select a country and we'll check the weather and give you a smart packing list. It's that easy!
+            </Text>
+
+            <Picker
+                selectedValue={selectedCountry}
+                onValueChange={(itemValue) => setSelectedCountry(itemValue)}
+                style={styles.picker}
+            >
+                {countries.map((country) => (
+                    <Picker.Item key={country} label={country} value={country} />
+                ))}
+            </Picker>
 
             <TouchableOpacity testID='generate-outfit-button' 
-            style={[
-                styles.generateOutfitButton,
-                (loading || !myOutfitDetails.trim()) && styles.generateOutfitButtonDisabled
-            ]}
-            onPress={handleGenerateImage} disabled={loading || !myOutfitDetails.trim()}>
+                style={[
+                    styles.generateOutfitButton,
+                    (loading || !selectedCountry) && styles.generateOutfitButtonDisabled
+                ]}
+                onPress={handleGenerateImage} disabled={loading || !selectedCountry}>
                 <Text style={styles.generateOutfitButtonText}>Generate Outfit</Text>
             </TouchableOpacity>
 
@@ -55,18 +84,16 @@ export default function DailyOutFit() {
                     <Image source={{ uri: imageData }} style={styles.image} resizeMode="contain" />
                 </>
             )}
+
             {imageData && (
-            <TouchableOpacity style={styles.saveButton} onPress={() => {
-            setImageData(null);
-            setMyOutfitDetails('');
-            setError(null);
-         }}>
-        <Text style={styles.saveButtonText}>Refresh page</Text>
-    </TouchableOpacity>
-)}
-
-            
-
+                <TouchableOpacity style={styles.saveButton} onPress={() => {
+                    setImageData(null);
+                    setSelectedCountry('');
+                    setError(null);
+                }}>
+                    <Text style={styles.saveButtonText}>Refresh page</Text>
+                </TouchableOpacity>
+            )}
         </View>
     );
 }
@@ -96,16 +123,10 @@ const styles = StyleSheet.create({
     inputContainer: {
         marginBottom: 20,
     },
-    input: {
-        backgroundColor: '#F9F9F4',
-        borderRadius: 15,
-        padding: 15,
-        fontSize: 16,
-        borderWidth: 1,
-        borderColor: '#E0E0E0',
-        width: 400,
-        height: 80,
-        marginBottom: 10,
+    picker: {
+        flex: 1,
+        height: 50,
+        width: '100%',
     },
     error: {
         color: 'red',

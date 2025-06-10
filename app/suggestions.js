@@ -9,7 +9,7 @@ export default function SuggestionsPage() {
   const suggestions = [
     {
       id: 1,
-      title: "Today's Look",
+      title: "Weather-based",
       tag: "Weather-Based",
       icon: "sunny-outline",
       iconColor: "#FFFFFF",
@@ -35,7 +35,7 @@ export default function SuggestionsPage() {
     },
     {
       id: 4,
-      title: "Made for You",
+      title: "Personalised Outfits",
       tag: "Personalized",
       icon: "person-outline",
       iconColor: "#FFFFFF",
