@@ -4,9 +4,9 @@ import { useWardrobe } from '../context/wardrobeContext';
 import { useState, useEffect, useMemo } from 'react';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
-import { doc, getDoc } from 'firebase/firestore'; // Add imports for Firestore
-import { db } from '../firebaseConfig'; // Import your Firebase configuration
-import { scaleSize, scaleWidth, scaleHeight, scaleFontSize, scaleSpacing, deviceWidth, getTwoColumnWidth } from '../utils/responsive';
+import { doc, getDoc } from 'firebase/firestore'; 
+import { db } from '../firebaseConfig';
+import { scaleSize, scaleHeight, scaleFontSize, scaleSpacing } from '../utils/responsive';
 
 // Pre-load and cache images
 const CATEGORY_ICONS = {

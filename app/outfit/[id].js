@@ -1,30 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Alert, ScrollView, ActivityIndicator, TextInput } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useWardrobe } from '../../context/wardrobeContext';
-import { useNavigation } from 'expo-router';
-import { useLayoutEffect } from 'react';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useWardrobe } from '../../context/wardrobeContext';
 
+// OutfitDetailScreen component displays detailed information about a specific outfit
+// Allows users to view, edit description, and delete outfits
 export default function OutfitDetailScreen() {
+  // Route parameters and context
   const { id } = useLocalSearchParams();
   const { savedOutfits, deleteOutfit, updateOutfit } = useWardrobe();
-  const navigation = useNavigation();
   const router = useRouter();
+  
+  // Component state
   const [isEditing, setIsEditing] = useState(false);
   const [editedDescription, setEditedDescription] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
+  // Find the current outfit from saved outfits
   const outfit = savedOutfits.find((outfit) => outfit.id === id);
 
   // Initialize edited description when outfit is loaded
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (outfit) {
       setEditedDescription(outfit.description || '');
     }
   }, [outfit]);
 
-  // Handle redirect when outfit is deleted (moved from render phase to useEffect)
+  // Handle redirect when outfit is deleted or not found
   useEffect(() => {
     if (!outfit && savedOutfits.length > 0) {
       // Only redirect if we have loaded outfits but this specific one isn't found
@@ -45,6 +48,7 @@ export default function OutfitDetailScreen() {
     );
   }
 
+  // Handles outfit deletion with confirmation dialog
   const handleDelete = () => {
     Alert.alert(
       "Delete Outfit",
@@ -71,6 +75,7 @@ export default function OutfitDetailScreen() {
     );
   };
 
+  // Saves the edited description for the current outfit
   const handleSaveDescription = async () => {
     if (!outfit) return;
     
@@ -92,6 +97,8 @@ export default function OutfitDetailScreen() {
     }
   };
 
+  // Formats a date object into a readable string
+  // Accepts Date object or Firestore timestamp and returns formatted date string
   const formatDate = (date) => {
     if (!date) return 'Unknown date';
     
@@ -106,7 +113,7 @@ export default function OutfitDetailScreen() {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.content}>
-        {/* Outfit Image Section */}
+        {/* Main outfit image section */}
         <View style={styles.imageContainer}>
           {outfit.imageUri ? (
             <Image 
@@ -122,10 +129,12 @@ export default function OutfitDetailScreen() {
           )}
         </View>
 
-        {/* Outfit Details Section */}
+        {/* Outfit information and details section */}
         <View style={styles.detailsContainer}>
+          {/* Outfit name */}
           <Text style={styles.outfitName}>{outfit.name}</Text>
           
+          {/* Editable description section */}
           <View style={styles.descriptionContainer}>
             <View style={styles.descriptionHeader}>
               <Text style={styles.descriptionLabel}>Description</Text>
@@ -139,6 +148,7 @@ export default function OutfitDetailScreen() {
               )}
             </View>
             
+            {/* Description editing interface */}
             {isEditing ? (
               <View>
                 <TextInput
@@ -181,6 +191,7 @@ export default function OutfitDetailScreen() {
             )}
           </View>
 
+          {/* Outfit metadata information */}
           <View style={styles.infoContainer}>
             <View style={styles.infoItem}>
               <MaterialCommunityIcons name="tshirt-crew-outline" size={20} color="#4A6D51" />
@@ -195,7 +206,7 @@ export default function OutfitDetailScreen() {
             </View>
           </View>
 
-          {/* Individual Items */}
+          {/* Individual clothing items horizontal scroll */}
           {outfit.items && outfit.items.length > 0 && (
             <View style={styles.itemsContainer}>
               <Text style={styles.sectionTitle}>Items in this Outfit</Text>
@@ -217,7 +228,8 @@ export default function OutfitDetailScreen() {
             </View>
           )}
 
-          {/* Delete Button */}
+          {/* Action buttons section */}
+          {/* Delete outfit button */}
           <TouchableOpacity 
             style={styles.deleteButton} 
             onPress={handleDelete}
@@ -226,7 +238,7 @@ export default function OutfitDetailScreen() {
             <Text style={styles.deleteButtonText}>Delete Outfit</Text>
           </TouchableOpacity>
 
-          {/* Back Button */}
+          {/* Back navigation button */}
           <TouchableOpacity 
             style={styles.backButton} 
             onPress={() => router.push('/savedOutfits')}

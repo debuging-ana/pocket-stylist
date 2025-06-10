@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -18,7 +18,7 @@ import {
 } from '../services/auth';
 import Feather from '@expo/vector-icons/Feather';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { scaleSize, scaleWidth, scaleHeight, scaleFontSize, scaleSpacing, deviceWidth } from '../utils/responsive';
+import { scaleSize, scaleFontSize, scaleSpacing } from '../utils/responsive';
 
 export default function ChangeEmail() {
   const [newEmail, setNewEmail] = useState(''); // stores new email input

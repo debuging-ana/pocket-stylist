@@ -1,10 +1,8 @@
 // the add item screen - where users can add new clothing items to their digital wardrobe
 import { useNavigation } from 'expo-router';
-import { useLayoutEffect, useEffect } from 'react';
+import { useLayoutEffect } from 'react';
 import WardrobeBackButton from './components/WardrobeBackButton';
 import { useState } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
-import { useCallback } from 'react';
 import { 
   View, 
   Text, 
@@ -72,7 +70,6 @@ export default function AddItemScreen() {
   const [imageLoading, setImageLoading] = useState(false);
   const [isProcessingBackground, setIsProcessingBackground] = useState(false);
   const [showImageOptions, setShowImageOptions] = useState(false);
-  const [showBackgroundOptions, setShowBackgroundOptions] = useState(false);
 
   // configure custom back button in header
   useLayoutEffect(() => {
@@ -256,21 +253,14 @@ export default function AddItemScreen() {
     }
   };
 
-  const resetForm = useCallback(() => {
+  const resetForm = () => {
     setImageUri(null);
     setName('');
     setCategory('tops');
     setDescription('');
     setImageLoading(false);
     setIsProcessingBackground(false);
-  }, []);
-
-  // Reset form only when coming from a successful save (not on every focus)
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     resetForm();
-  //   }, [resetForm])
-  // );
+  };
 
   return (
     <>

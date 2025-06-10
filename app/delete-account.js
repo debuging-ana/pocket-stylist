@@ -13,9 +13,12 @@ import { router } from 'expo-router';
 import { getAuth, reauthenticateWithCredential, EmailAuthProvider, deleteUser } from 'firebase/auth';
 import Feather from '@expo/vector-icons/Feather';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { scaleSize, scaleWidth, scaleHeight, scaleFontSize, scaleSpacing, deviceWidth } from '../utils/responsive';
+import { scaleSize, scaleFontSize, scaleSpacing } from '../utils/responsive';
 
+// Main component for permanent account deletion
+// Requires password confirmation and shows warning messages
 export default function DeleteAccount() {
+  // State for password inputs and form validation
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -23,10 +26,12 @@ export default function DeleteAccount() {
 
   const auth = getAuth();
   
+  // Main function to handle account deletion process
+  // Includes validation, confirmation dialog, and Firebase operations
   const handleDeleteAccount = async () => {
     setError('');
 
-    // Validation checks
+    // Input validation checks
     if (!password.trim()) {
       setError('Password is required');
       return;
@@ -42,6 +47,7 @@ export default function DeleteAccount() {
       return;
     }
 
+    // Show confirmation dialog before proceeding
     Alert.alert(
       'Confirm Deletion',
       'Are you sure you want to permanently delete your account? This action cannot be undone.',
@@ -63,11 +69,14 @@ export default function DeleteAccount() {
                 throw new Error('No user is currently logged in.');
               }
 
+              // Re-authenticate user before deletion (Firebase security requirement)
               const credential = EmailAuthProvider.credential(user.email, password);
               await reauthenticateWithCredential(user, credential);
 
+              // Permanently delete the user account
               await deleteUser(user);
 
+              // Show success message and redirect to home
               Alert.alert(
                 'Account Deleted', 
                 'Your account has been successfully deleted.', 
@@ -76,7 +85,7 @@ export default function DeleteAccount() {
                 ]
               );
             } catch (err) {
-              // Error handling
+              // Handle different types of Firebase errors
               let errorMessage = 'Failed to delete account. Please try again.';
               
               switch (err.code) {
@@ -114,15 +123,19 @@ export default function DeleteAccount() {
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
+        {/* Main header section with warning styling */}
         <View style={styles.headerContainer}>
           <View style={styles.headerCard}>
+            {/* Delete icon with warning color */}
             <View style={styles.iconContainer}>
               <MaterialCommunityIcons name="delete" size={50} color="#EA6D6D" />
             </View>
             
+            {/* Page title and description */}
             <Text style={styles.title}>Delete Account</Text>
             <Text style={styles.subtitle}>Permanently remove your account and data</Text>
 
+            {/* Error message display */}
             {error ? (
               <View style={styles.errorContainer}>
                 <Feather name="alert-circle" size={16} color="#D32F2F" />
@@ -130,6 +143,7 @@ export default function DeleteAccount() {
               </View>
             ) : null}
             
+            {/* Warning message about permanent deletion */}
             <View style={styles.warningContainer}>
               <Feather name="alert-triangle" size={20} color="#FFA000" />
               <Text style={styles.warningText}>
@@ -137,6 +151,7 @@ export default function DeleteAccount() {
               </Text>
             </View>
 
+            {/* Password input field */}
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>Password</Text>
               <TextInput
@@ -149,6 +164,7 @@ export default function DeleteAccount() {
               />
             </View>
 
+            {/* Password confirmation input field */}
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>Confirm Password</Text>
               <TextInput
@@ -161,6 +177,7 @@ export default function DeleteAccount() {
               />
             </View>
 
+            {/* Main delete account button */}
             <TouchableOpacity
               style={styles.deleteButton}
               onPress={handleDeleteAccount}
@@ -171,6 +188,7 @@ export default function DeleteAccount() {
               </Text>
             </TouchableOpacity>
 
+            {/* Cancel button to go back to settings */}
             <TouchableOpacity
               style={styles.cancelButton}
               onPress={() => router.push('/settings')}
@@ -184,6 +202,7 @@ export default function DeleteAccount() {
   );
 }
 
+// Styles for the delete account screen
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,

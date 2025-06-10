@@ -1,3 +1,4 @@
+// Password change screen for updating user account password
 import React, { useState } from 'react';
 import {
   View,
@@ -12,19 +13,23 @@ import { router } from 'expo-router';
 import { updatePassword } from '../services/auth';
 import Feather from '@expo/vector-icons/Feather';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { scaleSize, scaleWidth, scaleHeight, scaleFontSize, scaleSpacing, deviceWidth } from '../utils/responsive';
+import { scaleSize, scaleFontSize, scaleSpacing } from '../utils/responsive';
 
 export default function ChangePassword() {
+  // Form input states
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  // Loading state for password update process
   const [isLoading, setIsLoading] = useState(false);
+  // Error message display state
   const [error, setError] = useState('');
 
+  // Function to handle password change with validation and Firebase update
   const handleChangePassword = async () => {
     setError('');
 
-    // Validation checks
+    // Input validation checks
     if (!oldPassword) {
       setError('Current password is required');
       return;
@@ -48,12 +53,13 @@ export default function ChangePassword() {
     setIsLoading(true);
 
     try {
+      // Update password using Firebase auth service
       await updatePassword(oldPassword, newPassword);
       
       alert('Your password has been updated successfully.');
-      router.push('/settings'); // Navigate to settings page
+      router.push('/settings'); // Navigate back to settings page
     } catch (err) {
-      // Error handling
+      // Handle different Firebase authentication errors
       let errorMessage = 'Failed to update password. Please try again.';
       
       switch (err.code) {
@@ -65,8 +71,8 @@ export default function ChangePassword() {
           break;
         case 'auth/requires-recent-login':
           errorMessage = 'Please log in again before changing your password';
-          // Could navigate to re-authentication screen here
-          router.push('/login'); // Redirect to login
+          // Redirect to login for re-authentication
+          router.push('/login');
           break;
         case 'auth/invalid-credential':
           errorMessage = 'Invalid credentials. Please try again.';
@@ -93,13 +99,16 @@ export default function ChangePassword() {
       >
         <View style={styles.headerContainer}>
           <View style={styles.headerCard}>
+            {/* Header icon */}
             <View style={styles.iconContainer}>
               <MaterialCommunityIcons name="shield-key" size={50} color="#4A6D51" />
             </View>
             
+            {/* Title and subtitle */}
             <Text style={styles.title}>Change Password</Text>
             <Text style={styles.subtitle}>Update your account password</Text>
 
+            {/* Error message display */}
             {error ? (
               <View style={styles.errorContainer}>
                 <Feather name="alert-circle" size={16} color="#D32F2F" />
@@ -107,6 +116,7 @@ export default function ChangePassword() {
               </View>
             ) : null}
 
+            {/* Current password input */}
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>Current Password</Text>
               <TextInput
@@ -119,6 +129,7 @@ export default function ChangePassword() {
               />
             </View>
 
+            {/* New password input */}
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>New Password</Text>
               <TextInput
@@ -131,6 +142,7 @@ export default function ChangePassword() {
               />
             </View>
 
+            {/* Confirm new password input */}
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>Confirm New Password</Text>
               <TextInput
@@ -143,6 +155,7 @@ export default function ChangePassword() {
               />
             </View>
 
+            {/* Change password button */}
             <TouchableOpacity
               style={styles.changeButton}
               onPress={handleChangePassword}
@@ -153,6 +166,7 @@ export default function ChangePassword() {
               </Text>
             </TouchableOpacity>
 
+            {/* Cancel button */}
             <TouchableOpacity
               style={styles.cancelButton}
               onPress={() => router.push('/settings')}

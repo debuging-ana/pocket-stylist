@@ -1,3 +1,4 @@
+// Camera screen for taking photos of clothing items
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   View, 
@@ -10,17 +11,21 @@ import {
 } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as MediaLibrary from 'expo-media-library';
-import * as FileSystem from 'expo-file-system';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 
 export default function CameraScreen() {
+  // State for captured image URI
   const [capturedImage, setCapturedImage] = useState(null);
+  // Camera permissions hook
   const [permission, requestPermission] = useCameraPermissions();
+  // Camera facing direction (back camera by default)
   const [facing, setFacing] = useState('back');
+  // Reference to camera component
   const cameraRef = useRef(null);
   const router = useRouter();
 
+  // Request camera permissions on component mount
   useEffect(() => {
     (async () => {
       if (!permission?.granted) {
@@ -29,6 +34,7 @@ export default function CameraScreen() {
     })();
   }, [permission, requestPermission]);
 
+  // Function to capture a photo using the camera
   const takePictureWithCamera = async () => {
     if (!cameraRef.current) return;
 
@@ -51,10 +57,12 @@ export default function CameraScreen() {
     }
   };
 
+  // Function to clear captured image and retake photo
   const retakePicture = () => {
     setCapturedImage(null);
   };
 
+  // Function to save captured image to device gallery
   const saveImageToGallery = async () => {
     if (!capturedImage) {
       console.log('No captured image to save');
@@ -103,11 +111,14 @@ export default function CameraScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
+        {/* Display captured image or camera view */}
         {capturedImage ? (
+          // Show captured image preview
           <View style={styles.imageContainer}>
             <Image source={{ uri: capturedImage }} style={styles.capturedImage} />
           </View>
         ) : (
+          // Show camera view or permission request
           <View style={styles.cameraContainer}>
             {permission?.granted ? (
               <View style={styles.cameraWrapper}>
@@ -118,6 +129,7 @@ export default function CameraScreen() {
                 />
               </View>
             ) : (
+              // Camera permission request screen
               <View style={styles.permissionContainer}>
                 <MaterialIcons name="camera-alt" size={80} color="#CCCCCC" />
                 <Text style={styles.permissionText}>Camera permission needed</Text>
@@ -130,8 +142,10 @@ export default function CameraScreen() {
         )}
       </View>
 
+      {/* Camera controls */}
       <View style={styles.controls}>
         {capturedImage ? (
+          // Show retake and save buttons when image is captured
           <View style={styles.buttonContainer}>
             <TouchableOpacity style={styles.actionButton} onPress={retakePicture}>
               <Feather name="rotate-ccw" size={24} color="#FFFFFF" />
@@ -144,6 +158,7 @@ export default function CameraScreen() {
             </TouchableOpacity>
           </View>
         ) : (
+          // Show camera capture button
           <TouchableOpacity 
             style={[styles.cameraButton, !permission?.granted && styles.disabledButton]} 
             onPress={takePictureWithCamera}
@@ -182,14 +197,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     resizeMode: 'contain',
-  },
-  clearButton: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    padding: 10,
-    borderRadius: 20,
-    backgroundColor: 'rgba(0,0,0,0.6)',
   },
   cameraContainer: {
     flex: 1,
