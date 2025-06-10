@@ -165,27 +165,6 @@ export default function HomePage() {
             </TouchableOpacity>
           </View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestionsScrollContent}>
-             <TouchableOpacity
-              style={[styles.suggestionCard, { 
-                backgroundColor: '#CDD7E4',
-                borderColor: '#536C8C'
-              }]} 
-              onPress={() => router.push('/get-away-trip')}
-            >
-              <View style={styles.cardContent}>
-                <View style={styles.cardHeader}>
-                  <Ionicons name="calendar-outline" size={18} color="#FFFFFF" />
-                  <Text style={styles.cardTag}>Get Away Trip!</Text>
-                </View>
-                <Text style={styles.cardTitle}>What to pack?</Text>
-                <Text style={styles.cardDescription}>Outfit ideas to avoid overpack or forget essentials.</Text>
-                <View style={styles.cardButton}>
-                  <Text style={styles.cardButtonText}>Make your list!</Text>
-                  <Feather name="arrow-right" size={14} color="#4A6D51" />
-                </View>
-              </View>
-            </TouchableOpacity>
-
             <TouchableOpacity 
               style={[styles.suggestionCard, { 
                 backgroundColor: '#CADBC1',
@@ -206,22 +185,42 @@ export default function HomePage() {
                 </View>
               </View>
             </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.suggestionCard, { 
+                backgroundColor: '#CDD7E4',
+                borderColor: '#536C8C'
+              }]} 
+              onPress={() => router.push('/get-away-trip')}
+            >
+              <View style={styles.cardContent}>
+                <View style={styles.cardHeader}>
+                  <Ionicons name="calendar-outline" size={18} color="#FFFFFF" />
+                  <Text style={styles.cardTag}>Travel-Based</Text>
+                </View>
+                <Text style={styles.cardTitle}>What to pack?</Text>
+                <Text style={styles.cardDescription}>Outfit ideas to avoid overpack or forget essentials.</Text>
+                <View style={styles.cardButton}>
+                  <Text style={styles.cardButtonText}>View Outfit</Text>
+                  <Feather name="arrow-right" size={14} color="#4A6D51" />
+                </View>
+              </View>
+            </TouchableOpacity>
             <TouchableOpacity 
               style={[styles.suggestionCard, { 
                 backgroundColor: '#E3D3C6',
                 borderColor: '#8B6E57'
               }]} 
-              onPress={() => router.push('/occasion-styles')}
+              onPress={() => router.push('/events')}
             >
               <View style={styles.cardContent}>
                 <View style={styles.cardHeader}>
-                  <Ionicons name="briefcase-outline" size={18} color="#FFFFFF" />
-                  <Text style={styles.cardTag}>Occasion-Based</Text>
+                  <Ionicons name="calendar-outline" size={18} color="#FFFFFF" />
+                  <Text style={styles.cardTag}>Special Event</Text>
                 </View>
-                <Text style={styles.cardTitle}>Styling by Occasion</Text>
-                <Text style={styles.cardDescription}>Find the perfect look for any occasion, from office meetings to weekend brunches</Text>
+                <Text style={styles.cardTitle}>Event Ready</Text>
+                <Text style={styles.cardDescription}>Outfit ideas perfect for your upcoming events and occasions</Text>
                 <View style={styles.cardButton}>
-                  <Text style={styles.cardButtonText}>Browse Occasions</Text>
+                  <Text style={styles.cardButtonText}>View Outfit</Text>
                   <Feather name="arrow-right" size={14} color="#4A6D51" />
                 </View>
               </View>
@@ -241,27 +240,7 @@ export default function HomePage() {
                 <Text style={styles.cardTitle}>Personalised Outfits</Text>
                 <Text style={styles.cardDescription}>Custom style recommendations based on your preferences.</Text>
                 <View style={styles.cardButton}>
-                  <Text style={styles.cardButtonText}>Generate now!</Text>
-                  <Feather name="arrow-right" size={14} color="#4A6D51" />
-                </View>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={[styles.suggestionCard, { 
-                backgroundColor: '#CDD7E4',
-                borderColor: '#536C8C'
-              }]} 
-              onPress={() => router.push('/events')}
-            >
-              <View style={styles.cardContent}>
-                <View style={styles.cardHeader}>
-                  <Ionicons name="calendar-outline" size={18} color="#FFFFFF" />
-                  <Text style={styles.cardTag}>Special Event</Text>
-                </View>
-                <Text style={styles.cardTitle}>Event Ready</Text>
-                <Text style={styles.cardDescription}>Outfit ideas perfect for your upcoming events and occasions</Text>
-                <View style={styles.cardButton}>
-                  <Text style={styles.cardButtonText}>Explore</Text>
+                  <Text style={styles.cardButtonText}>View Outfit</Text>
                   <Feather name="arrow-right" size={14} color="#4A6D51" />
                 </View>
               </View>
