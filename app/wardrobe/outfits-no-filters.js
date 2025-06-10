@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView, TouchableOpacity, Image, ActivityIndicator, Alert, TextInput } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
+import { View, Text, StyleSheet, Pressable, ScrollView, TouchableOpacity, Image, ActivityIndicator, Alert, TextInput, StatusBar } from 'react-native';
+import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { collection, query, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db, auth } from '../../firebaseConfig'; 
@@ -419,12 +419,16 @@ const findSelectedItemByName = (itemName) => {
 
     return (
       <View style={styles.selectedItemsContainer}>
-        <Text style={styles.selectedItemsTitle}>Selected Items for Outfit Generation</Text>
-        {allSelectedItems.map(({ category, items }) => (
-          <View key={category} style={styles.categoryContainer}>
-            <Text style={styles.categoryTitle}>{category.charAt(0).toUpperCase() + category.slice(1)}</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              <View style={styles.itemsRow}>
+        <Text style={styles.selectedItemsTitle}>Selected Items</Text>
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.selectedItemsScrollContent}
+        >
+          {allSelectedItems.map(({ category, items }) => (
+            <View key={category} style={styles.categoryScrollContainer}>
+              <Text style={styles.categoryScrollTitle}>{category.charAt(0).toUpperCase() + category.slice(1)}</Text>
+              <View style={styles.categoryItemsContainer}>
                 {items.map((item) => (
                   <View key={item.id} style={styles.selectedItemCard}>
                     <Image
@@ -437,9 +441,9 @@ const findSelectedItemByName = (itemName) => {
                   </View>
                 ))}
               </View>
-            </ScrollView>
-          </View>
-        ))}
+            </View>
+          ))}
+        </ScrollView>
       </View>
     );
   };
@@ -566,208 +570,428 @@ const findSelectedItemByName = (itemName) => {
   const hasSelectedItems = Object.values(selectedItems).some(category => category.length > 0);
 
   return (
-    <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.scrollContent}>
-      <View style={styles.iconWrapper}>
-        <MaterialIcons name="auto-awesome" size={80} color="#7D7D7D" />
-      </View>
-
-      <View style={styles.contentContainer}>
-        <Text style={styles.sectionTitle}>AI Outfit Generator</Text>
-        
-        {/* Selected Items Display */}
-        {renderSelectedItems()}
-
-        {/* Generate Button - only show if items are selected */}
-        {hasSelectedItems && (
-          <TouchableOpacity 
-            style={[styles.generateButton, loading && styles.disabledButton]} 
-            onPress={generateOutfit}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator size="small" color="white" />
-            ) : (
-              <Text style={styles.generateButtonText}>Generate Outfit from Selected Items</Text>
-            )}
-          </TouchableOpacity>
-        )}
-
-        {/* Generated Outfit */}
-        {generatedOutfit && (
-          <View style={styles.outfitContainer}>
-            <Text style={styles.outfitTitle}>Your Generated Outfit</Text>
-            {renderOutfit()}
+    <>
+      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
+      <View style={styles.container}>
+        {/* Header Section */}
+        <View style={styles.headerSection}>
+          <View style={styles.headerContent}>
+            <View style={styles.iconContainer}>
+              <MaterialCommunityIcons name="auto-fix" size={40} color="#4A6D51" />
+            </View>
+            <Text style={styles.headerTitle}>AI Outfit Generator</Text>
+            <Text style={styles.headerSubtitle}>
+              Generating your personalized outfit...
+            </Text>
           </View>
-        )}
+        </View>
 
-        {/* Save Form */}
-        {renderSaveForm()}
+        {/* Content Section */}
+        <ScrollView style={styles.contentContainer} contentContainerStyle={styles.scrollContent}>
+          {/* Render selected items */}
+          {renderSelectedItems()}
 
-        {/* Back to Selection Button */}
-        {!hasSelectedItems && (
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => router.back()}
-          >
-            <MaterialIcons name="arrow-back" size={20} color="white" />
-            <Text style={styles.backButtonText}>Go Back to Select Items</Text>
-          </TouchableOpacity>
-        )}
+          {/* Generation Status Card */}
+          <View style={styles.statusCard}>
+            <View style={styles.statusIconContainer}>
+              <MaterialCommunityIcons name="creation" size={32} color="#4A6D51" />
+            </View>
+            <Text style={styles.statusTitle}>Creating Your Perfect Outfit</Text>
+            <Text style={styles.statusText}>
+              Our AI is analyzing your selected items and style preferences to create amazing outfit combinations.
+            </Text>
+          </View>
+
+          {/* Generate Button - only show if items are selected */}
+          {hasSelectedItems && (
+            <TouchableOpacity 
+              style={[styles.primaryButton, loading && styles.disabledButton]} 
+              onPress={generateOutfit}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator size="small" color="#FFFFFF" />
+              ) : (
+                <>
+                  <MaterialCommunityIcons name="auto-fix" size={20} color="#FFFFFF" />
+                  <Text style={styles.primaryButtonText}>Generate Outfit</Text>
+                </>
+              )}
+            </TouchableOpacity>
+          )}
+
+          {/* Generated Outfit */}
+          {generatedOutfit && renderOutfit()}
+
+          {/* Save Form */}
+          {renderSaveForm()}
+
+          {/* Back to Selection Button */}
+          {!hasSelectedItems && (
+            <TouchableOpacity 
+              style={styles.secondaryButton}
+              onPress={() => router.push('/wardrobe/add-outfit')}
+            >
+              <MaterialIcons name="arrow-back" size={20} color="#4A6D51" />
+              <Text style={styles.secondaryButtonText}>Go Back to Select Items</Text>
+            </TouchableOpacity>
+          )}
+        </ScrollView>
       </View>
-    </ScrollView>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  scrollContainer: {
+  container: {
     flex: 1,
-    backgroundColor: '#E8F0E2',
+    backgroundColor: '#F9F9F4',
   },
   scrollContent: {
     flexGrow: 1,
+    paddingBottom: 30,
   },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
+  headerSection: {
+    paddingHorizontal: 20,
+    paddingTop: 30,
+    paddingBottom: 20,
+    backgroundColor: '#F9F9F4',
+  },
+  headerContent: {
     alignItems: 'center',
-    backgroundColor: '#E8F0E2',
   },
-  loadingText: {
-    marginTop: 10,
+  iconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#DBE9D1',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#4A6D51',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  headerSubtitle: {
     fontSize: 16,
-    color: '#7D7D7D',
-  },
-  iconWrapper: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 120,
-    paddingTop: 20,
-    backgroundColor: 'transparent',
+    color: '#828282',
+    textAlign: 'center',
+    paddingHorizontal: 20,
+    marginBottom: 10,
   },
   contentContainer: {
     flex: 1,
-    backgroundColor: 'white',
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    paddingTop: 40,
-    paddingBottom: 40,
     paddingHorizontal: 20,
   },
-  sectionTitle: {
-    fontSize: 22,
-    fontWeight: '600',
-    color: '#7D7D7D',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
   selectedItemsContainer: {
-    backgroundColor: '#F9F9F9',
-    borderRadius: 15,
-    padding: 15,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 20,
     marginBottom: 20,
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   selectedItemsTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
     color: '#4A6D51',
-    marginBottom: 15,
+    marginBottom: 16,
+    textAlign: 'center',
   },
-  categoryContainer: {
-    marginBottom: 15,
+  selectedItemsScrollContent: {
+    paddingRight: 20,
   },
-  categoryTitle: {
+  categoryScrollContainer: {
+    marginRight: 24,
+    alignItems: 'center',
+  },
+  categoryScrollTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
+    color: '#4A6D51',
+    marginBottom: 12,
+    textAlign: 'center',
   },
-  itemsRow: {
-    flexDirection: 'row',
-    paddingRight: 10,
+  categoryItemsContainer: {
+    alignItems: 'center',
   },
   selectedItemCard: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 8,
-    marginRight: 10,
     width: 80,
+    marginBottom: 8,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
   },
   selectedItemImage: {
     width: 60,
     height: 60,
-    borderRadius: 8,
-    marginBottom: 5,
+    borderRadius: 10,
+    resizeMode: 'cover',
+    marginBottom: 6,
   },
   selectedItemName: {
-    fontSize: 10,
-    color: '#333',
+    fontSize: 11,
+    color: '#4A6D51',
     textAlign: 'center',
-    lineHeight: 12,
+    fontWeight: '500',
+    paddingHorizontal: 2,
   },
-  noItemsContainer: {
-    backgroundColor: '#F9F9F9',
-    borderRadius: 15,
-    padding: 20,
+  statusCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 24,
     marginBottom: 20,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  noItemsText: {
-    fontSize: 14,
-    color: '#7D7D7D',
-    textAlign: 'center',
-    marginTop: 10,
-  },
-  generateButton: {
-    backgroundColor: '#4A6D51',
-    paddingVertical: 15,
-    borderRadius: 30,
+  statusIconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#DBE9D1',
     alignItems: 'center',
-    marginBottom: 20,
+    justifyContent: 'center',
+    marginBottom: 16,
   },
-  disabledButton: {
-    backgroundColor: '#A0A0A0',
-  },
-  generateButtonText: {
-    color: 'white',
-    fontSize: 16,
+  statusTitle: {
+    fontSize: 20,
     fontWeight: '600',
+    color: '#4A6D51',
+    marginBottom: 12,
+    textAlign: 'center',
   },
-  backButton: {
-    backgroundColor: '#4A6D51',
+  statusText: {
+    fontSize: 16,
+    color: '#828282',
+    textAlign: 'center',
+    lineHeight: 24,
+  },
+  primaryButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 15,
-    borderRadius: 30,
-    marginTop: 20,
+    backgroundColor: '#4A6D51',
+    paddingVertical: 16,
+    borderRadius: 15,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  backButtonText: {
-    color: 'white',
+  primaryButtonText: {
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
     marginLeft: 8,
   },
-  outfitContainer: {
-    marginTop: 20,
+  secondaryButton: {
+    backgroundColor: '#CADBC1',
+    borderColor: '#4A6D51',
+    borderWidth: 1,
+    paddingVertical: 15,
+    borderRadius: 15,
+    alignItems: 'center',
   },
-  outfitTitle: {
+  secondaryButtonText: {
+    color: '#4A6D51',
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 8,
+  },
+  disabledButton: {
+    backgroundColor: '#CCCCCC',
+  },
+  noItemsContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 24,
+    marginBottom: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  noItemsText: {
+    fontSize: 16,
+    color: '#828282',
+    textAlign: 'center',
+    marginTop: 12,
+  },
+  outfitCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  outfitHeader: {
+    marginBottom: 16,
+  },
+  outfitName: {
     fontSize: 18,
     fontWeight: '600',
+    color: '#4A6D51',
+    textAlign: 'center',
+  },
+  outfitItems: {
+    marginBottom: 16,
+  },
+  outfitItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    backgroundColor: '#F9F9F4',
+    borderRadius: 12,
+    padding: 12,
+  },
+  itemType: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#4A6D51',
+    width: 80,
+  },
+  itemName: {
+    fontSize: 14,
     color: '#333',
-    marginBottom: 15,
+    flex: 1,
+    marginLeft: 8,
+  },
+  itemImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+    marginLeft: 8,
+  },
+  stylingTip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#DBE9D1',
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 16,
+  },
+  stylingText: {
+    fontSize: 14,
+    color: '#4A6D51',
+    marginLeft: 8,
+    flex: 1,
+  },
+  saveOutfitButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#4A6D51',
+    paddingVertical: 12,
+    borderRadius: 15,
+  },
+  saveOutfitButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 8,
+  },
+  saveFormContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  saveFormTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#4A6D51',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  inputContainer: {
+    marginBottom: 16,
+  },
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#4A6D51',
+    marginBottom: 8,
+  },
+  textInput: {
+    backgroundColor: '#F9F9F4',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    borderRadius: 12,
+    padding: 12,
+    fontSize: 16,
+    color: '#333',
+  },
+  textArea: {
+    height: 80,
+    textAlignVertical: 'top',
+  },
+  saveFormButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  cancelButton: {
+    flex: 1,
+    backgroundColor: '#CADBC1',
+    borderColor: '#4A6D51',
+    borderWidth: 1,
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  cancelButtonText: {
+    color: '#4A6D51',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  confirmSaveButton: {
+    flex: 1,
+    backgroundColor: '#4A6D51',
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  confirmSaveButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: '#F9F9F4',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#4A6D51',
+    marginTop: 16,
   },
   outfitCard: {
     backgroundColor: '#F9F9F9',
@@ -835,7 +1059,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 12,
     paddingHorizontal: 20,
-    borderRadius: 25,
+    borderRadius: 15,
     marginTop: 15,
   },
   saveOutfitButtonText: {
@@ -910,5 +1134,16 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 14,
     fontWeight: '600',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#E8F0E2',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#7D7D7D',
   },
 });

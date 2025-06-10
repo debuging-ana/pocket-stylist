@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView, TouchableOpacity, Image } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
+import { View, Text, StyleSheet, Pressable, ScrollView, TouchableOpacity, Image, StatusBar } from 'react-native';
+import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router'; 
 
 export default function AiFiltersScreen() {
@@ -62,11 +62,15 @@ export default function AiFiltersScreen() {
     return (
       <View style={styles.selectedItemsContainer}>
         <Text style={styles.selectedItemsTitle}>Selected Items</Text>
-        {allSelectedItems.map(({ category, items }) => (
-          <View key={category} style={styles.categoryContainer}>
-            <Text style={styles.categoryTitle}>{capitalize(category)}</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              <View style={styles.itemsRow}>
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.selectedItemsScrollContent}
+        >
+          {allSelectedItems.map(({ category, items }) => (
+            <View key={category} style={styles.categoryScrollContainer}>
+              <Text style={styles.categoryScrollTitle}>{capitalize(category)}</Text>
+              <View style={styles.categoryItemsContainer}>
                 {items.map((item) => (
                   <View key={item.id} style={styles.selectedItemCard}>
                     <Image
@@ -79,158 +83,262 @@ export default function AiFiltersScreen() {
                   </View>
                 ))}
               </View>
-            </ScrollView>
-          </View>
-        ))}
+            </View>
+          ))}
+        </ScrollView>
       </View>
     );
   };
 
   return (
-    <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.scrollContent}>
-      <View style={styles.iconWrapper}>
-        <MaterialIcons name="filter-list" size={80} color="#7D7D7D" />
-      </View>
-
-      <View style={styles.contentContainer}>
-        <Text style={styles.sectionTitle}>Filters</Text>
-
-        <View style={styles.filtersContainer}>
-          {Object.entries(filters).map(([key, value]) => (
-            <Pressable key={key} style={styles.filterOption} onPress={() => toggleFilter(key)}>
-              <View style={[styles.checkbox, value && styles.checkboxChecked]}>
-                {value && <MaterialIcons name="check" size={18} color="white" />}
-              </View>
-              <Text style={styles.filterText}>{capitalize(key)}</Text>
-            </Pressable>
-          ))}
+    <>
+      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
+      <View style={styles.container}>
+        {/* Header Section */}
+        <View style={styles.headerSection}>
+          <View style={styles.headerContent}>
+            <View style={styles.iconContainer}>
+              <MaterialCommunityIcons name="magic-staff" size={40} color="#4A6D51" />
+            </View>
+            <Text style={styles.headerTitle}>AI Outfit Generator</Text>
+            <Text style={styles.headerSubtitle}>
+              Choose filters to personalize your AI-generated outfit
+            </Text>
+          </View>
         </View>
 
-        {/* Render selected items */}
-        {renderSelectedItems()}
+        {/* Content Section */}
+        <ScrollView style={styles.contentContainer} contentContainerStyle={styles.scrollContent}>
+          {/* Filters Card */}
+          <View style={styles.filtersCard}>
+            <Text style={styles.sectionTitle}>Personalization Filters</Text>
+            <Text style={styles.sectionSubtitle}>
+              Select any filters to get more personalized outfit recommendations (optional)
+            </Text>
 
-        <TouchableOpacity style={styles.generateButton} onPress={onGeneratePress}>
-          <Text style={styles.generateButtonText}>Generate</Text>
-        </TouchableOpacity>
+            <View style={styles.filtersContainer}>
+              {Object.entries(filters).map(([key, value]) => (
+                <TouchableOpacity key={key} style={styles.filterOption} onPress={() => toggleFilter(key)}>
+                  <View style={[styles.checkbox, value && styles.checkboxChecked]}>
+                    {value && <MaterialIcons name="check" size={16} color="#FFFFFF" />}
+                  </View>
+                  <Text style={styles.filterText}>{capitalize(key)}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
+          {/* Render selected items */}
+          {renderSelectedItems()}
+
+          {/* Generate Button */}
+          <TouchableOpacity style={styles.generateButton} onPress={onGeneratePress}>
+            <MaterialCommunityIcons name="auto-fix" size={20} color="#FFFFFF" />
+            <Text style={styles.generateButtonText}>Generate AI Outfit</Text>
+          </TouchableOpacity>
+          
+          {/* Back Button */}
+          <TouchableOpacity 
+            style={styles.backButton} 
+            onPress={() => router.push('/wardrobe/add-outfit')}
+          >
+            <Text style={styles.backButtonText}>Back to Selection</Text>
+          </TouchableOpacity>
+        </ScrollView>
       </View>
-    </ScrollView>
+    </>
   );
 }
 
-
-const newStyles = {
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F9F9F4',
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 30,
+  },
+  headerSection: {
+    paddingHorizontal: 20,
+    paddingTop: 30,
+    paddingBottom: 20,
+    backgroundColor: '#F9F9F4',
+  },
+  headerContent: {
+    alignItems: 'center',
+  },
+  iconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#DBE9D1',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#4A6D51',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  headerSubtitle: {
+    fontSize: 16,
+    color: '#828282',
+    textAlign: 'center',
+    paddingHorizontal: 20,
+    marginBottom: 10,
+  },
+  contentContainer: {
+    flex: 1,
+    paddingHorizontal: 20,
+  },
+  filtersCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#4A6D51',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  sectionSubtitle: {
+    fontSize: 14,
+    color: '#828282',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  filtersContainer: {
+    marginTop: 10,
+  },
+  filterOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: '#F9F9F4',
+    borderRadius: 12,
+    marginBottom: 12,
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#4A6D51',
+    marginRight: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkboxChecked: {
+    backgroundColor: '#4A6D51',
+  },
+  filterText: {
+    fontSize: 16,
+    color: '#4A6D51',
+    fontWeight: '500',
+  },
+  generateButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#4A6D51',
+    paddingVertical: 16,
+    borderRadius: 15,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  generateButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 8,
+  },
+  backButton: {
+    backgroundColor: '#CADBC1',
+    borderColor: '#4A6D51',
+    borderWidth: 1,
+    paddingVertical: 15,
+    borderRadius: 15,
+    alignItems: 'center',
+  },
+  backButtonText: {
+    color: '#4A6D51',
+    fontSize: 16,
+    fontWeight: '600',
+  },
   selectedItemsContainer: {
-    marginBottom: 30,
-    paddingTop: 20,
-    borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   selectedItemsTitle: {
     fontSize: 18,
     fontWeight: '600',
     color: '#4A6D51',
-    marginBottom: 12,
-  },
-  categoryContainer: {
     marginBottom: 16,
+    textAlign: 'center',
   },
-  categoryTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#7D7D7D',
-    marginBottom: 8,
+  selectedItemsScrollContent: {
+    paddingRight: 20,
   },
-  itemsRow: {
-    flexDirection: 'row',
-    paddingVertical: 4,
+  categoryScrollContainer: {
+    marginRight: 24,
+    alignItems: 'center',
+  },
+  categoryScrollTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#4A6D51',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  categoryItemsContainer: {
+    alignItems: 'center',
   },
   selectedItemCard: {
     width: 80,
-    marginRight: 12,
+    marginBottom: 8,
     alignItems: 'center',
   },
   selectedItemImage: {
     width: 60,
     height: 60,
-    borderRadius: 8,
+    borderRadius: 10,
     resizeMode: 'cover',
-    marginBottom: 4,
+    marginBottom: 6,
   },
   selectedItemName: {
     fontSize: 11,
-    color: '#333',
+    color: '#4A6D51',
     textAlign: 'center',
+    fontWeight: '500',
     paddingHorizontal: 2,
   },
-};
-
-const styles = StyleSheet.create({
-  scrollContainer: {
-    flex: 1,
-    backgroundColor: '#E8F0E2',
-  },
-  scrollContent: {
-    flexGrow: 1,
-  },
-  iconWrapper: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 120,
-    paddingTop: 20,
-    backgroundColor: 'transparent',
-  },
-  contentContainer: {
-    flex: 1,
-    backgroundColor: 'white',
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    paddingTop: 40,
-    paddingBottom: 40,
-    paddingHorizontal: 20,
-  },
-  sectionTitle: {
-    fontSize: 22,
-    fontWeight: '600',
-    color: '#7D7D7D',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  filtersContainer: {
-    marginBottom: 40,
-  },
-  filterOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  checkbox: {
-    width: 24,
-    height: 24,
-    borderRadius: 6,
-    borderWidth: 2,
-    borderColor: '#7D7D7D',
-    marginRight: 15,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  checkboxChecked: {
-    backgroundColor: '#7D7D7D',
-  },
-  filterText: {
-    fontSize: 16,
-    color: '#333',
-  },
-  generateButton: {
-    marginTop: 20,
-    backgroundColor: '#4A6D51',
-    paddingVertical: 15,
-    borderRadius: 30,
-    alignItems: 'center',
-  },
-  generateButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  ...newStyles,
 });
