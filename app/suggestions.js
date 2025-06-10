@@ -22,7 +22,7 @@ export default function SuggestionsPage() {
     {
       id: 2,
       title: "What to pack?",
-      tag: "Get Away",
+      tag: "Travel-Based",
       icon: "calendar-outline",
       iconColor: "#FFFFFF",
       description: "Outfit ideas to avoid overpack or forget essentials.",
@@ -34,16 +34,16 @@ export default function SuggestionsPage() {
     },
     {
       id: 3,
-      title: "Styling by Occasion",
-      tag: "Occasion-Based",
-      icon: "briefcase-outline",
+      title: "Event Ready",
+      tag: "Special Event",
+      icon: "calendar-outline",
       iconColor: "#FFFFFF",
-      description: "Find the perfect look for any occasion, from office meetings to weekend brunches",
+      description: "Outfit ideas perfect for your upcoming events and occasions",
       backgroundColor: "#E3D3C6",
       borderColor: "#8B6E57",
       accentColor: "#4A6D51",
-      route: "/occasion-styles",
-      buttonText: "Browse Occasions"
+      route: "/events",
+      buttonText: "Explore"
     },
     {
       id: 4,
@@ -57,19 +57,6 @@ export default function SuggestionsPage() {
       accentColor: "#4A6D51",
       route: "/made-for-you",
       buttonText: "Generate now!"
-    },
-    {
-      id: 5,
-      title: "Event Ready",
-      tag: "Special Event",
-      icon: "calendar-outline",
-      iconColor: "#FFFFFF",
-      description: "Outfit ideas perfect for your upcoming events and occasions",
-      backgroundColor: "#CDD7E4",
-      borderColor: "#536C8C",
-      accentColor: "#4A6D51",
-      route: "/events",
-      buttonText: "Explore"
     },
   ];
 
