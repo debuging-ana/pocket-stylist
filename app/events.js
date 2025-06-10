@@ -71,7 +71,7 @@ export default function EventsScreen() {
   const [weatherCache, setWeatherCache] = useState({});
 
   const isWeatherDataStale = (timestamp) => {
-    const ONE_HOUR = 60 * 60 * 1000; // 1 hour in milliseconds
+    const ONE_HOUR = 60 * 60 * 1000; //1 hour in milliseconds
       return !timestamp || (Date.now() - timestamp) > ONE_HOUR;
   };
   
@@ -412,7 +412,7 @@ export default function EventsScreen() {
              (response.includes('°C') || response.includes('weather'));
     };
 
-    //construct prompt for ollama AI
+    //construct prompt for ollama AI & changed to match the displayed weather 
     const prompt = `Suggest a complete outfit for a ${userProfile.gender} attending a ${event.type} event in ${currentWeatherData.condition} weather (${currentWeatherData.temperature}°C). 
     Featured item: ${itemDescription}.
     Respond in one paragraph with:
