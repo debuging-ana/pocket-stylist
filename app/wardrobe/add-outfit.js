@@ -578,7 +578,7 @@ export default function AddOutfitScreen() {
                   style={styles.aiGenerateButton}
                   onPress={navigateToAIGenerate}
                 >
-                  <MaterialCommunityIcons name="magic-staff" size={16} color="#FFFFFF" />
+                  <MaterialCommunityIcons name="magic-staff" size={16} color="#4A6D51" />
                   <Text style={styles.aiGenerateButtonText}>Create With AI</Text>
                 </TouchableOpacity>
               </View>
@@ -648,10 +648,12 @@ const styles = StyleSheet.create({
   aiGenerateButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#4A6D51',
+    backgroundColor: '#CADBC1',
+    borderColor: '#4A6D51',
+    borderWidth: 1,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    borderRadius: 20,
+    borderRadius: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -659,7 +661,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   aiGenerateButtonText: {
-    color: '#FFFFFF',
+    color: '#4A6D51',
     fontSize: 12,
     fontWeight: '600',
     marginLeft: 6,
