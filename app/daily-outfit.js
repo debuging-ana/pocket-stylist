@@ -67,6 +67,15 @@ export default function DailyOutFit() {
           </TouchableOpacity>
         </>
       )}
+      {imageData && (
+      <TouchableOpacity style={styles.saveButton} onPress={() => {
+            setImageData(null);
+            setError(null);
+            setLoading(null);
+     }}>
+       <Text style={styles.saveButtonText}>Refresh page</Text>
+      </TouchableOpacity>
+    )}
     </View>
   );
 }
