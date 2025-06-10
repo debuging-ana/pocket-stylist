@@ -68,6 +68,13 @@ export default function EventsScreen() {
   //user data states
   const [lastSelected, setLastSelected] = useState(null);
   const [userProfile, setUserProfile] = useState({ gender: 'person' });
+  const [weatherCache, setWeatherCache] = useState({});
+
+  // Add this helper function near the top of your component
+  const isWeatherDataStale = (timestamp) => {
+    const ONE_HOUR = 60 * 60 * 1000; // 1 hour in milliseconds
+      return !timestamp || (Date.now() - timestamp) > ONE_HOUR;
+  };
   
   //new event form state
   const [newEvent, setNewEvent] = useState({
@@ -306,67 +313,80 @@ export default function EventsScreen() {
      - performance tracking
      - personalized prompts based on user data
      - weather-aware recommendations
+     
+     this was modified to use the weather data directly from the fetch/cache instead of just relying on state
    */
-  const getOutfitSuggestions = useCallback(async (event) => {
-    setSelectedEvent(event);
-    setOutfitSuggestions([]);
-    setOutfitSource(null);
-
-    //early return if no wardrobe items available
-    if (!wardrobeItems.length) {
-      console.log("No wardrobe items available");
-      return;
-    }
-
-    //starts performance tracking
-    const startTime = Date.now();
-    log.info("Starting Ollama generation...");
-
-    // attempt to get user location
-    let location;
-    try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
+    const getOutfitSuggestions = useCallback(async (event) => {
+      setSelectedEvent(event); //saves the selected event in state
+      setOutfitSuggestions([]);
+      setOutfitSource(null);
       
-      //handles location permission denial
-      if (status !== 'granted') {
-        Alert.alert(
-          'Permission Required',
-          'Enable location access for weather-based suggestions',
-          [
-            {
-              text: 'Settings',
-              onPress: () => Linking.openSettings()
-            },
-            { text: 'Cancel' }
-          ]
-        );
-        throw new Error('Permission denied');
+      if (!wardrobeItems.length) {
+        console.log("No wardrobe items available");
+        return;
       }
-
-      //gets current position with high accuracy
-      location = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.High
-      });
-    } catch (error) {
-      console.log("Location error:", error);
-      //fallback to default location (AUT)
-      location = {
-        coords: {
-          latitude: -36.8536,
-          longitude: 174.7665
+      //starts timing the suggesttion process (for performance insight)
+      const startTime = Date.now();
+      log.info("Starting Ollama generation...");
+      
+      let location;
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          Alert.alert(
+            'Permission Required',
+            'Enable location access for weather-based suggestions',
+            [
+              { text: 'Settings', onPress: () => Linking.openSettings() },
+              { text: 'Cancel' }
+            ]
+          );
+          throw new Error('Permission denied');
+        } //get the user's current location with high accuracy
+        location = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.High
+        });
+      } catch (error) { //if location access, fails fallback to default location
+        console.log("Location error:", error);
+        location = {
+          coords: {
+            latitude: -36.8536,
+            longitude: 174.7665
+          }
+        };
+      }
+      
+      //get weather data first!
+      let currentWeatherData;
+      try {
+        if (weatherCache[event.id] && !isWeatherDataStale(weatherCache[event.id].timestamp)) {
+          currentWeatherData = weatherCache[event.id].data;
+        } else {
+          const weather = await getWeather(location.coords.latitude, location.coords.longitude, event.date);
+          currentWeatherData = {
+            condition: weather.condition.toLowerCase(),
+            temperature: Math.round(weather.temperature)
+          };
+          //update cache & state
+          setWeatherCache(prev => ({
+            ...prev,
+            [event.id]: {
+              data: currentWeatherData,
+              timestamp: Date.now()
+            }
+          }));
+          setWeatherData(currentWeatherData); //update state for UI
         }
-      };
-    }
-
-    //fetches weather data based on location
-    try {
-      const weather = await getWeather(location.coords.latitude, location.coords.longitude, event.date);
-      setWeatherData({
-        condition: weather.condition.toLowerCase(),
-        temperature: Math.round(weather.temperature)
-      });
-    } catch (error) {
-      console.log("Weather error:", error);
+      } catch (error) {
+        console.log("Weather error:", error);
+        if (weatherCache[event.id]?.data) { currentWeatherData = weatherCache[event.id].data;   
+        } else {
+          currentWeatherData = {
+            condition: 'moderate',
+            temperature: 20
+          };
+        }
+        setWeatherData(currentWeatherData); //update state for UI
     }
 
     //helper function to select a random wardrobe item
@@ -394,7 +414,7 @@ export default function EventsScreen() {
     };
 
     //construct prompt for ollama AI
-    const prompt = `Suggest a complete outfit for a ${userProfile.gender} attending a ${event.type} event in ${weatherData.condition} weather (${weatherData.temperature}°C). 
+    const prompt = `Suggest a complete outfit for a ${userProfile.gender} attending a ${event.type} event in ${currentWeatherData.condition} weather (${currentWeatherData.temperature}°C). 
     Featured item: ${itemDescription}.
     Respond in one paragraph with:
     - 2 to 3 clothing items including the featured item
