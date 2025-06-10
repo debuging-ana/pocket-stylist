@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Image, Alert, TextInput } from 'react-native';
-import { generateImageFromPrompt } from '../services/openAI';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Image, Keyboard, TextInput } from 'react-native';
+import { generateImageFromPrompt } from '../services/deepAi';
 
 export default function DailyOutFit() {
     const [imageData, setImageData] = useState(null);
@@ -9,6 +9,8 @@ export default function DailyOutFit() {
     const [myOutfitDetails, setMyOutfitDetails] = useState('');
 
     const handleGenerateImage = async () => {
+        Keyboard.dismiss();
+        
         if(!myOutfitDetails){
             setError("Please fill all inputs");
             return;

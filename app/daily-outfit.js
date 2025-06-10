@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Image, Alert } from 'react-native';
-import { generateImageFromPrompt } from '../services/openAI';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Image, Alert, Keyboard } from 'react-native';
+import { generateImageFromPrompt } from '../services/deepAi';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
@@ -11,6 +11,8 @@ export default function DailyOutFit() {
   const [saving, setSaving] = useState(false);
 
   const handleGenerateImage = async () => {
+    Keyboard.dismiss();
+
     setLoading(true);
     setError(null);
     setImageData(null);

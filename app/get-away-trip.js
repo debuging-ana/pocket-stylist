@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
-import { generateImageFromPrompt } from '../services/openAI';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Image, Keyboard } from 'react-native';
+import { generateImageFromPrompt } from '../services/deepAi';
 import { Picker } from '@react-native-picker/picker';
 
 
@@ -26,6 +26,8 @@ export default function TravelBased() {
     const [selectedCountry, setSelectedCountry] = useState("Afghanistan");
 
     const handleGenerateImage = async () => {
+        Keyboard.dismiss();
+        
         if(!selectedCountry){
             setError("Please select a country first");
             return;
