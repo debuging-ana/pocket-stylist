@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Image, Alert, TextInput } from 'react-native';
 import { generateImageFromPrompt } from '../services/openAI';
+import { Button } from 'react-native';
 
 export default function DailyOutFit() {
     const [imageData, setImageData] = useState(null);
@@ -10,7 +11,7 @@ export default function DailyOutFit() {
 
     const handleGenerateImage = async () => {
         if(!myOutfitDetails){
-            setError("Please fill all inputs");
+            setError("Please fill in destination and style preferences");
             return;
         }
 
@@ -19,7 +20,8 @@ export default function DailyOutFit() {
         setImageData(null);
 
         try {
-            const prompt = "A fashion full body model wearing an outfit based on the current weather in Auckland, high fashion photography, photorealistic, 4K detail, make sure there is no background in the image";
+            const { destination, stylePreferences, weather } = myOutfitDetails;
+            const prompt = "Flat lay photo of clothing and accessories for a trip to ${destination}. The weather is ${weather.condition} with around ${weather.temperature}°C. The outfit should match a ${stylePreferences} style, and be suitable for this weather — include items like sunglasses, light layers, or jackets depending on the temperature. High quality, 4K, no background, photorealistic.";
             const base64Image = await generateImageFromPrompt(`${prompt} and using these requirements ${myOutfitDetails}`);
             setImageData(base64Image);
         } catch (err) {
@@ -33,7 +35,7 @@ export default function DailyOutFit() {
         <View style={styles.container}>
             <Text style={styles.text}>Get away!</Text>
 
-            <Text style={styles.inputLabel}>Let your imagination run wild! Your style, your rules!</Text>
+            <Text style={styles.inputLabel}>Planning a getaway but don’t want to overpack? Just tell us where you’re headed — we’ll check the weather and give you a smart packing list. It’s that easy!</Text>
             <TextInput testID='my-outfit-details' style={styles.input} value={myOutfitDetails} onChangeText={setMyOutfitDetails} editable multiline numberOfLines={4} maxLength={80} />
 
             <TouchableOpacity testID='generate-outfit-button' 
@@ -53,6 +55,18 @@ export default function DailyOutFit() {
                     <Image source={{ uri: imageData }} style={styles.image} resizeMode="contain" />
                 </>
             )}
+            {imageData && (
+            <TouchableOpacity style={styles.saveButton} onPress={() => {
+            setImageData(null);
+            setMyOutfitDetails('');
+            setError(null);
+         }}>
+        <Text style={styles.saveButtonText}>Refresh page</Text>
+    </TouchableOpacity>
+)}
+
+            
+
         </View>
     );
 }
