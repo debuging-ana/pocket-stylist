@@ -18,9 +18,9 @@ Key Features:
 - performance tracking & logging
 */
 
-import { View, Text, FlatList, Pressable, Modal, TextInput, Alert, ScrollView, ActivityIndicator, Linking, StyleSheet } from 'react-native';
+import { View, Text, FlatList, Pressable, Modal, TextInput, Alert, ScrollView, ActivityIndicator, Linking, StyleSheet, StatusBar } from 'react-native';
 import { useState, useEffect, useCallback } from 'react';
-import { Ionicons, FontAwesome } from '@expo/vector-icons';
+import { Ionicons, FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 import { generateWithLlama } from '../services/ollamaService';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { auth, db } from '../firebaseConfig';
@@ -507,229 +507,275 @@ export default function EventsScreen() {
 
   //this is main component render
   return (
-    <View style={styles.container}>
-      {/* header with title & add button */}
-      <View style={styles.header}>
-        <Text style={styles.title}>My Events</Text>
-        <Pressable 
-          style={styles.addButton}
-          onPress={() => setShowModal(true)}>
-          <Ionicons name="add" size={24} color="#4A6D51" />
-        </Pressable>
-      </View>
-
-      {/* events list */}
-      <FlatList
-        data={events.sort((a, b) => a.date - b.date)}
-        keyExtractor={(item) => item.id}
-        ListEmptyComponent={
-          <View style={styles.emptyState}>
-            <Ionicons name="calendar-outline" size={50} color="#4A6D51" />
-            <Text style={styles.emptyText}>No events planned yet</Text>
-          </View>
-        }
-        renderItem={({ item }) => (
-          <View style={styles.eventCard}>
-            <Text style={styles.eventTitle}>{item.title}</Text>
-            <Text style={styles.eventDetails}>
-              {formatDateTime(item.date)} • {item.type}
+    <>
+      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
+      <View style={styles.container}>
+        {/* Header Section with improved design */}
+        <View style={styles.headerSection}>
+          <View style={styles.headerContent}>
+            <View style={styles.iconContainer}>
+              <MaterialCommunityIcons name="calendar-heart" size={40} color="#4A6D51" />
+            </View>
+            <Text style={styles.headerTitle}>My Events</Text>
+            <Text style={styles.headerSubtitle}>
+              Plan your outfits for upcoming events
             </Text>
-            {item.outfit ? (
-              <Text style={styles.outfitText}>
-                <FontAwesome name="check-square-o" size={16} color="#4A6D51" /> Planned: {item.outfit.name}</Text>
-              ) : (
-              <Pressable 
-                style={styles.suggestButton}
-                onPress={() => getOutfitSuggestions(item)}>
-                <Text style={styles.buttonText}>Get Outfit Ideas</Text>
-              </Pressable>
-            )}
           </View>
-        )}
-      />
+        </View>
 
-      {/* add event modal */}
-      <Modal visible={showModal} animationType="slide">
-        <ScrollView contentContainerStyle={styles.modalScrollContainer}>
-          <View style={styles.modalContainer}>
-            <View style={styles.modalHeader}>
-              <Pressable onPress={() => setShowModal(false)}>
-                <Ionicons name="close" size={24} color="#4A6D51" />
-              </Pressable>
-              <Text style={styles.modalTitle}>New Event</Text>
-              <View style={{ width: 24 }} />
-            </View>
+        {/* Add Event Button */}
+        <View style={styles.addButtonContainer}>
+          <Pressable 
+            style={styles.addButton}
+            onPress={() => setShowModal(true)}>
+            <MaterialCommunityIcons name="plus" size={20} color="#FFFFFF" />
+            <Text style={styles.addButtonText}>Add New Event</Text>
+          </Pressable>
+        </View>
 
-            {/* event title input */}
-            <TextInput
-              style={[styles.input, errors.title && styles.errorInput]}
-              placeholder="Event name"
-              placeholderTextColor="#828282"
-              value={newEvent.title}
-              onChangeText={text => setNewEvent({...newEvent, title: text})}
-            />
-            {errors.title && <Text style={styles.errorText}>Please enter a title</Text>}
-
-            {/* date picker */}
-            <Pressable 
-              style={[styles.dateInput, errors.date && styles.errorInput]}
-              onPress={() => setShowDatePicker(true)}>
-              <Text style={styles.dateInputText}>
-                {newEvent.date.toLocaleDateString()}
-              </Text>
-              <Ionicons name="calendar" size={20} color="#4A6D51" />
-            </Pressable>
-            {errors.date && <Text style={styles.errorText}>Please select a future date</Text>}
-
-            {/* time picker */}
-            <Pressable 
-              style={styles.dateInput}
-              onPress={() => setShowTimePicker(true)}>
-              <Text style={styles.dateInputText}>
-                {newEvent.time.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-              </Text>
-              <Ionicons name="time" size={20} color="#4A6D51" />
-            </Pressable>
-
-            {/* event type selector */}
-            <View style={styles.typeContainer}>
-              {['casual', 'formal', 'business', 'party'].map(type => (
-                <Pressable
-                  key={type}
-                  style={[
-                    styles.typeButton,
-                    newEvent.type === type && styles.selectedTypeButton
-                  ]}
-                  onPress={() => setNewEvent({...newEvent, type})}>
-                  <Text style={newEvent.type === type ? styles.selectedTypeText : styles.typeText}>
-                    {type.charAt(0).toUpperCase() + type.slice(1)}
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
-
-            {/* submit button */}
-            <Pressable 
-              style={[styles.submitButton, isLoading && styles.disabledButton]}
-              onPress={addEvent}
-              disabled={isLoading}>
-              <Text style={styles.buttonText}>
-                {isLoading ? 'Adding...' : 'Add Event'}
-              </Text>
-            </Pressable>
-
-            {/* date picker component */}
-            {showDatePicker && (
-              <DateTimePicker
-                value={newEvent.date}
-                mode="date"
-                display="inline"
-                onChange={(event, date) => {
-                  setShowDatePicker(false);
-                  if (date) setNewEvent({...newEvent, date});
-                }}
-                minimumDate={new Date()}
-                style={styles.datePicker}
-              />
-            )}
-
-            {/* time picker component */}
-            {showTimePicker && (
-              <View style={styles.timePickerContainer}>
-                <DateTimePicker
-                  value={newEvent.time}
-                  mode="time"
-                  onChange={(event, time) => {
-                    setShowTimePicker(false);
-                    if (time) setNewEvent({...newEvent, time});
-                  }}
-                />
+        {/* events list */}
+        <FlatList
+          data={events.sort((a, b) => a.date - b.date)}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.listContainer}
+          ListEmptyComponent={
+            <View style={styles.emptyState}>
+              <View style={styles.emptyIconContainer}>
+                <MaterialCommunityIcons name="calendar-outline" size={60} color="#4A6D51" />
               </View>
-            )}
-          </View>
-        </ScrollView>
-      </Modal>
+              <Text style={styles.emptyTitle}>No Events Yet</Text>
+              <Text style={styles.emptyText}>Add your first event to get started with outfit planning</Text>
+            </View>
+          }
+          renderItem={({ item }) => (
+            <View style={styles.eventCard}>
+              <View style={styles.eventHeader}>
+                <View style={styles.eventTypeIcon}>
+                  <MaterialCommunityIcons 
+                    name={
+                      item.type === 'formal' ? 'tie' :
+                      item.type === 'business' ? 'briefcase' :
+                      item.type === 'party' ? 'party-popper' :
+                      'account-casual'
+                    } 
+                    size={24} 
+                    color="#4A6D51" 
+                  />
+                </View>
+                <View style={styles.eventInfo}>
+                  <Text style={styles.eventTitle}>{item.title}</Text>
+                  <Text style={styles.eventDetails}>
+                    {formatDateTime(item.date)} • {item.type}
+                  </Text>
+                </View>
+              </View>
+              
+              {item.outfit ? (
+                <View style={styles.outfitSelectedContainer}>
+                  <MaterialCommunityIcons name="check-circle" size={16} color="#4A6D51" />
+                  <Text style={styles.outfitText}>Outfit planned: {item.outfit.name}</Text>
+                </View>
+              ) : (
+                <Pressable 
+                  style={styles.suggestButton}
+                  onPress={() => getOutfitSuggestions(item)}>
+                  <MaterialCommunityIcons name="magic-staff" size={16} color="#4A6D51" />
+                  <Text style={styles.buttonText}>Get Outfit Ideas</Text>
+                </Pressable>
+              )}
+            </View>
+          )}
+        />
 
-      {/* outfit suggestion modal */}
-      {selectedEvent && (
-        <Modal visible={!!selectedEvent} animationType="slide">
+        {/* add event modal */}
+        <Modal visible={showModal} animationType="slide">
           <ScrollView contentContainerStyle={styles.modalScrollContainer}>
             <View style={styles.modalContainer}>
               <View style={styles.modalHeader}>
-                <Pressable onPress={() => setSelectedEvent(null)}>
+                <Pressable onPress={() => setShowModal(false)}>
                   <Ionicons name="close" size={24} color="#4A6D51" />
                 </Pressable>
-                <Text style={styles.modalTitle}>Outfit Ideas for {selectedEvent.title}</Text>
+                <Text style={styles.modalTitle}>New Event</Text>
                 <View style={{ width: 24 }} />
               </View>
 
-              {/* weather display */}
-              <View style={styles.weatherHeader}>
-                <Ionicons name={getWeatherIcon(weatherData.condition)} size={24} color="#4A6D51" />
-                <Text style={styles.weatherText}>
-                  {weatherData.condition} • {weatherData.temperature}°C
-                </Text>
-              </View>
+               {/* event title input */}
+               <View style={styles.formContent}>
+                 <TextInput
+                   style={[styles.input, errors.title && styles.errorInput]}
+                   placeholder="Event name"
+                   placeholderTextColor="#828282"
+                   value={newEvent.title}
+                   onChangeText={text => setNewEvent({...newEvent, title: text})}
+                 />
+                 {errors.title && <Text style={styles.errorText}>Please enter a title</Text>}
 
-              {/* outfit suggestions list */}
-              {Array.isArray(outfitSuggestions) && outfitSuggestions.length > 0 ? (
-                outfitSuggestions.map((outfit, index) => (
-                  <View key={index} style={styles.outfitCard}>
-                    <Text style={styles.outfitName}>{outfit.name}</Text>
-                    {/* indicate if suggestion is AI-generated or fallback */}
-                    {outfitSource && (
-                      <Text style={[
-                        styles.outfitSource,
-                        { color: outfitSource === "AI" ? "#4A6D51" : "#FF6B6B" }
-                      ]}>
-                        {outfitSource === "AI" 
-                          ? "AI-generated suggestions" 
-                          : "Showing fallback suggestions"}
+                 {/* date picker */}
+                 <Pressable 
+                   style={[styles.dateInput, errors.date && styles.errorInput]}
+                   onPress={() => setShowDatePicker(true)}>
+                   <Text style={styles.dateInputText}>
+                     {newEvent.date.toLocaleDateString()}
+                   </Text>
+                   <Ionicons name="calendar" size={20} color="#4A6D51" />
+                 </Pressable>
+                 {errors.date && <Text style={styles.errorText}>Please select a future date</Text>}
+
+                 {/* time picker */}
+                 <Pressable 
+                   style={styles.dateInput}
+                   onPress={() => setShowTimePicker(true)}>
+                   <Text style={styles.dateInputText}>
+                     {newEvent.time.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                   </Text>
+                   <Ionicons name="time" size={20} color="#4A6D51" />
+                 </Pressable>
+
+                 {/* event type selector */}
+                 <View style={styles.typeContainer}>
+                   {['casual', 'formal', 'business', 'party'].map(type => (
+                     <Pressable
+                       key={type}
+                       style={[
+                         styles.typeButton,
+                         newEvent.type === type && styles.selectedTypeButton
+                       ]}
+                       onPress={() => setNewEvent({...newEvent, type})}>
+                       <Text style={newEvent.type === type ? styles.selectedTypeText : styles.typeText}>
+                         {type.charAt(0).toUpperCase() + type.slice(1)}
+                       </Text>
+                     </Pressable>
+                   ))}
+                 </View>
+
+                 {/* submit button */}
+                 <Pressable 
+                   style={[styles.submitButton, isLoading && styles.disabledButton]}
+                   onPress={addEvent}
+                   disabled={isLoading}>
+                   <Text style={styles.submitButtonText}>
+                     {isLoading ? 'Adding...' : 'Add Event'}
+                   </Text>
+                 </Pressable>
+               </View>
+
+               {/* date picker component */}
+               {showDatePicker && (
+                 <View style={styles.datePickerContainer}>
+                   <DateTimePicker
+                     value={newEvent.date}
+                     mode="date"
+                     display="inline"
+                     onChange={(event, date) => {
+                       setShowDatePicker(false);
+                       if (date) setNewEvent({...newEvent, date});
+                     }}
+                     minimumDate={new Date()}
+                     style={styles.datePicker}
+                     themeVariant="light"
+                   />
+                 </View>
+               )}
+
+               {/* time picker component */}
+               {showTimePicker && (
+                 <View style={styles.timePickerContainer}>
+                   <DateTimePicker
+                     value={newEvent.time}
+                     mode="time"
+                     onChange={(event, time) => {
+                       setShowTimePicker(false);
+                       if (time) setNewEvent({...newEvent, time});
+                     }}
+                     themeVariant="light"
+                   />
+                 </View>
+               )}
+             </View>
+           </ScrollView>
+         </Modal>
+
+        {/* outfit suggestion modal */}
+        {selectedEvent && (
+          <Modal visible={!!selectedEvent} animationType="slide">
+            <ScrollView contentContainerStyle={styles.modalScrollContainer}>
+              <View style={styles.modalContainer}>
+                <View style={styles.modalHeader}>
+                  <Pressable onPress={() => setSelectedEvent(null)}>
+                    <Ionicons name="close" size={24} color="#4A6D51" />
+                  </Pressable>
+                  <Text style={styles.modalTitle}>Outfit Ideas for {selectedEvent.title}</Text>
+                  <View style={{ width: 24 }} />
+                </View>
+
+                {/* weather display */}
+                <View style={styles.weatherHeader}>
+                  <Ionicons name={getWeatherIcon(weatherData.condition)} size={24} color="#4A6D51" />
+                  <Text style={styles.weatherText}>
+                    {weatherData.condition} • {weatherData.temperature}°C
+                  </Text>
+                </View>
+
+                {/* outfit suggestions list */}
+                {Array.isArray(outfitSuggestions) && outfitSuggestions.length > 0 ? (
+                  outfitSuggestions.map((outfit, index) => (
+                    <View key={index} style={styles.outfitCard}>
+                      <Text style={styles.outfitName}>{outfit.name}</Text>
+                      {/* indicate if suggestion is AI-generated or fallback */}
+                      {outfitSource && (
+                        <Text style={[
+                          styles.outfitSource,
+                          { color: outfitSource === "AI" ? "#4A6D51" : "#FF6B6B" }
+                        ]}>
+                          {outfitSource === "AI" 
+                            ? "AI-generated suggestions" 
+                            : "Showing fallback suggestions"}
+                        </Text>
+                      )}
+                      
+                      {/* outfit description */}
+                      <ScrollView style={styles.outfitDescriptionContainer}
+                      nestedScrollEnabled={true}
+                      >
+                      <Text style={styles.outfitDescription}>
+                        {outfit.description}
                       </Text>
-                    )}
-                    
-                    {/* outfit description */}
-                    <ScrollView style={styles.outfitDescriptionContainer}
-                    nestedScrollEnabled={true}
-                    >
-                    <Text style={styles.outfitDescription}>
-                      {outfit.description}
-                    </Text>
-                    </ScrollView>
+                      </ScrollView>
 
-                    
-                    {/* select outfit button */}
-                    <View style={{ marginTop: 10 }}> 
+                      
+                      {/* select outfit button */}
+                      <View style={{ marginTop: 10 }}> 
+                        <Pressable 
+                          style={styles.selectButton}
+                          onPress={() => confirmOutfit(outfit)} 
+                          disabled={loadingOutfitId === outfit.name}>
+                            <Text style={styles.selectButtonText}>
+                              {loadingOutfitId === outfit.name ? 'Saving...' : 'Select This Outfit Suggestion'}
+                            </Text>
+                        </Pressable>
+                      </View>
+                      {/* regenerate button with AI */}
                       <Pressable 
-                        style={styles.selectButton}
-                        onPress={() => confirmOutfit(outfit)} 
-                        disabled={loadingOutfitId === outfit.name}>
-                          <Text style={styles.selectButtonText}>
-                            {loadingOutfitId === outfit.name ? 'Saving...' : 'Select This Outfit Suggestion'}
-                          </Text>
-                      </Pressable>
+                        style={styles.regenerateButton}
+                        onPress={regenerateSuggestions}
+                        disabled={regenerating}>
+                          {regenerating ? (
+                            <ActivityIndicator color="#FFFFFF" />
+                          ) : (
+                            <Text style={styles.regenerateButtonText}>Generate with Ollama AI</Text>
+                          )}
+                        </Pressable>
                     </View>
-                    {/* regenerate button with AI */}
-                    <Pressable 
-                      style={styles.regenerateButton}
-                      onPress={regenerateSuggestions}
-                      disabled={regenerating}>
-                        {regenerating ? (
-                          <ActivityIndicator color="#FFFFFF" />
-                        ) : (
-                          <Text style={styles.buttonText}>Generate with Ollama AI</Text>
-                        )}
-                    </Pressable>
-                  </View>
-                ))
-              ) : (
-                <Text style={styles.emptyText}>Generating outfit suggestions...</Text>
-              )}
-            </View>
-          </ScrollView>
-        </Modal>
-      )}
-    </View>
+                  ))
+                ) : (
+                  <Text style={styles.emptyText}>Generating outfit suggestions...</Text>
+                )}
+              </View>
+            </ScrollView>
+          </Modal>
+        )}
+      </View>
+    </>
   );
 }
 
@@ -738,48 +784,129 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F9F9F4',
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  headerSection: {
+    paddingHorizontal: 20,
+    paddingTop: 30,
+    paddingBottom: 20,
+    backgroundColor: '#F9F9F4',
+  },
+  headerContent: {
     alignItems: 'center',
-    padding: 20,
-    paddingBottom: 10,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#4A6D51',
-  },
-  addButton: {
-    backgroundColor: '#CADBC1',
-    borderColor: '#4A6D51', 
-    borderWidth: 1,  
-    borderRadius: 20,
-    padding: 8,
-  },
-  emptyState: {
-    flex: 1,
+  iconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#DBE9D1',
+    alignItems: 'center',
     justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 100,
-  },
-  emptyText: {
-    color: '#828282',
-    marginTop: 10,
-    fontSize: 16,
-    textAlign: 'center',
-  },
-  eventCard: {
-    backgroundColor: 'white',
-    borderRadius: 15,
-    padding: 16,
-    marginHorizontal: 20,
-    marginBottom: 12,
+    marginBottom: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#4A6D51',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  headerSubtitle: {
+    fontSize: 16,
+    color: '#828282',
+    textAlign: 'center',
+    paddingHorizontal: 20,
+    marginBottom: 5,
+  },
+  addButtonContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 25,
+  },
+  addButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#4A6D51',
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  addButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 8,
+  },
+  listContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+  emptyState: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 60,
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 20,
+    borderRadius: 20,
+    padding: 40,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  emptyIconContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#DBE9D1',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#4A6D51',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  emptyText: {
+    color: '#828282',
+    fontSize: 14,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  eventCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  eventHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  eventTypeIcon: {
+    marginRight: 10,
+  },
+  eventInfo: {
+    flexDirection: 'column',
   },
   eventTitle: {
     fontSize: 18,
@@ -793,21 +920,31 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   suggestButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: '#CADBC1',
     borderColor: '#4A6D51', 
     borderWidth: 1,  
-    padding: 10,
-    borderRadius: 10,
-    marginTop: 8,
-    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 15,
+    marginTop: 12,
   },
   buttonText: {
     color: '#4A6D51',
+    fontSize: 14,
     fontWeight: '600',
+    marginLeft: 6,
+  },
+  outfitSelectedContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
   },
   outfitText: {
     color: '#4A6D51',
-    marginTop: 8,
+    marginLeft: 8,
     fontStyle: 'italic',
   },
   modalScrollContainer: {
@@ -827,6 +964,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
   },
+  formContent: {
+    marginTop: 25,
+  },
   modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -834,11 +974,18 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   input: {
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF',
     padding: 15,
-    borderRadius: 10,
-    marginBottom: 8,
+    borderRadius: 15,
+    marginBottom: 12,
     fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 1,
   },
   errorInput: {
     borderColor: '#FF6B6B',
@@ -850,24 +997,56 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   dateInput: {
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF',
     padding: 15,
-    borderRadius: 10,
-    marginBottom: 8,
+    borderRadius: 15,
+    marginBottom: 12,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 1,
   },
   dateInputText: {
     color: '#4A6D51',
   },
+  datePickerContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    marginVertical: 20,
+    padding: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+  },
   datePicker: {
-    marginBottom: 20,
-    backgroundColor: '#F9F9F4',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 15,
+    width: '100%',
   },
   timePickerContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    marginVertical: 20,
+    padding: 20,
     alignItems: 'center',
-    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
   },
   typeContainer: {
     flexDirection: 'row',
@@ -876,17 +1055,20 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   typeButton: {
-    backgroundColor: '#E8E8E8',
-    padding: 10,
-    borderRadius: 8,
+    backgroundColor: '#F5F5F5',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 15,
     width: '48%',
-    marginBottom: 10,
+    marginBottom: 12,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
   },
   selectedTypeButton: {
-    backgroundColor: '#CADBC1',
+    backgroundColor: '#DBE9D1',
     borderColor: '#4A6D51', 
-    borderWidth: 1,  
+    borderWidth: 2,  
   },
   typeText: {
     color: '#4A6D51',
@@ -895,18 +1077,23 @@ const styles = StyleSheet.create({
     color: '#4A6D51',
   },
   submitButton: {
-    backgroundColor: '#CADBC1',
-    borderColor: '#4A6D51', 
-    borderWidth: 1,  
-    padding: 15,
-    borderRadius: 10,
+    backgroundColor: '#4A6D51',
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderRadius: 15,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+    marginTop: 10,
   },
   outfitCard: {
-    backgroundColor: 'white',
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 15,
+    backgroundColor: '#FFFFFF',
+    padding: 20,
+    borderRadius: 20,
+    marginBottom: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -936,8 +1123,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#CADBC1',
     borderColor: '#4A6D51', 
     borderWidth: 1,  
-    padding: 12,
-    borderRadius: 8,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 15,
     alignItems: 'center',
   },
   selectButtonText: {
@@ -953,25 +1141,44 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   regenerateButton: {
-    backgroundColor: '#CADBC1',
-    borderColor: '#4A6D51', 
-    borderWidth: 1,  
-    padding: 12,
-    borderRadius: 8,
+    backgroundColor: '#4A6D51',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 15,
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
   weatherHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 15,
-    padding: 10,
-    backgroundColor: 'white',
-    borderRadius: 10,
+    marginBottom: 20,
+    padding: 16,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   weatherText: {
     marginLeft: 10,
     color: '#4A6D51',
+    fontWeight: '600',
+  },
+  submitButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  regenerateButtonText: {
+    color: '#FFFFFF',
+    fontSize: 14,
     fontWeight: '600',
   },
 });
