@@ -165,6 +165,29 @@ export default function HomePage() {
             </TouchableOpacity>
           </View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestionsScrollContent}>
+             <TouchableOpacity Add commentMore actions
+              style={[styles.suggestionCard, { 
+                backgroundColor: '#CADBC1',
+                borderColor: '#4A6D51'
+              }]} 
+              onPress={() => router.push('/get-away-trip')}
+            >
+              <View style={styles.cardContent}>
+                <View style={styles.cardHeader}>
+                  <Ionicons name="calendar-outline" size={18} color="#FFFFFF" />
+                  <Text style={styles.cardTag}>Get Away Trip!</Text>
+                </View>
+                <Text style={styles.cardTitle}>What to pack?</Text>
+                <Text style={styles.cardDescription}>Outfit ideas to avoid overpack or forget essentials.</Text>
+                <View style={styles.cardButton}>
+                  <Text style={styles.cardButtonText}>Make your list!</Text>
+                  <Feather name="arrow-right" size={14} color="#4A6D51" />
+                </View>
+              </View>
+            </TouchableOpacity>
+
+
+
             <TouchableOpacity 
               style={[styles.suggestionCard, { 
                 backgroundColor: '#CDD7E4',
@@ -177,7 +200,7 @@ export default function HomePage() {
                   <Ionicons name="sunny-outline" size={18} color="#FFFFFF" />
                   <Text style={styles.cardTag}>Weather-Based</Text>
                 </View>
-                <Text style={styles.cardTitle}>Today's Look</Text>
+                <Text style={styles.cardTitle}>Weather-based Look</Text>
                 <Text style={styles.cardDescription}>Perfect outfit suggestions based on today's weather and your style preferences</Text>
                 <View style={styles.cardButton}>
                   <Text style={styles.cardButtonText}>View Outfit</Text>
@@ -185,6 +208,9 @@ export default function HomePage() {
                 </View>
               </View>
             </TouchableOpacity>
+
+
+              
             <TouchableOpacity 
               style={[styles.suggestionCard, { 
                 backgroundColor: '#DFBDBD',

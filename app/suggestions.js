@@ -29,6 +29,19 @@ export default function SuggestionsPage() {
       buttonText: "View Outfit"
     },
     {
+      id: 2,
+      title: "What to pack?",
+      tag: "Get Away",
+      icon: "calendar-outline",
+      iconColor: "#FFFFFF",
+      description: "Outfit ideas to avoid overpack or forget essentials.",
+      backgroundColor: "#CADBC1",
+      borderColor: "#4A6D51",
+      accentColor: "#4A6D51",
+      route: "/get-away-trip",
+      buttonText: "Make your list!"
+    },
+    {
       id: 4,
       title: "Made for You",
       tag: "Personalized",
