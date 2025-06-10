@@ -1,12 +1,20 @@
 import { TouchableOpacity, Text } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useNavigation } from 'expo-router';
 
 export default function BackButton() {
-  const router = useRouter();
+  const navigation = useNavigation();
+
+  const handlePress = () => {
+    if(navigation.canGoBack()){
+      navigation.goBack();
+    } else {
+      navigation.navigate('index');
+    }
+  }
   
   return (
     <TouchableOpacity 
-      onPress={() => router.back()}
+      onPress={handlePress}
       style={{ marginLeft: 15 }}
     >
       <Text style={{ fontSize: 17 }}>←</Text>

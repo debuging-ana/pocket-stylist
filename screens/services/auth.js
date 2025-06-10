@@ -1,1 +1,0 @@
-//Firebase authentication logic (login/signup/reset)

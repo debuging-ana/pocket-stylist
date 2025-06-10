@@ -106,7 +106,7 @@ FIREBASE_STORAGE_BUCKET=your_project.appspot.com
 FIREBASE_MESSAGING_SENDER_ID=your_sender_id
 FIREBASE_APP_ID=your_app_id
 FIREBASE_MEASUREMENT_ID=your_measurement_id
-OPENAI_SECRET_KEY=your_openai_key
+DEEPAI_API_KEY=your_openai_key
 OLLAMA_BASE_URL=http://YOUR_LOCAL_IP:11434
 REMOVE_BG_API_KEY=your_remove_bg_key
 ```

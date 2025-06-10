@@ -1,4 +1,0 @@
-/*
-reusable ~
-reusable text input
-*/
