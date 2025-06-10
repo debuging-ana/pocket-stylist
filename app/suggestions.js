@@ -65,8 +65,8 @@ export default function SuggestionsPage() {
       icon: "calendar-outline",
       iconColor: "#FFFFFF",
       description: "Outfit ideas perfect for your upcoming events and occasions",
-      backgroundColor: "#CADBC1",
-      borderColor: "#4A6D51",
+      backgroundColor: "#CDD7E4",
+      borderColor: "#536C8C",
       accentColor: "#4A6D51",
       route: "/events",
       buttonText: "Explore"
