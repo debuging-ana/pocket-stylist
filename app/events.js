@@ -945,7 +945,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   disabledButton: {
-    backgroundColor: '#cccccc',
+    backgroundColor: '#CADBC1',
   },
   outfitSource: {
     fontSize: 12,

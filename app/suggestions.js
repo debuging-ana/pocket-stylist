@@ -1,18 +1,11 @@
-import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar } from 'react-native';
 import { useRouter } from 'expo-router';
 import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { generateWithLlama } from '../services/ollamaService';
 import { ActivityIndicator } from 'react-native';
 
 export default function SuggestionsPage() {
   const router = useRouter();
-  const [testStatus, setTestStatus] = useState({
-    loading: false,
-    result: '',
-    showResult: false
-  });
   const suggestions = [
     {
       id: 1,
@@ -52,50 +45,26 @@ export default function SuggestionsPage() {
       accentColor: "#4A6D51",
       route: "/made-for-you",
       buttonText: "Generate now!"
-    }
+    },
+    {
+      id: 5,
+      title: "Event Ready",
+      tag: "Special Event",
+      icon: "calendar-outline",
+      iconColor: "#FFFFFF",
+      description: "Outfit ideas perfect for your upcoming events and occasions",
+      backgroundColor: "#CADBC1",
+      borderColor: "#4A6D51",
+      accentColor: "#4A6D51",
+      route: "/events",
+      buttonText: "Explore"
+    },
   ];
-
-  //temporary!
-  const runOllamaTest = async () => {
-    setTestStatus(prev => ({ ...prev, loading: true, showResult: true }));
-    
-    try {
-      const prompt = "As a fashion assistant, suggest one outfit idea for a college student's business casual presentation. Include 3 specific clothing items.";
-      const response = await generateWithLlama(prompt);
-      setTestStatus(prev => ({ ...prev, loading: false, result: response || "No response received" }));
-    } catch (error) {
-      console.error("Ollama Error:", error);
-      setTestStatus(prev => ({ ...prev, loading: false, result: "Failed to connect to Ollama. Make sure it's running and check your network connection." }));
-    }
-  };
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
-        {/* Test Button */}
-        <TouchableOpacity 
-          style={styles.testButton}
-          onPress={runOllamaTest}
-          disabled={testStatus.loading}
-        >
-          {testStatus.loading ? (
-            <ActivityIndicator color="#FFFFFF" />
-          ) : (
-            <Text style={styles.testButtonText}>Test Ollama Integration</Text>
-          )}
-        </TouchableOpacity>
-
-        {/* Test Result Display */}
-        {testStatus.showResult && (
-          <View style={styles.testResultContainer}>
-            <Text style={styles.testResultTitle}>Ollama Test Result:</Text>
-            <Text style={styles.testResultText}>
-              {testStatus.result}
-            </Text>
-          </View>
-        )}
-
         {/* Suggestions Cards */}
         <View style={styles.suggestionsContainer}>
           {suggestions.map(suggestion => (
