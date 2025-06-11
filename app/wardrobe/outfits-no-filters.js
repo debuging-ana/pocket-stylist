@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView, TouchableOpacity, Image, ActivityIndicator, Alert, TextInput, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ScrollView, TouchableOpacity, Image, ActivityIndicator, Alert, TextInput, StatusBar, Modal, Animated } from 'react-native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { collection, query, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, query, getDocs } from 'firebase/firestore';
 import { db, auth } from '../../firebaseConfig'; 
-import { generateWithLlama } from '../../services/ollamaService'; 
+import { generateWithLlama } from '../../services/ollamaService';
+import { useWardrobe } from '../../context/wardrobeContext'; 
 
 export default function OutfitsNoFiltersScreen() {
   const [wardrobeItems, setWardrobeItems] = useState({});
@@ -22,9 +23,12 @@ export default function OutfitsNoFiltersScreen() {
   const [outfitName, setOutfitName] = useState('');
   const [outfitDescription, setOutfitDescription] = useState('');
   const [showSaveForm, setShowSaveForm] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [fadeAnim] = useState(new Animated.Value(0));
   
   const router = useRouter();
   const { selectedItems: selectedItemsParam } = useLocalSearchParams();
+  const { addOutfit } = useWardrobe(); 
 
   // Parse selected items from URL params
   useEffect(() => {
@@ -43,6 +47,26 @@ export default function OutfitsNoFiltersScreen() {
   useEffect(() => {
     fetchWardrobeItems();
   }, []);
+
+  // Show success popup with animation
+  const showSuccessMessage = () => {
+    setShowSuccessPopup(true);
+    Animated.sequence([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.delay(2000),
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      setShowSuccessPopup(false);
+    });
+  };
 
   const fetchWardrobeItems = async () => {
     try {
@@ -82,29 +106,29 @@ export default function OutfitsNoFiltersScreen() {
   };
 
   const createOutfitPrompt = (selectedItems) => {
-  const availableItems = [];
-  const itemsByCategory = {
-    tops: [],
-    bottoms: [],
-    shoes: [],
-    accessories: [],
-    jackets: []
-  };
-  
-  // Organize items by category and create the available items list
-  Object.entries(selectedItems).forEach(([category, categoryItems]) => {
-    categoryItems.forEach(item => {
-      availableItems.push(`${item.name} (${category})`);
-      itemsByCategory[category].push(item.name);
+    const availableItems = [];
+    const itemsByCategory = {
+      tops: [],
+      bottoms: [],
+      shoes: [],
+      accessories: [],
+      jackets: []
+    };
+    
+    // Organize items by category and create the available items list
+    Object.entries(selectedItems).forEach(([category, categoryItems]) => {
+      categoryItems.forEach(item => {
+        availableItems.push(`${item.name} (${category})`);
+        itemsByCategory[category].push(item.name);
+      });
     });
-  });
 
-  if (availableItems.length === 0) {
-    return "No items selected";
-  }
+    if (availableItems.length === 0) {
+      return "No items selected";
+    }
 
-  // Create a more structured and restrictive prompt
-  const prompt = `STRICT RULES: You must ONLY use items from this exact list. DO NOT add any items not listed below.
+    
+    const prompt = `STRICT RULES: You must ONLY use items from this exact list. DO NOT add any items not listed below.
 
 AVAILABLE ITEMS:
 ${availableItems.join('\n')}
@@ -127,79 +151,77 @@ Smart Casual | White Button Shirt | Black Trousers | None | None | Perfect for o
 
 YOUR TASK: Create an outfit using ONLY the items listed above. If shoes or accessories are not available, write "None" for those fields.`;
 
-  return prompt;
-};
+    return prompt;
+  };
 
   // Generate a single outfit using Ollama with selected items only
-// Replace the generateOutfit function with this improved version
-const generateOutfit = async () => {
-  // Enhanced validation - check for required items
-  const tops = selectedItems.tops || [];
-  const bottoms = selectedItems.bottoms || [];
-  
-  if (tops.length === 0 || bottoms.length === 0) {
-    Alert.alert(
-      'Incomplete Selection', 
-      'Please select at least one top and one bottom to generate an outfit.',
-      [{ text: 'OK' }]
-    );
-    return;
-  }
+  const generateOutfit = async () => {
+    const tops = selectedItems.tops || [];
+    const bottoms = selectedItems.bottoms || [];
+    
+    if (tops.length === 0 || bottoms.length === 0) {
+      Alert.alert(
+        'Incomplete Selection', 
+        'Please select at least one top and one bottom to generate an outfit.',
+        [{ text: 'OK' }]
+      );
+      return;
+    }
 
-  setLoading(true);
-  setGeneratedOutfit(null);
-  setShowSaveForm(false);
-  
-  try {
-    const prompt = createOutfitPrompt(selectedItems);
+    setLoading(true);
+    setGeneratedOutfit(null);
+    setShowSaveForm(false);
     
-    if (prompt.includes("Insufficient items")) {
-      Alert.alert('Error', 'Please select at least one top and one bottom item');
-      return;
-    }
-    
-    console.log('📝 Sending prompt to Ollama:', prompt);
-    
-    const response = await generateWithLlama(prompt, 45000); // Reduced timeout
-    console.log('🤖 Ollama raw response:', response);
-    
-    if (!response || response.length < 10) {
-      console.log('⚠️ Response too short, creating manual outfit...');
+    try {
+      const prompt = createOutfitPrompt(selectedItems);
+      
+      if (prompt.includes("Insufficient items")) {
+        Alert.alert('Error', 'Please select at least one top and one bottom item');
+        return;
+      }
+      
+      console.log('📝 Sending prompt to Ollama:', prompt);
+      
+      const response = await generateWithLlama(prompt, 45000); // Reduced timeout
+      console.log('🤖 Ollama raw response:', response);
+      
+      if (!response || response.length < 10) {
+        console.log('⚠️ Response too short, creating manual outfit...');
+        const manualOutfit = createManualOutfit();
+        setGeneratedOutfit(manualOutfit);
+        Alert.alert('Info', 'Generated outfit using your selected items. For better AI suggestions, check your Ollama connection.');
+        return;
+      }
+      
+      const outfit = parseOutfitResponse(response);
+      console.log('✅ Parsed outfit:', outfit);
+      
+      if (!outfit) {
+        console.log('❌ No outfit parsed successfully - creating manual outfit');
+        const manualOutfit = createManualOutfit();
+        setGeneratedOutfit(manualOutfit);
+        Alert.alert('Info', 'Generated outfit from your selected items. AI parsing may need improvement.');
+      } else {
+        setGeneratedOutfit(outfit);
+      }
+      
+    } catch (error) {
+      console.error('❌ Error generating outfit:', error);
+      
       const manualOutfit = createManualOutfit();
       setGeneratedOutfit(manualOutfit);
-      Alert.alert('Info', 'Generated outfit using your selected items. For better AI suggestions, check your Ollama connection.');
-      return;
+      
+      if (error.message.includes('timeout') || error.message.includes('AbortError')) {
+        Alert.alert('Timeout Error', 'Ollama request timed out. Using your selected items to create an outfit.');
+      } else if (error.message.includes('Cannot connect')) {
+        Alert.alert('Connection Error', 'Could not connect to Ollama. Using your selected items instead.');
+      } else {
+        Alert.alert('Generation Error', 'Using your selected items to create an outfit combination.');
+      }
+    } finally {
+      setLoading(false);
     }
-    
-    const outfit = parseOutfitResponse(response);
-    console.log('✅ Parsed outfit:', outfit);
-    
-    if (!outfit) {
-      console.log('❌ No outfit parsed successfully - creating manual outfit');
-      const manualOutfit = createManualOutfit();
-      setGeneratedOutfit(manualOutfit);
-      Alert.alert('Info', 'Generated outfit from your selected items. AI parsing may need improvement.');
-    } else {
-      setGeneratedOutfit(outfit);
-    }
-    
-  } catch (error) {
-    console.error('❌ Error generating outfit:', error);
-    
-    const manualOutfit = createManualOutfit();
-    setGeneratedOutfit(manualOutfit);
-    
-    if (error.message.includes('timeout') || error.message.includes('AbortError')) {
-      Alert.alert('Timeout Error', 'Ollama request timed out. Using your selected items to create an outfit.');
-    } else if (error.message.includes('Cannot connect')) {
-      Alert.alert('Connection Error', 'Could not connect to Ollama. Using your selected items instead.');
-    } else {
-      Alert.alert('Generation Error', 'Using your selected items to create an outfit combination.');
-    }
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   // Create a manual outfit when AI fails - using only selected items
   const createManualOutfit = () => {
@@ -282,35 +304,34 @@ const generateOutfit = async () => {
   };
 
   // Find selected item by name
-  // Improved item finding function
-const findSelectedItemByName = (itemName) => {
-  if (!itemName || itemName.trim() === '') return null;
-  
-  const searchName = itemName.toLowerCase().trim();
-  
-  for (const [category, items] of Object.entries(selectedItems)) {
-    if (!items || !Array.isArray(items)) continue;
+  const findSelectedItemByName = (itemName) => {
+    if (!itemName || itemName.trim() === '') return null;
     
-    // First try exact match
-    let found = items.find(item => 
-      item.name.toLowerCase().trim() === searchName
-    );
+    const searchName = itemName.toLowerCase().trim();
     
-    if (found) return found;
+    for (const [category, items] of Object.entries(selectedItems)) {
+      if (!items || !Array.isArray(items)) continue;
+      
+      // First try exact match
+      let found = items.find(item => 
+        item.name.toLowerCase().trim() === searchName
+      );
+      
+      if (found) return found;
+      
+      // Then try partial match
+      found = items.find(item => 
+        item.name.toLowerCase().includes(searchName) ||
+        searchName.includes(item.name.toLowerCase())
+      );
+      
+      if (found) return found;
+    }
     
-    // Then try partial match
-    found = items.find(item => 
-      item.name.toLowerCase().includes(searchName) ||
-      searchName.includes(item.name.toLowerCase())
-    );
-    
-    if (found) return found;
-  }
-  
-  return null;
-};
+    return null;
+  };
 
-  // Save outfit to Firebase
+  
   const saveOutfitToFirebase = async () => {
     if (!outfitName.trim()) {
       Alert.alert('Error', 'Please enter an outfit name');
@@ -325,13 +346,7 @@ const findSelectedItemByName = (itemName) => {
     setSavingOutfit(true);
     
     try {
-      const user = auth.currentUser;
-      if (!user) {
-        Alert.alert('Error', 'Please log in to save outfits');
-        return;
-      }
-
-      // Convert the generated outfit to the format expected by Firebase
+      // Convert the generated outfit to the format expected by the wardrobe context
       const outfitItems = [];
       
       // Add each item from the generated outfit to the items array
@@ -339,7 +354,7 @@ const findSelectedItemByName = (itemName) => {
         if (itemName && itemName !== 'Any shoes' && type !== 'styling') {
           const selectedItem = findSelectedItemByName(itemName);
           if (selectedItem) {
-            // Create a positioned item similar to the AddOutfitScreen format
+            
             const positionedItem = {
               ...selectedItem,
               id: `${selectedItem.id}-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
@@ -352,40 +367,24 @@ const findSelectedItemByName = (itemName) => {
         }
       });
 
-      // Create the outfit document
       const outfitData = {
         id: `outfit-${Date.now()}-${Math.floor(Math.random() * 100000)}`,
         name: outfitName.trim(),
         description: outfitDescription.trim() || generatedOutfit.items.styling || 'AI Generated Outfit',
         items: outfitItems,
-        createdAt: serverTimestamp(),
-        // Note: imageUri would be null since we're not capturing a visual arrangement
+        selectedItems: selectedItems, // Include the original selected items
         imageUri: null
       };
 
-      // Save to Firebase
-      const outfitsRef = collection(db, 'users', user.uid, 'outfits');
-      await addDoc(outfitsRef, outfitData);
+      await addOutfit(outfitData);
       
-      Alert.alert(
-        'Success', 
-        'Outfit saved successfully!',
-        [
-          {
-            text: 'View Saved Outfits',
-            onPress: () => router.push('/savedOutfits')
-          },
-          {
-            text: 'Generate Another',
-            onPress: () => {
-              setShowSaveForm(false);
-              setOutfitName('');
-              setOutfitDescription('');
-              setGeneratedOutfit(null);
-            }
-          }
-        ]
-      );
+      // Show success popup instead of Alert
+      showSuccessMessage();
+      
+      // Hide save form and reset
+      setShowSaveForm(false);
+      setOutfitName('');
+      setOutfitDescription('');
       
     } catch (error) {
       console.error('Error saving outfit:', error);
@@ -558,6 +557,27 @@ const findSelectedItemByName = (itemName) => {
     );
   };
 
+  // Render success popup
+  const renderSuccessPopup = () => {
+    if (!showSuccessPopup) return null;
+
+    return (
+      <Modal
+        transparent={true}
+        visible={showSuccessPopup}
+        animationType="none"
+        onRequestClose={() => setShowSuccessPopup(false)}
+      >
+        <View style={styles.popupOverlay}>
+          <Animated.View style={[styles.successPopup, { opacity: fadeAnim }]}>
+            <MaterialIcons name="check-circle" size={40} color="#4A6D51" />
+            <Text style={styles.successPopupText}>Outfit Saved</Text>
+          </Animated.View>
+        </View>
+      </Modal>
+    );
+  };
+
   if (fetchingWardrobe) {
     return (
       <View style={styles.loadingContainer}>
@@ -637,10 +657,14 @@ const findSelectedItemByName = (itemName) => {
             </TouchableOpacity>
           )}
         </ScrollView>
+
+        {/* Success Popup */}
+        {renderSuccessPopup()}
       </View>
     </>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

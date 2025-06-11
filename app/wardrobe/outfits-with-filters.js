@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView, TouchableOpacity, Image, ActivityIndicator, Alert, TextInput } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { collection, query, getDocs, addDoc, serverTimestamp, doc, getDoc } from 'firebase/firestore';
+import { collection, query, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db, auth } from '../../firebaseConfig'; 
 import { generateWithLlama } from '../../services/ollamaService'; 
+import { useWardrobe } from '../../context/wardrobeContext'; // Added this import
 
 export default function OutfitsWithFiltersScreen() {
   const [wardrobeItems, setWardrobeItems] = useState({});
@@ -31,6 +32,7 @@ export default function OutfitsWithFiltersScreen() {
   
   const router = useRouter();
   const { selectedItems: selectedItemsParam, filters } = useLocalSearchParams();
+  const { addOutfit } = useWardrobe(); // Added this line
 
   // Parse selected items and filters from URL params
   useEffect(() => {
@@ -132,7 +134,7 @@ export default function OutfitsWithFiltersScreen() {
       return "No items selected";
     }
 
-    // Build user context based on selected filters - FIXED LOGIC
+    
     let userContextParts = [];
     let hasValidPreferences = false;
     
@@ -394,7 +396,7 @@ YOUR RESPONSE: Create ONE outfit using the exact format above, considering the u
     return null;
   };
 
-  // Find selected item by name (same as before)
+
   const findSelectedItemByName = (itemName) => {
     if (!itemName || itemName.trim() === '') return null;
     
@@ -422,91 +424,70 @@ YOUR RESPONSE: Create ONE outfit using the exact format above, considering the u
     return null;
   };
 
-  // Save outfit to Firebase (same as before)
+  
   const saveOutfitToFirebase = async () => {
-    if (!outfitName.trim()) {
-      Alert.alert('Error', 'Please enter an outfit name');
-      return;
-    }
+  if (!outfitName.trim()) {
+    Alert.alert('Error', 'Please enter an outfit name');
+    return;
+  }
 
-    if (!generatedOutfit) {
-      Alert.alert('Error', 'No outfit to save');
-      return;
-    }
+  if (!generatedOutfit) {
+    Alert.alert('Error', 'No outfit to save');
+    return;
+  }
 
-    setSavingOutfit(true);
+  setSavingOutfit(true);
+  
+  try {
+    // Convert the generated outfit to the format expected by the wardrobe context
+    const outfitItems = [];
     
-    try {
-      const user = auth.currentUser;
-      if (!user) {
-        Alert.alert('Error', 'Please log in to save outfits');
-        return;
-      }
-
-      // Convert the generated outfit to the format expected by Firebase
-      const outfitItems = [];
-      
-      // Add each item from the generated outfit to the items array
-      Object.entries(generatedOutfit.items).forEach(([type, itemName]) => {
-        if (itemName && itemName !== 'Any shoes' && type !== 'styling') {
-          const selectedItem = findSelectedItemByName(itemName);
-          if (selectedItem) {
-            // Create a positioned item
-            const positionedItem = {
-              ...selectedItem,
-              id: `${selectedItem.id}-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
-              x: Math.random() * 200,
-              y: Math.random() * 200,
-              scale: 1.0
-            };
-            outfitItems.push(positionedItem);
-          }
+    Object.entries(generatedOutfit.items).forEach(([type, itemName]) => {
+      if (itemName && itemName !== 'Any shoes' && type !== 'styling') {
+        const selectedItem = findSelectedItemByName(itemName);
+        if (selectedItem) {
+          
+          const positionedItem = {
+            ...selectedItem,
+            id: `${selectedItem.id}-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+            x: Math.random() * 200, // Random positioning
+            y: Math.random() * 200,
+            scale: 1.0
+          };
+          outfitItems.push(positionedItem);
         }
-      });
+      }
+    });
 
-      // Create the outfit document
-      const outfitData = {
-        id: `outfit-${Date.now()}-${Math.floor(Math.random() * 100000)}`,
-        name: outfitName.trim(),
-        description: outfitDescription.trim() || generatedOutfit.items.styling || 'Personalized AI Generated Outfit',
-        items: outfitItems,
-        createdAt: serverTimestamp(),
-        isPersonalized: true, // Flag to indicate this was generated with filters
-        usedFilters: selectedFilters,
-        imageUri: null
-      };
+    const outfitData = {
+      id: `outfit-${Date.now()}-${Math.floor(Math.random() * 100000)}`,
+      name: outfitName.trim(),
+      description: outfitDescription.trim() || generatedOutfit.items.styling || 'Personalized AI Generated Outfit',
+      items: outfitItems,
+      selectedItems: selectedItems, 
+      imageUri: null,
+      isPersonalized: true,
+      usedFilters: selectedFilters,
+      userProfile: userProfile 
+    };
 
-      // Save to Firebase
-      const outfitsRef = collection(db, 'users', user.uid, 'outfits');
-      await addDoc(outfitsRef, outfitData);
-      
-      Alert.alert(
-        'Success', 
-        'Personalized outfit saved successfully!',
-        [
-          {
-            text: 'View Saved Outfits',
-            onPress: () => router.push('/savedOutfits')
-          },
-          {
-            text: 'Generate Another',
-            onPress: () => {
-              setShowSaveForm(false);
-              setOutfitName('');
-              setOutfitDescription('');
-              setGeneratedOutfit(null);
-            }
-          }
-        ]
-      );
-      
-    } catch (error) {
-      console.error('Error saving outfit:', error);
-      Alert.alert('Error', 'Failed to save outfit. Please try again.');
-    } finally {
-      setSavingOutfit(false);
-    }
-  };
+    await addOutfit(outfitData); 
+    
+    // Hide the save form immediately after successful save
+    setShowSaveForm(false);
+    setOutfitName('');
+    setOutfitDescription('');
+    
+    // Show simple success popup
+    Alert.alert('Outfit Saved', 'Your personalized outfit has been saved successfully!');
+    
+  } catch (error) {
+    console.error('Error saving outfit:', error);
+    Alert.alert('Error', 'Failed to save outfit. Please try again.');
+  } finally {
+    setSavingOutfit(false);
+  }
+};
 
   // Show save form
   const handleSaveOutfit = () => {

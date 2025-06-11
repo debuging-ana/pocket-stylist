@@ -46,7 +46,7 @@ OR check if it's responding:
 */
 
 
-const OLLAMA_BASE_URL = "http://YOUR_LOCAL_IP:11434" // REPLACE WITH UR IP
+const OLLAMA_BASE_URL = "http://172.29.81.13:11434" // REPLACE WITH UR IP
 
 // connection test with timeout
 const testConnection = async () => {
@@ -103,7 +103,7 @@ export const generateWithLlama = async (prompt, timeoutMs = 120000) => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "llama3", // switched from tinyllama, mistral to that after testing
+        model: "llama3.2", // switched from tinyllama, mistral to that after testing
         prompt: `You are a fashion assistant. ${prompt}`, // role context
         stream: false,
         options: { 

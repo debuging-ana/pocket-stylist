@@ -18,7 +18,7 @@ export default {
         NSAppTransportSecurity: {
           NSAllowsArbitraryLoads: true,
           NSExceptionDomains: {
-            "YOUR_LOCAL_IP": { // GUYS REPLACE WITH UR IP (using ipconfig for windows)
+            "172.29.81.13": { // GUYS REPLACE WITH UR IP (using ipconfig for windows)
               NSExceptionAllowsInsecureHTTPLoads: true,
               NSIncludesSubdomains: true
             },
@@ -50,7 +50,7 @@ export default {
       firebaseMeasurementId: process.env.FIREBASE_MEASUREMENT_ID,
       removeBgApiKey: process.env.REMOVE_BG_API_KEY,
       deepAiApiKey: process.env.DEEPAI_API_KEY,
-      ollamaBaseUrl: process.env.OLLAMA_BASE_URL || "http://YOUR_LOCAL_IP:11434" // REPLACE WITH UR IP
+      ollamaBaseUrl: process.env.OLLAMA_BASE_URL || "http://172.29.81.1311434" // REPLACE WITH UR IP
     },
 
     plugins: [
